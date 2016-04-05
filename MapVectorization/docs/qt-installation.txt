@@ -1,0 +1,11 @@
+Qt 5.5.1 installation
+
+1) unzip 5.5.1-x64-shared.zip to C:\Qt\
+2) add new system variable  
+Name: QTDIR
+Value: C:\Qt\5.5.1-x64-shared
+3) add %QTDIR%\bin; to PATH (system variable)
+
+Link:
+1) Qt 5.5.1 x64 shared
+https://www.dropbox.com/s/55j2fa0aplfu5dq/5.5.1-x64-shared.zip?dl=0

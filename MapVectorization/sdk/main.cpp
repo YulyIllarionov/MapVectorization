@@ -3,9 +3,11 @@
 
 #include "stdafx.h"
 
+// OpenCV include example
 #include "opencv2/opencv.hpp" 
 #include "opencv/cv.h"
 #include "opencv/highgui.h"
+//
 
 using namespace cv;
 using namespace std;
