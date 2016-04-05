@@ -7,11 +7,17 @@
 #include "opencv/cv.h"
 #include "opencv/highgui.h"
 
+using namespace cv;
+using namespace std;
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-  cv::Mat img = cv::imread("fon.bmp"); //Считываем картинку в матрицу img
-  cv::waitKey();
+    Mat img = imread("images/jp1263.jpg"); 
+
+    namedWindow("Map", WINDOW_KEEPRATIO);
+    imshow("Map", img);
+
+    waitKey();
 
 	return 0;
 }
