@@ -3,14 +3,17 @@
 
 #include "stdafx.h"
 
+// OpenCV include example
 #include "opencv2/opencv.hpp" 
 #include "opencv/cv.h"
 #include "opencv/highgui.h"
-
+//
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-  cv::Mat img = cv::imread("fon.bmp"); //Считываем картинку в матрицу img
+
+  // OpenCV usage example
+  cv::Mat img = cv::imread("fon.bmp");
   cv::waitKey();
 
 	return 0;
