@@ -23,12 +23,13 @@ FORMS    += mainwindow.ui \
     imageviewerwidget.ui
 
 # Подключение openCV библиотеки
-INCLUDEPATH += C:\opencv\release\install\include
-LIBS += C:\opencv\release\bin\libopencv_core2411.dll
-LIBS += C:\opencv\release\bin\libopencv_contrib2411.dll
-LIBS += C:\opencv\release\bin\libopencv_highgui2411.dll
-LIBS += C:\opencv\release\bin\libopencv_imgproc2411.dll
-LIBS += C:\opencv\release\bin\libopencv_calib3d2411.dll
-LIBS += C:\opencv\release\bin\libopencv_objdetect2411.dll
-LIBS += C:\opencv\release\bin\libopencv_ml2411.dll
+INCLUDEPATH += C:\opencv3.1\release\include
+LIBS += C:\opencv3.1\release\x86\mingw\bin\libopencv_core310.dll
+LIBS += C:\opencv3.1\release\x86\mingw\bin\libopencv_highgui310.dll
+LIBS += C:\opencv3.1\release\x86\mingw\bin\libopencv_imgproc310.dll
+LIBS += C:\opencv3.1\release\x86\mingw\bin\libopencv_calib3d310.dll
+LIBS += C:\opencv3.1\release\x86\mingw\bin\libopencv_objdetect310.dll
+LIBS += C:\opencv3.1\release\x86\mingw\bin\libopencv_ml310.dll
+LIBS += C:\opencv3.1\release\x86\mingw\bin\libopencv_features2d310.dll
+LIBS += C:\opencv3.1\release\x86\mingw\bin\libopencv_imgcodecs310.dll
 ########################################################
