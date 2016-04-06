@@ -23,6 +23,12 @@ FORMS    += mainwindow.ui \
     imageviewerwidget.ui
 
 # Подключение openCV библиотеки
-INCLUDEPATH += ..\3rdparty\opencv\include
-LIBS += ..\3rdparty\opencv\bin\opencv_world310.dll
+INCLUDEPATH += C:\opencv\release\install\include
+LIBS += C:\opencv\release\bin\libopencv_core2411.dll
+LIBS += C:\opencv\release\bin\libopencv_contrib2411.dll
+LIBS += C:\opencv\release\bin\libopencv_highgui2411.dll
+LIBS += C:\opencv\release\bin\libopencv_imgproc2411.dll
+LIBS += C:\opencv\release\bin\libopencv_calib3d2411.dll
+LIBS += C:\opencv\release\bin\libopencv_objdetect2411.dll
+LIBS += C:\opencv\release\bin\libopencv_ml2411.dll
 ########################################################
