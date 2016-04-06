@@ -26,18 +26,7 @@ ImageViewerWidget::~ImageViewerWidget()
     delete ui;
 }
 
-void ImageViewerWidget::wheelEvent(QWheelEvent *ev)
-{
-    switch(_state)
-    {
-        case zoom:
-        {
-            if(ev->delta()>0) zoomIn();
-            else zoomOut();
-            break;
-        }
-    }
-}
+
 void ImageViewerWidget::zoomIn()
 {
     if((label->pixmap()->width()>label->width()*1.25)&&(label->pixmap()->height()>label->height()*1.25))
@@ -60,7 +49,7 @@ void ImageViewerWidget::setNormalSizeOfImage()
     else
     {
         int temp_height=ui->scrollArea->height()-ui->scrollArea->horizontalScrollBar()->height();
-        label->resize(ui->scrollArea->width()*temp_height/label->pixmap()->height(),
+        label->resize(label->pixmap()->width()*temp_height/label->pixmap()->height(),
                       temp_height);
     }
 }

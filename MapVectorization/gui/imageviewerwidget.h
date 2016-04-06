@@ -34,8 +34,6 @@ public slots:
     void zoomIn();
     void zoomOut();
     void setNormalSizeOfImage();
-protected slots:
-    void wheelEvent(QWheelEvent *ev);
 private:
     Ui::ImageViewerWidget *ui;
     cv::Mat cv_image;

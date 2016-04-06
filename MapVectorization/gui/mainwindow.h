@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QFileDialog>
+#include <QInputDialog>
 #include "imageviewerwidget.h"
 
 namespace Ui {
@@ -19,6 +20,8 @@ public:
 
 private slots:
     void on_OpenImage_triggered();
+
+    void on_actionSharpen_triggered();
 
 private:
     Ui::MainWindow *ui;
