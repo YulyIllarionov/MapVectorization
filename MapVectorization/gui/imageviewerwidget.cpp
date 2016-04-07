@@ -26,6 +26,17 @@ ImageViewerWidget::~ImageViewerWidget()
     delete ui;
 }
 
+void ImageViewerWidget::SetState(State state)
+{
+    _state=state;
+}
+
+void ImageViewerWidget::mousePressEvent(QMouseEvent *event)
+{
+    if(_state==pipette)
+        emit sendPointColor(image.pixel(image.width()/label->width()*event->x(),image.height()/label->height()*event->y()));
+}
+
 
 void ImageViewerWidget::zoomIn()
 {
@@ -52,6 +63,11 @@ void ImageViewerWidget::setNormalSizeOfImage()
         label->resize(label->pixmap()->width()*temp_height/label->pixmap()->height(),
                       temp_height);
     }
+}
+
+QLabel *ImageViewerWidget::GetLabel()
+{
+    return label;
 }
 void ImageViewerWidget::scaleImage(double factor)
 {

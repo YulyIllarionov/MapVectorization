@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QInputDialog>
+#include "layersdefinewidget.h"
 #include "imageviewerwidget.h"
 
 namespace Ui {
@@ -22,6 +23,8 @@ private slots:
     void on_OpenImage_triggered();
 
     void on_actionSharpen_triggered();
+
+    void on_action_LayersEditor_triggered();
 
 private:
     Ui::MainWindow *ui;
