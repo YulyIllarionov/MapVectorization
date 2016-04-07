@@ -14,13 +14,16 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    imageviewerwidget.cpp
+    imageviewerwidget.cpp \
+    layersdefinewidget.cpp
 
 HEADERS  += mainwindow.h \
-    imageviewerwidget.h
+    imageviewerwidget.h \
+    layersdefinewidget.h
 
 FORMS    += mainwindow.ui \
-    imageviewerwidget.ui
+    imageviewerwidget.ui \
+    layersdefinewidget.ui
 
 # Подключение openCV библиотеки
 INCLUDEPATH += C:\opencv3.1\release\include
@@ -33,3 +36,6 @@ LIBS += C:\opencv3.1\release\x86\mingw\bin\libopencv_ml310.dll
 LIBS += C:\opencv3.1\release\x86\mingw\bin\libopencv_features2d310.dll
 LIBS += C:\opencv3.1\release\x86\mingw\bin\libopencv_imgcodecs310.dll
 ########################################################
+
+RESOURCES += \
+    res.qrc

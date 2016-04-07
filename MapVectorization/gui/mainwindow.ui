@@ -37,6 +37,7 @@
     </property>
     <addaction name="actionZoom_in"/>
     <addaction name="actionZoom_out"/>
+    <addaction name="action_LayersEditor"/>
     <addaction name="actionSharpen"/>
    </widget>
    <addaction name="menu"/>
@@ -75,6 +76,11 @@
   <action name="actionSharpen">
    <property name="text">
     <string>Увеличить резкость</string>
+   </property>
+  </action>
+  <action name="action_LayersEditor">
+   <property name="text">
+    <string>Редактор слоев</string>
    </property>
   </action>
  </widget>
