@@ -24,12 +24,12 @@
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
     <Filter Include="Generated Files\Debug">
-      <UniqueIdentifier>{4c06ee11-b613-42cf-ba63-03321b456c54}</UniqueIdentifier>
+      <UniqueIdentifier>{b7d0d8c2-ff42-464e-927e-48e293caee13}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
     <Filter Include="Generated Files\Release">
-      <UniqueIdentifier>{517ca17a-ef5c-4fee-82fd-9d9a1983259e}</UniqueIdentifier>
+      <UniqueIdentifier>{a55d32fd-0987-4cbc-835a-0764da875d33}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
@@ -41,30 +41,36 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="qtquick2applicationviewer.cpp">
+    <ClCompile Include="mapappmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_qtquick2applicationviewer.cpp">
+    <ClCompile Include="GeneratedFiles\Debug\moc_mapappmain.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_qtquick2applicationviewer.cpp">
+    <ClCompile Include="GeneratedFiles\Release\moc_mapappmain.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\qrc_mapappmain.cpp">
+      <Filter>Generated Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_mapappmain.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="main.qml" />
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="qtquick2applicationviewer.h">
+    <CustomBuild Include="mapappmain.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="map-app.rc" />
+    <CustomBuild Include="mapappmain.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="mapappmain.qrc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
