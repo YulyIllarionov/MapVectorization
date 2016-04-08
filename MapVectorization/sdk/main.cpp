@@ -9,12 +9,17 @@
 #include "opencv/highgui.h"
 //
 
+using namespace cv;
+using namespace std;
+
 int _tmain(int argc, _TCHAR* argv[])
 {
+    Mat img = imread("images/jp1263.jpg"); 
 
-  // OpenCV usage example
-  cv::Mat img = cv::imread("fon.bmp");
-  cv::waitKey();
+    namedWindow("Map", WINDOW_KEEPRATIO);
+    imshow("Map", img);
+
+    waitKey();
 
 	return 0;
 }
