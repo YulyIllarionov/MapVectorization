@@ -29,9 +29,9 @@ void WRaster::Initialize(std::string img_path)
 // ------------------------------------------------------------
 
 // ------------------------------------------------------------
-void WRaster::IncreaseSharpness(cv::Mat& src, cv::Mat& dst, double k)
+void WRaster::IncreaseSharpness(double k)
 {
-    cv::filter2D(src, dst, src.depth(), utils::WsharpKernel(k));
+    cv::filter2D(m_raster, m_raster, m_raster.depth(), utils::WsharpKernel(k));
 }
 // ------------------------------------------------------------
 

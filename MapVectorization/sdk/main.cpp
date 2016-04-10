@@ -18,20 +18,15 @@ int _tmain(int argc, _TCHAR* argv[])
 {
     Mat img = imread("images/part2.jpg"); 
     Mat imgSharp1;
-    Mat imgSharp2;
 
     blur(img, imgSharp1, cv::Size(3, 3));
     addWeighted(img, 1.9, imgSharp1, -0.9, 0, imgSharp1);
-
-    //SDK_NAMESPACE::Wsharpen(img, imgSharp1, 2);
-
+    
     namedWindow("Map", WINDOW_KEEPRATIO);
     namedWindow("MapSharp1", WINDOW_KEEPRATIO);
-    namedWindow("MapSharp2", WINDOW_KEEPRATIO);
 
     imshow("Map", img);
     imshow("MapSharp1", imgSharp1);
-    imshow("MapSharp2", imgSharp2);
 
     waitKey();
 

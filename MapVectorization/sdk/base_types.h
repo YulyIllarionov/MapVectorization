@@ -39,7 +39,7 @@ public:
 
   virtual ~WRaster(){}
 
-  void IncreaseSharpness(cv::Mat& src, cv::Mat& dst, double k);
+  void IncreaseSharpness(double k);
 
 public:
 
