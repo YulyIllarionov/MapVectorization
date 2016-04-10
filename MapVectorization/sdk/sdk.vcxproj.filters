@@ -25,12 +25,6 @@
     <Filter Include="Source Files\util">
       <UniqueIdentifier>{15c6c2a8-ab05-4ac9-8cb9-b36acd2a4849}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\graphics">
-      <UniqueIdentifier>{991e2f8c-10dd-4cfb-9923-721d5891dc4d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\graphics">
-      <UniqueIdentifier>{e1024ece-fb98-4839-bca5-81acd72e473b}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -54,9 +48,6 @@
     <ClInclude Include="base_types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphics\img_preprocessing.h">
-      <Filter>Header Files\graphics</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -73,9 +64,6 @@
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="graphics\img_preprocessing.cpp">
-      <Filter>Source Files\graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

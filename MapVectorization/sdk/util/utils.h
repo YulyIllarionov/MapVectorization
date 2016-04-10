@@ -11,13 +11,17 @@
 
 #include "..\app\sdk_const.h"
 
+#include "opencv2/opencv.hpp" 
+#include "opencv/cv.h"
+#include "opencv/highgui.h"
+
 SDK_BEGIN_NAMESPACE
 
 namespace utils
 {
   
   std::string WSTR2STR(const std::wstring& wide);
-
+  cv::Mat WsharpKernel(double k);
 }
 
 SDK_END_NAMESPACE

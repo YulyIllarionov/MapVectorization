@@ -8,7 +8,6 @@
 #include "opencv/cv.h"
 #include "opencv/highgui.h"
 
-#include "graphics/img_preprocessing.h"
 //
 
 using namespace cv;
@@ -24,7 +23,7 @@ int _tmain(int argc, _TCHAR* argv[])
     blur(img, imgSharp1, cv::Size(3, 3));
     addWeighted(img, 1.9, imgSharp1, -0.9, 0, imgSharp1);
 
-    SDK_NAMESPACE::Wsharpen(img, imgSharp1, 2);
+    //SDK_NAMESPACE::Wsharpen(img, imgSharp1, 2);
 
     namedWindow("Map", WINDOW_KEEPRATIO);
     namedWindow("MapSharp1", WINDOW_KEEPRATIO);

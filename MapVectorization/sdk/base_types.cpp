@@ -28,4 +28,11 @@ void WRaster::Initialize(std::string img_path)
 }
 // ------------------------------------------------------------
 
+// ------------------------------------------------------------
+void WRaster::IncreaseSharpness(cv::Mat& src, cv::Mat& dst, double k)
+{
+    cv::filter2D(src, dst, src.depth(), utils::WsharpKernel(k));
+}
+// ------------------------------------------------------------
+
   SDK_END_NAMESPACE

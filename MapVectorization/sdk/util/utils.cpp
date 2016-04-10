@@ -38,5 +38,19 @@ std::string WSTR2STR(const std::wstring& wide)
     return std::string(nstring);
 } 
 
+// ----------------------------------------------------
+// Inline Функция:
+//       1. именование: WsharpKernel(float k) функция возвращающая ядро свертки для увеличения резкости 
+//       2. аргументы функции:  k - коэффицент ядра
+// ----------------------------------------------------
+cv::Mat WsharpKernel(double k)
+{
+    cv::Mat kernel(3, 3, CV_64F, -0.125);
+    kernel *= k;
+    kernel.at<double>(1, 1) = k + 1;
+    return kernel;
+}
+
+
 
 SDK_END_NAMESPACE
