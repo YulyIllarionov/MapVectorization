@@ -1,14 +1,11 @@
 #include "stdafx.h"
-#include "qtquick2applicationviewer.h"
-#include <QtGui/QGuiApplication>
+#include "mapappmain.h"
+#include <QtWidgets/QApplication>
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
-
-    QtQuick2ApplicationViewer viewer;
-    viewer.setMainQmlFile(QStringLiteral("main.qml"));
-    viewer.showExpanded();
-
-    return app.exec();
+    QApplication a(argc, argv);
+    mapAppMain w;
+    w.show();
+    return a.exec();
 }

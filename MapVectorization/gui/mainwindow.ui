@@ -31,7 +31,17 @@
     </property>
     <addaction name="OpenImage"/>
    </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Инструменты</string>
+    </property>
+    <addaction name="actionZoom_in"/>
+    <addaction name="actionZoom_out"/>
+    <addaction name="action_LayersEditor"/>
+    <addaction name="actionSharpen"/>
+   </widget>
    <addaction name="menu"/>
+   <addaction name="menu_2"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -45,6 +55,32 @@
   <action name="OpenImage">
    <property name="text">
     <string>&amp;Открыть изображение...</string>
+   </property>
+  </action>
+  <action name="actionZoom_in">
+   <property name="text">
+    <string>Zoom in</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+=</string>
+   </property>
+  </action>
+  <action name="actionZoom_out">
+   <property name="text">
+    <string>Zoom out</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+-</string>
+   </property>
+  </action>
+  <action name="actionSharpen">
+   <property name="text">
+    <string>Увеличить резкость</string>
+   </property>
+  </action>
+  <action name="action_LayersEditor">
+   <property name="text">
+    <string>Редактор слоев</string>
    </property>
   </action>
  </widget>

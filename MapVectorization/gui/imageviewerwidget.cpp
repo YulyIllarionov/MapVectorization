@@ -26,18 +26,18 @@ ImageViewerWidget::~ImageViewerWidget()
     delete ui;
 }
 
-void ImageViewerWidget::wheelEvent(QWheelEvent *ev)
+void ImageViewerWidget::SetState(State state)
 {
-    switch(_state)
-    {
-        case zoom:
-        {
-            if(ev->delta()>0) zoomIn();
-            else zoomOut();
-            break;
-        }
-    }
+    _state=state;
 }
+
+void ImageViewerWidget::mousePressEvent(QMouseEvent *event)
+{
+    if(_state==pipette)
+        emit sendPointColor(image.pixel(image.width()/label->width()*event->x(),image.height()/label->height()*event->y()));
+}
+
+
 void ImageViewerWidget::zoomIn()
 {
     if((label->pixmap()->width()>label->width()*1.25)&&(label->pixmap()->height()>label->height()*1.25))
@@ -60,9 +60,14 @@ void ImageViewerWidget::setNormalSizeOfImage()
     else
     {
         int temp_height=ui->scrollArea->height()-ui->scrollArea->horizontalScrollBar()->height();
-        label->resize(ui->scrollArea->width()*temp_height/label->pixmap()->height(),
+        label->resize(label->pixmap()->width()*temp_height/label->pixmap()->height(),
                       temp_height);
     }
+}
+
+QLabel *ImageViewerWidget::GetLabel()
+{
+    return label;
 }
 void ImageViewerWidget::scaleImage(double factor)
 {

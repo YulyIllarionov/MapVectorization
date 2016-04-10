@@ -2,7 +2,7 @@
 #define IMAGEVIEWERWIDGET_H
 
 #include <QWidget>
-#include <QWheelEvent>
+#include <QMouseEvent>
 #include <QScrollBar>
 #include <QLabel>
 #include "opencv/cv.h"
@@ -15,7 +15,7 @@
 
 enum State
 {
-    def,zoom
+    def,zoom,pipette
 };
 
 namespace Ui {
@@ -30,12 +30,16 @@ public:
     explicit ImageViewerWidget(QWidget *parent = 0);
     ImageViewerWidget(QString filename,QWidget *parent = 0);
     ~ImageViewerWidget();
+    void SetState(State state);
+    QLabel *GetLabel();
+protected:
+    virtual void mousePressEvent(QMouseEvent *event);
+signals:
+    void sendPointColor(QRgb);
 public slots:
     void zoomIn();
     void zoomOut();
     void setNormalSizeOfImage();
-protected slots:
-    void wheelEvent(QWheelEvent *ev);
 private:
     Ui::ImageViewerWidget *ui;
     cv::Mat cv_image;
