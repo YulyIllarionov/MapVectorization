@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/new/icons">
         <file>pipette.ico</file>
+        <file>add.ico</file>
+        <file>remove.ico</file>
     </qresource>
 </RCC>

@@ -18,7 +18,9 @@ SOURCES += main.cpp\
     layersdefinewidget.cpp \
     base_types.cpp \
     imageviewer.cpp \
-    mypixmapitem.cpp
+    mypixmapitem.cpp \
+    layersviewer.cpp \
+    layerconfiguredialog.cpp
 
 HEADERS  += mainwindow.h \
     imageviewerwidget.h \
@@ -26,11 +28,15 @@ HEADERS  += mainwindow.h \
     app/sdk_const.h \
     base_types.h \
     imageviewer.h \
-    mypixmapitem.h
+    mypixmapitem.h \
+    layersviewer.h \
+    layerconfiguredialog.h
 
 FORMS    += mainwindow.ui \
     imageviewerwidget.ui \
-    layersdefinewidget.ui
+    layersdefinewidget.ui \
+    layersviewer.ui \
+    layerconfiguredialog.ui
 
 # Подключение openCV библиотеки
 INCLUDEPATH += C:\opencv3.1\release\include
