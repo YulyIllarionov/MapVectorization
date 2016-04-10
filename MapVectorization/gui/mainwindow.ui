@@ -35,13 +35,20 @@
     <property name="title">
      <string>Инструменты</string>
     </property>
-    <addaction name="actionZoom_in"/>
-    <addaction name="actionZoom_out"/>
-    <addaction name="action_LayersEditor"/>
-    <addaction name="actionSharpen"/>
+    <addaction name="LayersEditor"/>
+    <addaction name="SharpenAction"/>
+   </widget>
+   <widget class="QMenu" name="menu_3">
+    <property name="title">
+     <string>Вид</string>
+    </property>
+    <addaction name="ZoomIn"/>
+    <addaction name="ZoomOut"/>
+    <addaction name="FitImage"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
+   <addaction name="menu_3"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -57,7 +64,7 @@
     <string>&amp;Открыть изображение...</string>
    </property>
   </action>
-  <action name="actionZoom_in">
+  <action name="ZoomIn">
    <property name="text">
     <string>Zoom in</string>
    </property>
@@ -65,7 +72,7 @@
     <string>Ctrl+=</string>
    </property>
   </action>
-  <action name="actionZoom_out">
+  <action name="ZoomOut">
    <property name="text">
     <string>Zoom out</string>
    </property>
@@ -73,14 +80,19 @@
     <string>Ctrl+-</string>
    </property>
   </action>
-  <action name="actionSharpen">
+  <action name="SharpenAction">
    <property name="text">
     <string>Увеличить резкость</string>
    </property>
   </action>
-  <action name="action_LayersEditor">
+  <action name="LayersEditor">
    <property name="text">
     <string>Редактор слоев</string>
+   </property>
+  </action>
+  <action name="FitImage">
+   <property name="text">
+    <string>Fit Image</string>
    </property>
   </action>
  </widget>

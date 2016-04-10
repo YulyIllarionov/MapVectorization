@@ -15,11 +15,18 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     imageviewerwidget.cpp \
-    layersdefinewidget.cpp
+    layersdefinewidget.cpp \
+    base_types.cpp \
+    imageviewer.cpp \
+    mypixmapitem.cpp
 
 HEADERS  += mainwindow.h \
     imageviewerwidget.h \
-    layersdefinewidget.h
+    layersdefinewidget.h \
+    app/sdk_const.h \
+    base_types.h \
+    imageviewer.h \
+    mypixmapitem.h
 
 FORMS    += mainwindow.ui \
     imageviewerwidget.ui \
