@@ -17,11 +17,11 @@ SDK_BEGIN_NAMESPACE
 
 
 //  Enumerator
-template <typename T> class IEnumItem {
+class IEnumItem {
 public:
   // return true - next item
   // return false - end of enum
-  virtual bool Next(T* item) const = 0;
+  virtual bool Next(IEnumItem* item) const = 0;
 
   // reset the enumerator
   virtual void Reset() const = 0;
@@ -29,8 +29,14 @@ public:
 protected:
   virtual ~IEnumItem() {}
 };
-
-typedef std::vector<cv::Mat> LayersContainer;
+// ------------------------------------------------------------
+struct WLayer
+{
+  cv::Mat     m_data;
+  cv::Vec3b   m_color;
+};
+// ------------------------------------------------------------
+typedef std::vector<WLayer> LayersContainer;
 // ------------------------------------------------------------
 class WRaster //: public IEnumItem<cv::Mat>
 {
@@ -56,13 +62,13 @@ private:
   void Initialize(std::string img_path);
 
 public:
-
-  cv::Mat         m_raster;
+  
+  cv::Mat           m_raster;
+  LayersContainer   m_layers;
 
 private:
 
 //LayersContainer::const_iterator   m_layer_cit;
-  LayersContainer                   m_layers;
   std::wstring                      m_image_path;
 };
 // ------------------------------------------------------------
