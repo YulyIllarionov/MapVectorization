@@ -47,6 +47,12 @@ public:
 
   void IncreaseSharpness(double k);
 
+  void WRaster::AddLayer();
+
+  int WRaster::SetLayerMask(int layerNumber, std::vector<uchar> rgbScope);
+
+  int WRaster::SetLayerColor(int layerNumber, std::vector<uchar> rgbColor);
+    
 public:
 
   //bool NextLayer(cv::Mat* layer) const { return Next(layer); }
