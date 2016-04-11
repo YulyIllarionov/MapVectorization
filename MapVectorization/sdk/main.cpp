@@ -18,22 +18,35 @@ using namespace std;
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-    SDK_NAMESPACE::WRaster raster("images/part2.jpg");
-    SDK_NAMESPACE::utils::SetTransparent(raster.m_raster, Mat(), 127);
+    SDK_NAMESPACE::WRaster raster("../sample/map/cu24.png");
+    //raster.IncreaseSharpness(1.8);
+    raster.AddLayer();
+    vector<uchar> scope;
+    scope.push_back(150);
+    scope.push_back(255);
+    scope.push_back(0);
+    scope.push_back(150);
+    scope.push_back(0);
+    scope.push_back(255);
+    Vec4b vect = raster.m_raster.at<Vec4b>(2350, 2120);
+    raster.SetLayerMask(0, scope);
+    SDK_NAMESPACE::utils::SetTransparent(raster.m_raster, raster.m_layers.at(0).m_data, 2);
+    imwrite("../sample/map/cu24Changed.png", raster.m_raster);
 
-    Mat img = imread("images/part2.jpg"); 
-    Mat imgSharp1;
 
-    blur(img, imgSharp1, cv::Size(3, 3));
-    addWeighted(img, 1.9, imgSharp1, -0.9, 0, imgSharp1);
-    
-    namedWindow("Map", WINDOW_KEEPRATIO);
-    namedWindow("MapSharp1", WINDOW_KEEPRATIO);
-
-    imshow("Map", raster.m_raster);
-    imshow("MapSharp1", imgSharp1);
-
-    waitKey();
+    //Mat img = imread("images/part2.jpg"); d
+    //Mat imgSharp1;
+    //
+    //blur(img, imgSharp1, cv::Size(3, 3));
+    //addWeighted(img, 1.9, imgSharp1, -0.9, 0, imgSharp1);
+    //
+    //namedWindow("Map", WINDOW_KEEPRATIO);
+    //namedWindow("MapSharp1", WINDOW_KEEPRATIO);
+    //
+    //imshow("Map", raster.m_raster);
+    //imshow("MapSharp1", imgSharp1);
+    //
+    //waitKey();
 
 	return 0;
 }
