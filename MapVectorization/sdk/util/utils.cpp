@@ -11,7 +11,7 @@
 
 SDK_BEGIN_NAMESPACE
 
-using namespace utils;
+namespace utils {
 
 std::string WSTR2STR(const std::wstring& wide)
 {
@@ -51,6 +51,6 @@ cv::Mat WsharpKernel(double k)
     return kernel;
 }
 
-
+}
 
 SDK_END_NAMESPACE
