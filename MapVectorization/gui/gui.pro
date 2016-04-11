@@ -14,8 +14,6 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    imageviewerwidget.cpp \
-    layersdefinewidget.cpp \
     base_types.cpp \
     imageviewer.cpp \
     mypixmapitem.cpp \
@@ -23,8 +21,6 @@ SOURCES += main.cpp\
     layerconfiguredialog.cpp
 
 HEADERS  += mainwindow.h \
-    imageviewerwidget.h \
-    layersdefinewidget.h \
     app/sdk_const.h \
     base_types.h \
     imageviewer.h \
@@ -33,8 +29,6 @@ HEADERS  += mainwindow.h \
     layerconfiguredialog.h
 
 FORMS    += mainwindow.ui \
-    imageviewerwidget.ui \
-    layersdefinewidget.ui \
     layersviewer.ui \
     layerconfiguredialog.ui
 
