@@ -13,7 +13,6 @@
 
 #include "opencv/cxcore.h"
 
-
 SDK_BEGIN_NAMESPACE
 
 
@@ -39,6 +38,8 @@ public:
   WRaster(std::string img_path);
 
   virtual ~WRaster(){}
+
+  void IncreaseSharpness(double k);
 
 public:
 
