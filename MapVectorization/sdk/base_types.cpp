@@ -25,6 +25,7 @@ void WRaster::Initialize(std::string img_path)
 {
   // Read the file
   m_raster = imread(cv::String(img_path), CV_LOAD_IMAGE_COLOR);   
+  cvtColor(m_raster, m_raster, CV_RGB2RGBA, 4);
 }
 // ------------------------------------------------------------
 

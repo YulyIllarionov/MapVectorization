@@ -51,6 +51,33 @@ cv::Mat WsharpKernel(double k)
     return kernel;
 }
 
+void SetTransparent(cv::Mat& img, cv::Mat& mask, uchar aTrue, int aFalse)
+{
+    if (mask.empty())
+    {
+        for (int y = 0; y < img.rows; y++)
+        {
+            for (int x = 0; x < img.rows; x++)
+            {
+                img.at<cv::Vec4b>(y,x)[3] = aTrue;
+            }
+        }
+    }
+    else
+    {
+        for (int y = 0; y < img.rows; y++)
+        {
+            for (int x = 0; x < img.rows; x++)
+            {
+                if (mask.at<uchar>(y,x) > 0)
+                    img.at<cv::Vec4b>(y, x)[3] = aTrue;
+                else if (aFalse >=0)
+                    img.at<cv::Vec4b>(y, x)[3] = aFalse;
+            }
+        }
+    }
+}
+
 }
 
 SDK_END_NAMESPACE
