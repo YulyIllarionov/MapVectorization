@@ -15,26 +15,29 @@ LayerConfigureDialog::~LayerConfigureDialog()
     delete ui;
 }
 
-void LayerConfigureDialog::focusInEvent(QFocusEvent *)
+bool LayerConfigureDialog::event(QEvent *event)
 {
-    this->setWindowOpacity(1.0);
-}
-
-void LayerConfigureDialog::focusOutEvent(QFocusEvent *)
-{
-    this->setWindowOpacity(0.5);
+    if(event->type()==QEvent::WindowActivate)
+        this->setWindowOpacity(1.0);
+    if(event->type()==QEvent::WindowDeactivate)
+        this->setWindowOpacity(0.5);
+    return QWidget::event(event);
 }
 
 void LayerConfigureDialog::GetCoord(int x, int y)
 {
-    QColor rgb=m_image.pixel(x,y);
-    m_r=rgb.red();
-    m_g=rgb.green();
-    m_b=rgb.blue();
-    QPalette palette;
-    palette.setColor(QPalette::Background ,QColor(rgb));
-    ui->SapleFrame->setPalette(palette);
-    ui->Pipette->setChecked(false);
+    if(ui->Pipette->isChecked())
+    {
+        QColor rgb=m_image.pixel(x,y);
+        m_r=rgb.red();
+        m_g=rgb.green();
+        m_b=rgb.blue();
+        QPalette palette;
+        palette.setColor(QPalette::Background ,QColor(rgb));
+        ui->SapleFrame->setPalette(palette);
+        ui->Pipette->setChecked(false);
+        activateWindow();
+    }
 }
 
 void LayerConfigureDialog::UpdateSamples()

@@ -25,3 +25,12 @@ void LayersViewer::on_Add_clicked()
     QObject::connect(m_wgt->GetPixItem(),SIGNAL(sendCoord(int,int)),dlg ,SLOT(GetCoord(int,int)));
     dlg->show();
 }
+
+bool LayersViewer::event(QEvent *event)
+{
+    if(event->type()==QEvent::WindowActivate)
+        this->setWindowOpacity(1.0);
+    if(event->type()==QEvent::WindowDeactivate)
+        this->setWindowOpacity(0.5);
+    return QWidget::event(event);
+}

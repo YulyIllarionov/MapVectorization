@@ -19,8 +19,7 @@ public:
     explicit LayerConfigureDialog(QImage image, QWidget *parent = 0);
     ~LayerConfigureDialog();
 protected:
-    void focusInEvent(QFocusEvent *);
-    void focusOutEvent(QFocusEvent *);
+    bool event(QEvent *event);
 public slots:
     void GetCoord(int x,int y);
     void UpdateSamples();

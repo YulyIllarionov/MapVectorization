@@ -18,7 +18,8 @@ class LayersViewer : public QWidget
 public:
     explicit LayersViewer(WRaster *image,ImageViewer *wgt,QWidget *parent = 0);
     ~LayersViewer();
-
+protected:
+    bool event(QEvent *event);
 private slots:
     void on_Add_clicked();
 
