@@ -20,23 +20,23 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="Add">
        <property name="text">
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="res.qrc">
+        <iconset>
          <normaloff>:/new/icons/add.ico</normaloff>:/new/icons/add.ico</iconset>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="Remove">
        <property name="text">
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="res.qrc">
+        <iconset>
          <normaloff>:/new/icons/remove.ico</normaloff>:/new/icons/remove.ico</iconset>
        </property>
       </widget>
@@ -45,8 +45,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="res.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

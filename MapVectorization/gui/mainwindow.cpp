@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_tabs->setTabsClosable(true);
     ui->centralWidget->layout()->addWidget(m_tabs);
     ui->centralWidget->layout()->setMargin(0);
+
 }
 
 MainWindow::~MainWindow()
@@ -35,13 +36,14 @@ void MainWindow::on_OpenImage_triggered()
         QObject::connect(ui->ZoomIn,SIGNAL(triggered(bool)),imView,SLOT(ZoomIn()));
         QObject::connect(ui->ZoomOut,SIGNAL(triggered(bool)),imView,SLOT(ZoomOut()));
         QObject::connect(ui->FitImage,SIGNAL(triggered(bool)),imView,SLOT(FitView()));
-
     }
 }
 
 void MainWindow::on_LayersEditor_triggered()
 {
-
+    LayersViewer *viewer=new LayersViewer(m_image,static_cast<ImageViewer *>(m_tabs->currentWidget()));
+    viewer->setAttribute(Qt::WA_DeleteOnClose);
+    viewer->show();
 }
 
 
@@ -56,4 +58,9 @@ void MainWindow::on_SharpenAction_triggered()
 {
     bool ok;
     double k=QInputDialog::getDouble(0,"Увеличение резкости","k - от 0 до 10:",5,0.0,10.0,2,&ok);
+}
+
+void MainWindow::temp(int x, int y)
+{
+    qDebug()<<x<<" "<<y;
 }

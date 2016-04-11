@@ -6,7 +6,8 @@
 #include <QInputDialog>
 #include "base_types.h"
 #include"imageviewer.h"
-#include "layersdefinewidget.h"
+#include "layersviewer.h"
+#include <QDebug>
 
 //#include "imageviewerwidget.h"
 using namespace white_sdk;
@@ -50,7 +51,7 @@ private slots:
     void on_LayersEditor_triggered();
 
     void on_SharpenAction_triggered();
-
+    void temp(int,int);
 private:
     Ui::MainWindow *ui;
     int m_idCounter;                // Если ведется работа с несколькими проектами

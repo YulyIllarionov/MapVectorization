@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>LayerConfigureDialog</class>
- <widget class="QDialog" name="LayerConfigureDialog">
+ <widget class="QWidget" name="LayerConfigureDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -19,7 +19,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="Pipette">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -30,8 +30,11 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset>
-           <normaloff>pipette.ico</normaloff>pipette.ico</iconset>
+          <iconset resource="res.qrc">
+           <normaloff>:/new/icons/pipette.ico</normaloff>:/new/icons/pipette.ico</iconset>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -51,7 +54,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QFrame" name="frame">
+      <widget class="QFrame" name="SapleFrame">
        <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
        </property>
@@ -63,7 +66,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButton_2">
+    <widget class="QPushButton" name="AddColor">
      <property name="text">
       <string>Добавить цвет</string>
      </property>
@@ -184,39 +187,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>LayerConfigureDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>LayerConfigureDialog</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
+ <connections/>
 </ui>
