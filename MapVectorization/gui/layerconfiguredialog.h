@@ -2,6 +2,7 @@
 #define LAYERCONFIGUREDIALOG_H
 
 #include <QWidget>
+#include <QDebug>
 #include "base_types.h"
 using namespace white_sdk;
 
@@ -16,6 +17,9 @@ class LayerConfigureDialog : public QWidget
 public:
     explicit LayerConfigureDialog(QImage image, QWidget *parent = 0);
     ~LayerConfigureDialog();
+protected:
+    void focusInEvent(QFocusEvent *);
+    void focusOutEvent(QFocusEvent *);
 public slots:
     void GetCoord(int x,int y);
 private:

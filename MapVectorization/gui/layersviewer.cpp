@@ -20,7 +20,8 @@ void LayersViewer::on_Add_clicked()
 {
     LayerConfigureDialog *dlg=new LayerConfigureDialog(QImage((uchar*) m_image->m_raster.data,
                                                               m_image->m_raster.cols, m_image->m_raster.rows, m_image->m_raster.step, QImage::Format_RGB888));
-
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->setWindowFlags(Qt::WindowStaysOnTopHint);
     QObject::connect(m_wgt->GetPixItem(),SIGNAL(sendCoord(int,int)),dlg ,SLOT(GetCoord(int,int)));
     dlg->show();
 }

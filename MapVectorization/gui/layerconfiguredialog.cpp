@@ -14,8 +14,19 @@ LayerConfigureDialog::~LayerConfigureDialog()
     delete ui;
 }
 
+void LayerConfigureDialog::focusInEvent(QFocusEvent *)
+{
+    this->setWindowOpacity(1.0);
+}
+
+void LayerConfigureDialog::focusOutEvent(QFocusEvent *)
+{
+    this->setWindowOpacity(0.5);
+}
+
 void LayerConfigureDialog::GetCoord(int x, int y)
 {
+    qDebug()<<x<<" "<<y;
     QPalette palette;
     palette.setColor(QPalette::Background ,QColor(m_image.pixel(x,y)));
     ui->SapleFrame->setPalette(palette);

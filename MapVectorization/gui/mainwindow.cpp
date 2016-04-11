@@ -43,15 +43,9 @@ void MainWindow::on_LayersEditor_triggered()
 {
     LayersViewer *viewer=new LayersViewer(m_image,static_cast<ImageViewer *>(m_tabs->currentWidget()));
     viewer->setAttribute(Qt::WA_DeleteOnClose);
+    viewer->setWindowFlags(Qt::WindowStaysOnTopHint);
     viewer->show();
 }
-
-
-
-//    LayersDefineWidget *lwgt=new LayersDefineWidget();
-//    lwgt->setAttribute(Qt::WA_DeleteOnClose);
-//    lwgt->SetImageWidget(static_cast<ImageViewerWidget *>(tabs->currentWidget()));
-//    lwgt->show();
 
 
 void MainWindow::on_SharpenAction_triggered()
