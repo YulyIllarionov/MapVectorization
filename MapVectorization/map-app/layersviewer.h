@@ -5,8 +5,8 @@
 
 #include "ui_layersviewer.h"
 
-#include "sdk/app/sdk_const.h"
-#include "sdk/base_types.h"
+#include "../sdk/app/sdk_const.h"
+#include "../sdk/base_types.h"
 
 #include "imageviewer.h"
 

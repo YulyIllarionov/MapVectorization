@@ -21,7 +21,7 @@ mapAppMain::~mapAppMain()
 
 void mapAppMain::on_OpenImage_triggered()
 {
-    QString str = QFileDialog::getOpenFileName(0, "Открыть изображение", "", "Image Files (*.png *.jpg *.bmp) ;; *.*");
+    QString str = QFileDialog::getOpenFileName(0, "Open image", "", "Image Files (*.png *.jpg *.bmp) ;; *.*");
     if(!str.isEmpty())
     {
         m_image = new WRaster(str.toStdString());
@@ -30,7 +30,7 @@ void mapAppMain::on_OpenImage_triggered()
           m_image->m_raster.cols, 
           m_image->m_raster.rows, 
           m_image->m_raster.step, 
-          QImage::Format_RGB888));
+          QImage::Format_ARGB32));
         
         m_tabs->addTab(imView, str.section('/', -1, -1));
         m_tabsInfo.append(tab_info(imView, WT_RASTR_IMAGE, ++m_idCounter));
@@ -54,7 +54,10 @@ void mapAppMain::on_LayersEditor_triggered()
 void mapAppMain::on_SharpenAction_triggered()
 {
     bool ok;
-    double k = QInputDialog::getDouble(0, "Увеличение резкости", "k - от 0 до 10:", 5, 0.0, 10.0, 2, &ok);
+    double k = QInputDialog::getDouble(0, "Increase Sharpness", "k  from 0 to 10:", 5, 0.0, 10.0, 2, &ok);
+    m_image->IncreaseSharpness(k);
+    static_cast<ImageViewer *>(m_tabs->currentWidget())->UpdatePixmap();
+
 }
 
 void mapAppMain::temp(int x, int y)
