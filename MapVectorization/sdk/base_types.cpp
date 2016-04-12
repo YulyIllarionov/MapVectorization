@@ -28,8 +28,6 @@ void WRaster::Initialize(std::string img_path)
   cvtColor(m_raster, m_raster, CV_RGB2RGBA, 4);
 }
 // ------------------------------------------------------------
-
-// ------------------------------------------------------------
 void WRaster::IncreaseSharpness(double k)
 {
     cv::filter2D(m_raster, m_raster, m_raster.depth(), utils::WsharpKernel(k));
