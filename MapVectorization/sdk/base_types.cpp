@@ -23,14 +23,66 @@ WRaster::WRaster(std::string img_path)
 // ------------------------------------------------------------
 void WRaster::Initialize(std::string img_path)
 {
-  // Read the file
-  m_raster = imread(cv::String(img_path), CV_LOAD_IMAGE_COLOR);   
-  cvtColor(m_raster, m_raster, CV_RGB2RGBA, 4);
+    // Read the file
+    Mat raster = imread(String(img_path), CV_LOAD_IMAGE_COLOR);   
+    cvtColor(raster, m_raster, CV_RGB2RGBA, 4);
 }
 // ------------------------------------------------------------
 void WRaster::IncreaseSharpness(double k)
 {
-    cv::filter2D(m_raster, m_raster, m_raster.depth(), utils::WsharpKernel(k));
+    filter2D(m_raster, m_raster, m_raster.depth(), utils::WsharpKernel(k));
+}
+// ------------------------------------------------------------
+
+// ------------------------------------------------------------
+void WRaster::AddLayer()
+{
+    WLayer layer;
+    layer.m_data = Mat(m_raster.size(), CV_8UC1);
+    layer.m_color = Vec3b(-1, -1, -1);
+    m_layers.push_back(layer);
+}
+// ------------------------------------------------------------
+
+// ------------------------------------------------------------
+int WRaster::SetLayerMask(int layerNumber, std::vector<uchar> rgbScope)
+{
+    if (layerNumber >= m_layers.size())
+        return 1;
+    if (m_raster.size() != m_layers.at(layerNumber).m_data.size())
+        return 2;
+
+    uchar bLeft = rgbScope.at(0);
+    uchar bRight = rgbScope.at(1);
+    uchar gLeft = rgbScope.at(2);
+    uchar gRight = rgbScope.at(3);
+    uchar rLeft = rgbScope.at(4);
+    uchar rRight = rgbScope.at(5);
+
+    for (int y = 0; y < m_raster.rows; y++)
+    {
+        for (int x = 0; x < m_raster.cols; x++)
+        {
+            if (((m_raster.at<Vec4b>(y, x)[0] >= rLeft) && (m_raster.at<Vec4b>(y, x)[0] <= rRight)) &&
+                ((m_raster.at<Vec4b>(y, x)[1] >= gLeft) && (m_raster.at<Vec4b>(y, x)[1] <= gRight)) &&
+                ((m_raster.at<Vec4b>(y, x)[2] >= bLeft) && (m_raster.at<Vec4b>(y, x)[2] <= bRight)))
+                m_layers.at(layerNumber).m_data.at<uchar>(y, x) = 1;
+            else
+                m_layers.at(layerNumber).m_data.at<uchar>(y, x) = 0;
+        }
+    }
+    return 0;
+}
+// ------------------------------------------------------------
+
+// ------------------------------------------------------------
+int WRaster::SetLayerColor(int layerNumber, std::vector<uchar> rgbColor)
+{
+    if (layerNumber >= m_layers.size())
+        return 1;
+    m_layers.at(layerNumber).m_color = 
+        Vec3b(rgbColor.at(0), rgbColor.at(1), rgbColor.at(2));
+    return 0;
 }
 // ------------------------------------------------------------
 

@@ -57,7 +57,7 @@ void SetTransparent(cv::Mat& img, cv::Mat& mask, uchar aTrue, int aFalse)
     {
         for (int y = 0; y < img.rows; y++)
         {
-            for (int x = 0; x < img.rows; x++)
+            for (int x = 0; x < img.cols; x++)
             {
                 img.at<cv::Vec4b>(y,x)[3] = aTrue;
             }
@@ -67,7 +67,7 @@ void SetTransparent(cv::Mat& img, cv::Mat& mask, uchar aTrue, int aFalse)
     {
         for (int y = 0; y < img.rows; y++)
         {
-            for (int x = 0; x < img.rows; x++)
+            for (int x = 0; x < img.cols; x++)
             {
                 if (mask.at<uchar>(y,x) > 0)
                     img.at<cv::Vec4b>(y, x)[3] = aTrue;
