@@ -11,8 +11,8 @@
 
 #include "ui_mapappmain.h"
 
-#include "sdk/app/sdk_const.h"
-#include "sdk/base_types.h"
+#include "../sdk/app/sdk_const.h"
+#include "../sdk/base_types.h"
 
 #include "imageviewer.h"
 #include "layersviewer.h"
