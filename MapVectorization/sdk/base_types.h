@@ -32,6 +32,14 @@ protected:
 // ------------------------------------------------------------
 struct WLayer
 {
+  enum class LAYER_TYPE
+  {
+    TEXT_AND_LINES = 0,
+    AREAS,
+    OTHER
+  };
+
+  LAYER_TYPE  m_type;
   cv::Mat     m_data;
   cv::Vec3b   m_color;
 };
