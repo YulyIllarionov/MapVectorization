@@ -30,8 +30,8 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="res.qrc">
-           <normaloff>:/new/icons/pipette.ico</normaloff>:/new/icons/pipette.ico</iconset>
+          <iconset resource="mapappmain.qrc">
+           <normaloff>:/mapAppMain/resources/icons/pipette.ico</normaloff>:/mapAppMain/resources/icons/pipette.ico</iconset>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -197,7 +197,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="res.qrc"/>
+  <include location="mapappmain.qrc"/>
  </resources>
  <connections/>
 </ui>

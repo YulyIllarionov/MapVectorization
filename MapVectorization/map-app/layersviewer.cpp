@@ -24,7 +24,7 @@ void LayersViewer::on_Add_clicked()
       m_image->m_raster.cols, 
       m_image->m_raster.rows, 
       m_image->m_raster.step, 
-      QImage::Format_RGB888));
+      QImage::Format_ARGB32));
 
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     dlg->setWindowFlags(Qt::WindowStaysOnTopHint);

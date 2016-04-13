@@ -25,8 +25,8 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset>
-         <normaloff>:/new/icons/add.ico</normaloff>:/new/icons/add.ico</iconset>
+        <iconset resource="mapappmain.qrc">
+         <normaloff>:/mapAppMain/resources/icons/add.ico</normaloff>:/mapAppMain/resources/icons/add.ico</iconset>
        </property>
       </widget>
      </item>
@@ -36,8 +36,8 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset>
-         <normaloff>:/new/icons/remove.ico</normaloff>:/new/icons/remove.ico</iconset>
+        <iconset resource="mapappmain.qrc">
+         <normaloff>:/mapAppMain/resources/icons/remove.ico</normaloff>:/mapAppMain/resources/icons/remove.ico</iconset>
        </property>
       </widget>
      </item>
@@ -45,6 +45,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="mapappmain.qrc"/>
+ </resources>
  <connections/>
 </ui>
