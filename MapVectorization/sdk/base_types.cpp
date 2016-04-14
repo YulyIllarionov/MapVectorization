@@ -63,9 +63,9 @@ int WRaster::SetLayerMask(int layerNumber, std::vector<uchar> rgbScope)
     {
         for (int x = 0; x < m_raster.cols; x++)
         {
-            if (((m_raster.at<Vec4b>(y, x)[0] >= rLeft) && (m_raster.at<Vec4b>(y, x)[0] <= rRight)) &&
+            if (((m_raster.at<Vec4b>(y, x)[0] >= bLeft) && (m_raster.at<Vec4b>(y, x)[0] <= bRight)) &&
                 ((m_raster.at<Vec4b>(y, x)[1] >= gLeft) && (m_raster.at<Vec4b>(y, x)[1] <= gRight)) &&
-                ((m_raster.at<Vec4b>(y, x)[2] >= bLeft) && (m_raster.at<Vec4b>(y, x)[2] <= bRight)))
+                ((m_raster.at<Vec4b>(y, x)[2] >= rLeft) && (m_raster.at<Vec4b>(y, x)[2] <= rRight)))
                 m_layers.at(layerNumber).m_data.at<uchar>(y, x) = 1;
             else
                 m_layers.at(layerNumber).m_data.at<uchar>(y, x) = 0;
