@@ -96,5 +96,14 @@ int WRaster::SetLayerType(int layerNumber, WLayer::LAYER_TYPE type)
 }
 // ------------------------------------------------------------
 
+// ------------------------------------------------------------
+int WRaster::SetLayerName(int layerNumber, std::string name)
+{
+    if (layerNumber >= m_layers.size())
+        return 1;
+    m_layers.at(layerNumber).m_name = name;
+    return 0;
+}
+// ------------------------------------------------------------
 
   SDK_END_NAMESPACE

@@ -42,6 +42,8 @@ struct WLayer
   LAYER_TYPE  m_type;
   cv::Mat     m_data;
   cv::Vec3b   m_color;
+  std::string m_name;
+
 };
 // ------------------------------------------------------------
 typedef std::vector<WLayer> LayersContainer;
@@ -62,6 +64,9 @@ public:
   int WRaster::SetLayerColor(int layerNumber, std::vector<uchar> rgbColor);
 
   int WRaster::SetLayerType(int layerNumber, WLayer::LAYER_TYPE type);
+
+  int WRaster::SetLayerName(int layerNumber, std::string name);
+
     
 public:
 
