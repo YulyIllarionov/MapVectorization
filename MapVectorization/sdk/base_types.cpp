@@ -86,4 +86,15 @@ int WRaster::SetLayerColor(int layerNumber, std::vector<uchar> rgbColor)
 }
 // ------------------------------------------------------------
 
+// ------------------------------------------------------------
+int WRaster::SetLayerType(int layerNumber, WLayer::LAYER_TYPE type)
+{
+    if (layerNumber >= m_layers.size())
+        return 1;
+    m_layers.at(layerNumber).m_type = type;
+    return 0;
+}
+// ------------------------------------------------------------
+
+
   SDK_END_NAMESPACE

@@ -34,9 +34,9 @@ struct WLayer
 {
   enum class LAYER_TYPE
   {
-    TEXT_AND_LINES = 0,
-    AREAS,
-    OTHER
+    LT_TEXT_AND_LINES = 0,
+    LT_AREAS,
+    LT_OTHER
   };
 
   LAYER_TYPE  m_type;
@@ -60,6 +60,8 @@ public:
   int WRaster::SetLayerMask(int layerNumber, std::vector<uchar> rgbScope);
 
   int WRaster::SetLayerColor(int layerNumber, std::vector<uchar> rgbColor);
+
+  int WRaster::SetLayerType(int layerNumber, WLayer::LAYER_TYPE type);
     
 public:
 
