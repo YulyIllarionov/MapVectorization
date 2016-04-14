@@ -160,7 +160,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="Name"/>
      </item>
     </layout>
    </item>
@@ -180,7 +180,23 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="comboBox"/>
+      <widget class="QComboBox" name="Type">
+       <item>
+        <property name="text">
+         <string>Линии и текст</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Области</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Другое</string>
+        </property>
+       </item>
+      </widget>
      </item>
     </layout>
    </item>
