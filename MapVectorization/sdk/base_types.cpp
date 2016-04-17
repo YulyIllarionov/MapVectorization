@@ -16,10 +16,44 @@ SDK_BEGIN_NAMESPACE
 using namespace cv;
 
 // ------------------------------------------------------------
+w_color::w_color(uchar r, uchar g, uchar b)
+{
+    this->r = r;
+    this->g = g;
+    this->b = b;
+}
+// ------------------------------------------------------------
+
+// ------------------------------------------------------------
+w_color::w_color(cv::Vec4b color)
+{
+    this->r = color[2];
+    this->g = color[1];
+    this->b = color[0];
+}
+// ------------------------------------------------------------
+
+// ------------------------------------------------------------
+inline bool operator <= (const w_color &first, const cv::Vec4b &second)
+{
+    return bool((first.r <= second[2]) && (first.g <= second[1]) && (first.b <= second[0]));
+}
+// ------------------------------------------------------------
+
+// ------------------------------------------------------------
+inline bool operator >= (const w_color &first, const cv::Vec4b &second)
+{
+    return bool((first.r >= second[2]) && (first.g >= second[1]) && (first.b >= second[0]));
+}
+// ------------------------------------------------------------
+
+// ------------------------------------------------------------
 WRaster::WRaster(std::string img_path)
 {
   Initialize(img_path);
 }
+// ------------------------------------------------------------
+
 // ------------------------------------------------------------
 void WRaster::Initialize(std::string img_path)
 {
@@ -27,6 +61,8 @@ void WRaster::Initialize(std::string img_path)
     Mat raster = imread(String(img_path), CV_LOAD_IMAGE_COLOR);   
     cvtColor(raster, m_raster, CV_RGB2RGBA, 4);
 }
+// ------------------------------------------------------------
+
 // ------------------------------------------------------------
 void WRaster::IncreaseSharpness(double k)
 {
@@ -45,30 +81,20 @@ void WRaster::AddLayer()
 // ------------------------------------------------------------
 
 // ------------------------------------------------------------
-int WRaster::SetLayerMask(int layerNumber, std::vector<uchar> rgbScope)
+int WRaster::SetLayerMask(int layerNumber, const w_color& colorLow, const w_color &colorHigh)
 {
     if (layerNumber >= m_layers.size())
         return 1;
-    if (m_raster.size() != m_layers.at(layerNumber).m_data.size())
+    if (m_raster.size() != (m_layers[layerNumber]).m_data.size())
         return 2;
-
-    uchar bLeft = rgbScope.at(0);
-    uchar bRight = rgbScope.at(1);
-    uchar gLeft = rgbScope.at(2);
-    uchar gRight = rgbScope.at(3);
-    uchar rLeft = rgbScope.at(4);
-    uchar rRight = rgbScope.at(5);
 
     for (int y = 0; y < m_raster.rows; y++)
     {
         for (int x = 0; x < m_raster.cols; x++)
         {
-            if (((m_raster.at<Vec4b>(y, x)[0] >= bLeft) && (m_raster.at<Vec4b>(y, x)[0] <= bRight)) &&
-                ((m_raster.at<Vec4b>(y, x)[1] >= gLeft) && (m_raster.at<Vec4b>(y, x)[1] <= gRight)) &&
-                ((m_raster.at<Vec4b>(y, x)[2] >= rLeft) && (m_raster.at<Vec4b>(y, x)[2] <= rRight)))
-                m_layers.at(layerNumber).m_data.at<uchar>(y, x) = 1;
-            else
-                m_layers.at(layerNumber).m_data.at<uchar>(y, x) = 0;
+            const Vec4b currentColor = m_raster.at<Vec4b>(y, x);
+            m_layers.at(layerNumber).m_data.at<uchar>(y, x) =
+                ((colorLow <= currentColor) && (colorHigh >= currentColor)) ? 1 : 0;
         }
     }
     return 0;
@@ -101,7 +127,7 @@ int WRaster::SetLayerName(int layerNumber, std::string name)
 {
     if (layerNumber >= m_layers.size())
         return 1;
-    m_layers.at(layerNumber).m_name = name;
+    (m_layers[layerNumber]).m_name = name;
     return 0;
 }
 // ------------------------------------------------------------
