@@ -48,7 +48,7 @@ public:
         Add = new QPushButton(LayersViewer);
         Add->setObjectName(QStringLiteral("Add"));
         QIcon icon;
-        icon.addFile(QStringLiteral(":/new/icons/add.ico"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QStringLiteral(":/mapAppMain/resources/icons/add.ico"), QSize(), QIcon::Normal, QIcon::Off);
         Add->setIcon(icon);
 
         horizontalLayout->addWidget(Add);
@@ -56,7 +56,7 @@ public:
         Remove = new QPushButton(LayersViewer);
         Remove->setObjectName(QStringLiteral("Remove"));
         QIcon icon1;
-        icon1.addFile(QStringLiteral(":/new/icons/remove.ico"), QSize(), QIcon::Normal, QIcon::Off);
+        icon1.addFile(QStringLiteral(":/mapAppMain/resources/icons/remove.ico"), QSize(), QIcon::Normal, QIcon::Off);
         Remove->setIcon(icon1);
 
         horizontalLayout->addWidget(Remove);

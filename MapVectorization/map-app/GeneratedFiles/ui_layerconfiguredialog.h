@@ -48,10 +48,10 @@ public:
     QFrame *RightSample;
     QHBoxLayout *horizontalLayout;
     QLabel *label_3;
-    QLineEdit *lineEdit;
+    QLineEdit *Name;
     QHBoxLayout *horizontalLayout_2;
     QLabel *label_4;
-    QComboBox *comboBox;
+    QComboBox *Type;
     QDialogButtonBox *buttonBox;
 
     void setupUi(QWidget *LayerConfigureDialog)
@@ -73,7 +73,7 @@ public:
         sizePolicy.setHeightForWidth(Pipette->sizePolicy().hasHeightForWidth());
         Pipette->setSizePolicy(sizePolicy);
         QIcon icon;
-        icon.addFile(QStringLiteral(":/new/icons/pipette.ico"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QStringLiteral(":/mapAppMain/resources/icons/pipette.ico"), QSize(), QIcon::Normal, QIcon::Off);
         Pipette->setIcon(icon);
         Pipette->setCheckable(true);
 
@@ -166,10 +166,10 @@ public:
 
         horizontalLayout->addWidget(label_3);
 
-        lineEdit = new QLineEdit(LayerConfigureDialog);
-        lineEdit->setObjectName(QStringLiteral("lineEdit"));
+        Name = new QLineEdit(LayerConfigureDialog);
+        Name->setObjectName(QStringLiteral("Name"));
 
-        horizontalLayout->addWidget(lineEdit);
+        horizontalLayout->addWidget(Name);
 
 
         verticalLayout_4->addLayout(horizontalLayout);
@@ -183,10 +183,10 @@ public:
 
         horizontalLayout_2->addWidget(label_4);
 
-        comboBox = new QComboBox(LayerConfigureDialog);
-        comboBox->setObjectName(QStringLiteral("comboBox"));
+        Type = new QComboBox(LayerConfigureDialog);
+        Type->setObjectName(QStringLiteral("Type"));
 
-        horizontalLayout_2->addWidget(comboBox);
+        horizontalLayout_2->addWidget(Type);
 
 
         verticalLayout_4->addLayout(horizontalLayout_2);
@@ -220,6 +220,12 @@ public:
         label_2->setText(QApplication::translate("LayerConfigureDialog", "\320\224\320\276:", 0));
         label_3->setText(QApplication::translate("LayerConfigureDialog", "\320\230\320\274\321\217 \321\201\320\273\320\276\321\217:", 0));
         label_4->setText(QApplication::translate("LayerConfigureDialog", "\320\242\320\270\320\277 \321\201\320\273\320\276\321\217:", 0));
+        Type->clear();
+        Type->insertItems(0, QStringList()
+         << QApplication::translate("LayerConfigureDialog", "\320\233\320\270\320\275\320\270\320\270 \320\270 \321\202\320\265\320\272\321\201\321\202", 0)
+         << QApplication::translate("LayerConfigureDialog", "\320\236\320\261\320\273\320\260\321\201\321\202\320\270", 0)
+         << QApplication::translate("LayerConfigureDialog", "\320\224\321\200\321\203\320\263\320\276\320\265", 0)
+        );
     } // retranslateUi
 
 };
