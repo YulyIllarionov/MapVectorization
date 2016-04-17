@@ -32,8 +32,18 @@ protected:
 // ------------------------------------------------------------
 struct WLayer
 {
+  enum class LAYER_TYPE
+  {
+    LT_TEXT_AND_LINES = 0,
+    LT_AREAS,
+    LT_OTHER
+  };
+
+  LAYER_TYPE  m_type;
   cv::Mat     m_data;
   cv::Vec3b   m_color;
+  std::string m_name;
+
 };
 // ------------------------------------------------------------
 typedef std::vector<WLayer> LayersContainer;
@@ -52,7 +62,13 @@ public:
   int WRaster::SetLayerMask(int layerNumber, std::vector<uchar> rgbScope);
 
   int WRaster::SetLayerColor(int layerNumber, std::vector<uchar> rgbColor);
-    
+
+  int WRaster::SetLayerType(int layerNumber, WLayer::LAYER_TYPE type);
+
+  int WRaster::SetLayerName(int layerNumber, std::string name);
+
+  std::vector<cv::Rect> detectLetters(int layerNumber);
+
 public:
 
   //bool NextLayer(cv::Mat* layer) const { return Next(layer); }
