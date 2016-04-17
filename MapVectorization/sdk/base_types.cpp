@@ -86,4 +86,34 @@ int WRaster::SetLayerColor(int layerNumber, std::vector<uchar> rgbColor)
 }
 // ------------------------------------------------------------
 
+//
+bool WPolyline::AddPointAt(const CvPoint& point, size_t idx)
+{
+	if (idx < m_points.size())
+	{
+		std::vector<CvPoint>::iterator it;
+		it = m_points.begin();
+		m_points.insert(it + idx, point);
+		return true;
+	}
+	return false;
+}
+
+bool WPolyline::RemovePoint(size_t idx)
+{
+	if (idx < m_points.size())
+	{
+		std::vector<CvPoint>::iterator it;
+		it = m_points.begin();
+		m_points.erase(it + idx);
+		return true;
+	}
+	return false;
+}
+
+void WPolyline::concat(WPolyline& line) {
+	m_points.insert(m_points.end(),line.getPoints().begin(),line.getPoints().end());
+}
+
+
   SDK_END_NAMESPACE

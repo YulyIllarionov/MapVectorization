@@ -10,11 +10,14 @@
 #include <vector>
 
 #include "app/sdk_const.h"
-
+#include "opencv2/highgui/highgui.hpp"
 #include "opencv/cxcore.h"
 
-SDK_BEGIN_NAMESPACE
 
+typedef std::vector<CvPoint>                WCVPointsContainer;
+typedef unsigned char                      WColor;
+
+SDK_BEGIN_NAMESPACE
 
 //  Enumerator
 class IEnumItem {
@@ -86,6 +89,41 @@ private:
   std::wstring                      m_image_path;
 };
 // ------------------------------------------------------------
+
+
+class WPolyline
+{
+public:
+	WPolyline();
+	virtual ~WPolyline();
+
+	WPolyline& operator=(WPolyline other);
+	void clearPoints();
+
+	// line width
+	void setWidth(double width);
+	double getWidth() { return m_width; };
+	void setColor(WColor color) { m_color = color; };
+	WColor getColor() { return m_color; }
+
+	// points
+	void AddPoint(const CvPoint& point) { m_points.push_back(point); };
+	bool AddPointAt(const CvPoint& point, size_t idx);
+	CvPoint getPoint(size_t idx) { return m_points.size() > idx ? m_points[idx] : CvPoint::CvPoint(); };
+	bool RemovePoint(size_t idx);
+	int Lenght() { return m_points.size(); };
+	WCVPointsContainer & getPoints() { return m_points; }
+	void concat(WPolyline& line); 
+
+	int getScaler() { return m_scaler; };
+	void setScaler(int scaler);
+
+private:
+	double            m_width;
+	WCVPointsContainer  m_points;
+	int m_scaler;
+	WColor m_color;
+};
 
 
 SDK_END_NAMESPACE
