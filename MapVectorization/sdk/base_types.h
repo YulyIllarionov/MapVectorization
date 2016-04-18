@@ -80,7 +80,8 @@ public:
 
   int SetLayerName(int layerNumber, std::string name);
 
-    
+  std::vector<cv::Rect> detectLetters(int layerNumber);
+
 public:
 
   //bool NextLayer(cv::Mat* layer) const { return Next(layer); }
