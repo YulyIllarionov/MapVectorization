@@ -65,7 +65,7 @@ typedef std::vector<WLayer> LayersContainer;
 class WRaster //: public IEnumItem<cv::Mat>
 {
 public:
-  WRaster(std::string img_path);
+  WRaster(std::string img_path = "");
 
   virtual ~WRaster(){}
 

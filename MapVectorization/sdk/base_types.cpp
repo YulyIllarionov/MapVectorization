@@ -57,7 +57,8 @@ inline bool operator >= (const w_color &first, const cv::Vec4b &second)
 // ------------------------------------------------------------
 WRaster::WRaster(std::string img_path)
 {
-  Initialize(img_path);
+  if (img_path != "")
+    Initialize(img_path);
 }
 // ------------------------------------------------------------
 
