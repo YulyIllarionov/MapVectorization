@@ -24,12 +24,12 @@ void mapAppMain::on_OpenImage_triggered()
     QString str = QFileDialog::getOpenFileName(0, "Открыть изображение", "", "Image Files (*.png *.jpg *.bmp) ;; *.*");
     if(!str.isEmpty())
     {
-        m_image = new WRaster(str.toStdString());
+        m_image = WRaster(str.toStdString());
         ImageViewer*  imView = new ImageViewer(
-          QImage((uchar*) m_image->m_raster.data,
-          m_image->m_raster.cols, 
-          m_image->m_raster.rows, 
-          m_image->m_raster.step, 
+          QImage((uchar*) m_image.m_raster.data,
+          m_image.m_raster.cols, 
+          m_image.m_raster.rows, 
+          m_image.m_raster.step, 
           QImage::Format_RGB888));
         
         m_tabs->addTab(imView, str.section('/', -1, -1));
@@ -44,7 +44,7 @@ void mapAppMain::on_OpenImage_triggered()
 
 void mapAppMain::on_LayersEditor_triggered()
 {
-    LayersViewer* viewer = new LayersViewer(m_image, static_cast<ImageViewer*>(m_tabs->currentWidget()));
+    LayersViewer* viewer = new LayersViewer(&m_image, static_cast<ImageViewer*>(m_tabs->currentWidget()));
     viewer->setAttribute(Qt::WA_DeleteOnClose);
     viewer->setWindowFlags(Qt::WindowStaysOnTopHint);
     viewer->show();

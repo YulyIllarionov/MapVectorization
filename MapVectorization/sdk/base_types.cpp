@@ -18,7 +18,8 @@ using namespace cv;
 // ------------------------------------------------------------
 WRaster::WRaster(std::string img_path)
 {
-  Initialize(img_path);
+  if (img_path != "")
+    Initialize(img_path);
 }
 // ------------------------------------------------------------
 void WRaster::Initialize(std::string img_path)

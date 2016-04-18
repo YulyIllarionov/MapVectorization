@@ -48,6 +48,9 @@
     <ClInclude Include="base_types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="app\sdk_result.h">
+      <Filter>Header Files\app</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
