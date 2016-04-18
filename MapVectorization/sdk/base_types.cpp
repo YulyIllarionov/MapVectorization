@@ -120,6 +120,29 @@ int WRaster::SetLayerColor(int layerNumber, w_color& rgbColor)
 // ------------------------------------------------------------
 
 // ------------------------------------------------------------
+int WRaster::SetLayerColor(int layerNumber)
+{
+    if (layerNumber >= m_layers.size())
+        return 1;
+    Vec3b  averageColor(0,0,0);
+    int number = 0;
+    for (int y = 0; y < m_raster.rows; y++)
+    {
+        for (int x = 0; x < m_raster.cols; x++)
+        {
+            if (m_layers[layerNumber].m_data.at<uchar>(y, x)>0)
+            {
+                averageColor += m_raster.at<Vec3b>(y, x);
+                number++;
+            }
+        }
+    }
+    m_layers[layerNumber].m_color = averageColor / number;
+    return 0;
+}
+// ------------------------------------------------------------
+
+// ------------------------------------------------------------
 int WRaster::SetLayerType(int layerNumber, WLayer::LAYER_TYPE type)
 {
     if (layerNumber >= m_layers.size())

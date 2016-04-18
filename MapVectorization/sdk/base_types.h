@@ -75,6 +75,8 @@ public:
 
   int SetLayerMask(int layerNumber, const w_color &colorLow, const w_color &colorHigh);
 
+  int WRaster::SetLayerColor(int layerNumber);
+
   int SetLayerColor(int layerNumber, w_color& rgbColor);
 
   int SetLayerType(int layerNumber, WLayer::LAYER_TYPE type);
