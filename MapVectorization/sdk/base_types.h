@@ -50,6 +50,7 @@ struct w_color
 {
     w_color(uchar r, uchar g, uchar b);
     w_color(cv::Vec4b color);
+    cv::Vec3b& toVec3b();
     friend inline bool operator <= (const w_color &first, const cv::Vec4b &second);
     friend inline bool operator >= (const w_color &first, const cv::Vec4b &second);
 
@@ -74,7 +75,7 @@ public:
 
   int SetLayerMask(int layerNumber, const w_color &colorLow, const w_color &colorHigh);
 
-  int SetLayerColor(int layerNumber, std::vector<uchar> rgbColor);
+  int SetLayerColor(int layerNumber, w_color& rgbColor);
 
   int SetLayerType(int layerNumber, WLayer::LAYER_TYPE type);
 

@@ -34,6 +34,13 @@ w_color::w_color(cv::Vec4b color)
 // ------------------------------------------------------------
 
 // ------------------------------------------------------------
+cv::Vec3b& w_color::toVec3b()
+{
+    return Vec3b(this->b, this->g, this->r);
+}
+// ------------------------------------------------------------
+
+// ------------------------------------------------------------
 inline bool operator <= (const w_color &first, const cv::Vec4b &second)
 {
     return bool((first.r <= second[2]) && (first.g <= second[1]) && (first.b <= second[0]));
@@ -102,12 +109,11 @@ int WRaster::SetLayerMask(int layerNumber, const w_color& colorLow, const w_colo
 // ------------------------------------------------------------
 
 // ------------------------------------------------------------
-int WRaster::SetLayerColor(int layerNumber, std::vector<uchar> rgbColor)
+int WRaster::SetLayerColor(int layerNumber, w_color& rgbColor)
 {
     if (layerNumber >= m_layers.size())
         return 1;
-    m_layers.at(layerNumber).m_color = 
-        Vec3b(rgbColor.at(0), rgbColor.at(1), rgbColor.at(2));
+    m_layers.at(layerNumber).m_color = rgbColor.toVec3b();
     return 0;
 }
 // ------------------------------------------------------------
