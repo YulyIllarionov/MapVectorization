@@ -36,6 +36,11 @@ void ImageViewer::UpdatePixmap()
     m_pixItem->setPixmap(QPixmap::fromImage(m_image));
     m_scene.addItem(m_pixItem);
 }
+QImage& ImageViewer::GetImage()
+{
+    return m_image;
+}
+
 
 MyPixmapItem* ImageViewer::GetPixItem() const
 {

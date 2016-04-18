@@ -30,8 +30,8 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="res.qrc">
-           <normaloff>:/new/icons/pipette.ico</normaloff>:/new/icons/pipette.ico</iconset>
+          <iconset resource="mapappmain.qrc">
+           <normaloff>:/mapAppMain/resources/icons/pipette.ico</normaloff>:/mapAppMain/resources/icons/pipette.ico</iconset>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -160,7 +160,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="Name"/>
      </item>
     </layout>
    </item>
@@ -180,7 +180,23 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="comboBox"/>
+      <widget class="QComboBox" name="Type">
+       <item>
+        <property name="text">
+         <string>Линии и текст</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Области</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Другое</string>
+        </property>
+       </item>
+      </widget>
      </item>
     </layout>
    </item>
@@ -197,7 +213,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="res.qrc"/>
+  <include location="mapappmain.qrc"/>
  </resources>
  <connections/>
 </ui>
