@@ -129,7 +129,7 @@ void LayerConfigureDialog::UpdatesMask()
     bgr.push_back(m_rightG);
     bgr.push_back(m_leftR);
     bgr.push_back(m_rightR);
-    m_image->SetLayerMask(number, bgr);
+    //m_image->SetLayerMask(number, bgr);
 
     utils::SetTransparent(m_image->m_raster, m_image->m_layers.at(number).m_data, 50);
     m_widget->UpdatePixmap();
@@ -154,7 +154,7 @@ void LayerConfigureDialog::on_buttonBox_accepted()
     bgr.push_back(m_leftR);
     bgr.push_back(m_rightR);
 
-    m_image->SetLayerMask(number, bgr);
+    //m_image->SetLayerMask(number, bgr);
 
     
     m_image->SetLayerType(number,(WLayer::LAYER_TYPE)(m_ui->Type->currentIndex()));

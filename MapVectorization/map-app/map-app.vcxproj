@@ -157,6 +157,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>opencv_world310d.lib;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Svgd.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>if not exist "$(OutDir)platforms" mkdir "$(OutDir)platforms"
+xcopy /d /y "$(QTDIR)\plugins\platforms\qwindowsd.dll" "$(OutDir)platforms"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release2|x64'">
     <ClCompile>
@@ -215,6 +219,10 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalDependencies>opencv_world310.lib;qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Svg.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>if not exist "$(OutDir)platforms" mkdir "$(OutDir)platforms"
+xcopy /d /y "$(QTDIR)\plugins\platforms\qwindows.dll" "$(OutDir)platforms"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_imageviewer.cpp">
