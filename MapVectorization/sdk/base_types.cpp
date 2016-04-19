@@ -34,6 +34,13 @@ w_color::w_color(cv::Vec4b color)
 // ------------------------------------------------------------
 
 // ------------------------------------------------------------
+cv::Vec3b& w_color::toVec3b()
+{
+    return Vec3b(this->b, this->g, this->r);
+}
+// ------------------------------------------------------------
+
+// ------------------------------------------------------------
 inline bool operator <= (const w_color &first, const cv::Vec4b &second)
 {
     return bool((first.r <= second[2]) && (first.g <= second[1]) && (first.b <= second[0]));
@@ -50,7 +57,8 @@ inline bool operator >= (const w_color &first, const cv::Vec4b &second)
 // ------------------------------------------------------------
 WRaster::WRaster(std::string img_path)
 {
-  Initialize(img_path);
+  if (img_path != "")
+    Initialize(img_path);
 }
 // ------------------------------------------------------------
 
@@ -102,12 +110,34 @@ int WRaster::SetLayerMask(int layerNumber, const w_color& colorLow, const w_colo
 // ------------------------------------------------------------
 
 // ------------------------------------------------------------
-int WRaster::SetLayerColor(int layerNumber, std::vector<uchar> rgbColor)
+int WRaster::SetLayerColor(int layerNumber, w_color& rgbColor)
 {
     if (layerNumber >= m_layers.size())
         return 1;
-    m_layers.at(layerNumber).m_color = 
-        Vec3b(rgbColor.at(0), rgbColor.at(1), rgbColor.at(2));
+    m_layers.at(layerNumber).m_color = rgbColor.toVec3b();
+    return 0;
+}
+// ------------------------------------------------------------
+
+// ------------------------------------------------------------
+int WRaster::SetLayerColor(int layerNumber)
+{
+    if (layerNumber >= m_layers.size())
+        return 1;
+    Vec3b  averageColor(0,0,0);
+    int number = 0;
+    for (int y = 0; y < m_raster.rows; y++)
+    {
+        for (int x = 0; x < m_raster.cols; x++)
+        {
+            if (m_layers[layerNumber].m_data.at<uchar>(y, x)>0)
+            {
+                averageColor += m_raster.at<Vec3b>(y, x);
+                number++;
+            }
+        }
+    }
+    m_layers[layerNumber].m_color = averageColor / number;
     return 0;
 }
 // ------------------------------------------------------------

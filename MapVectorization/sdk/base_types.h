@@ -46,26 +46,42 @@ struct WLayer
 
 };
 // ------------------------------------------------------------
+struct w_color
+{
+    w_color(uchar r, uchar g, uchar b);
+    w_color(cv::Vec4b color);
+    cv::Vec3b& toVec3b();
+    friend inline bool operator <= (const w_color &first, const cv::Vec4b &second);
+    friend inline bool operator >= (const w_color &first, const cv::Vec4b &second);
+
+private:
+    uchar r;
+    uchar g;
+    uchar b;
+};
+// ------------------------------------------------------------
 typedef std::vector<WLayer> LayersContainer;
 // ------------------------------------------------------------
 class WRaster //: public IEnumItem<cv::Mat>
 {
 public:
-  WRaster(std::string img_path);
+  WRaster(std::string img_path = "");
 
   virtual ~WRaster(){}
 
   void IncreaseSharpness(double k);
 
-  void WRaster::AddLayer();
+  void AddLayer();
 
-  int WRaster::SetLayerMask(int layerNumber, std::vector<uchar> rgbScope);
+  int SetLayerMask(int layerNumber, const w_color &colorLow, const w_color &colorHigh);
 
-  int WRaster::SetLayerColor(int layerNumber, std::vector<uchar> rgbColor);
+  int WRaster::SetLayerColor(int layerNumber);
 
-  int WRaster::SetLayerType(int layerNumber, WLayer::LAYER_TYPE type);
+  int SetLayerColor(int layerNumber, w_color& rgbColor);
 
-  int WRaster::SetLayerName(int layerNumber, std::string name);
+  int SetLayerType(int layerNumber, WLayer::LAYER_TYPE type);
+
+  int SetLayerName(int layerNumber, std::string name);
 
   std::vector<cv::Rect> detectLetters(int layerNumber);
 

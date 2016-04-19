@@ -24,12 +24,12 @@ void mapAppMain::on_OpenImage_triggered()
     QString str = QFileDialog::getOpenFileName(0, "Open image", "", "Image Files (*.png *.jpg *.bmp) ;; *.*");
     if(!str.isEmpty())
     {
-        m_image = new WRaster(str.toStdString());
+        m_image = WRaster(str.toStdString());
         ImageViewer*  imView = new ImageViewer(
-          QImage((uchar*) m_image->m_raster.data,
-          m_image->m_raster.cols, 
-          m_image->m_raster.rows, 
-          m_image->m_raster.step, 
+          QImage((uchar*) m_image.m_raster.data,
+          m_image.m_raster.cols, 
+          m_image.m_raster.rows, 
+          m_image.m_raster.step, 
           QImage::Format_ARGB32));
         
         m_tabs->addTab(imView, str.section('/', -1, -1));
@@ -44,7 +44,7 @@ void mapAppMain::on_OpenImage_triggered()
 
 void mapAppMain::on_LayersEditor_triggered()
 {
-    LayersViewer* viewer = new LayersViewer(m_image, static_cast<ImageViewer*>(m_tabs->currentWidget()));
+    LayersViewer* viewer = new LayersViewer(&m_image, static_cast<ImageViewer*>(m_tabs->currentWidget()));
     viewer->setAttribute(Qt::WA_DeleteOnClose);
     viewer->setWindowFlags(Qt::WindowStaysOnTopHint);
     viewer->show();
@@ -55,7 +55,7 @@ void mapAppMain::on_SharpenAction_triggered()
 {
     bool ok;
     double k = QInputDialog::getDouble(0, "Increase Sharpness", "k  from 0 to 10:", 5, 0.0, 10.0, 2, &ok);
-    m_image->IncreaseSharpness(k);
+    m_image.IncreaseSharpness(k);
     static_cast<ImageViewer *>(m_tabs->currentWidget())->UpdatePixmap();
 
 }

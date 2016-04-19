@@ -122,14 +122,10 @@ void LayerConfigureDialog::UpdatesMask()
 {
     int number = m_image->m_layers.size();
     m_image->AddLayer();
-    std::vector<uchar> bgr;
-    bgr.push_back(m_leftB);
-    bgr.push_back(m_rightB);
-    bgr.push_back(m_leftG);
-    bgr.push_back(m_rightG);
-    bgr.push_back(m_leftR);
-    bgr.push_back(m_rightR);
-    m_image->SetLayerMask(number, bgr);
+    w_color wc2(m_leftR, m_leftG, m_leftB);
+    w_color wc3(m_rightR, m_rightG, m_rightB);
+
+    m_image->SetLayerMask(number, wc2,wc3);
 
     utils::SetTransparent(m_image->m_raster, m_image->m_layers.at(number).m_data, 50);
     m_widget->UpdatePixmap();
@@ -141,22 +137,14 @@ void LayerConfigureDialog::on_buttonBox_accepted()
 {
     int number = m_image->m_layers.size();
     m_image->AddLayer();
-    std::vector<uchar> bgr;
-    bgr.push_back((m_rightB + m_leftB) / 2);
-    bgr.push_back((m_rightG + m_leftG) / 2);
-    bgr.push_back((m_rightR + m_leftR) / 2);
-    bgr.clear();
-
-    bgr.push_back(m_leftB);
-    bgr.push_back(m_rightB);
-    bgr.push_back(m_leftG);
-    bgr.push_back(m_rightG);
-    bgr.push_back(m_leftR);
-    bgr.push_back(m_rightR);
-
-    m_image->SetLayerMask(number, bgr);
-
+    w_color wc1((m_rightR + m_leftR) / 2, (m_rightG + m_leftG) / 2, (m_rightB + m_leftB) / 2);
+    m_image->SetLayerColor(number, wc1);
     
+    w_color wc2(m_leftR, m_leftG, m_leftB);
+    w_color wc3(m_rightR, m_rightG, m_rightB);
+
+    m_image->SetLayerMask(number,wc2,wc3);
+
     m_image->SetLayerType(number,(WLayer::LAYER_TYPE)(m_ui->Type->currentIndex()));
     m_image->SetLayerName(number, m_ui->Name->text().toStdString());
     emit Accept();

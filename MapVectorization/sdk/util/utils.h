@@ -20,7 +20,7 @@ SDK_BEGIN_NAMESPACE
 namespace utils
 {  
   std::string WSTR2STR(const std::wstring& wide);
-  inline cv::Mat WsharpKernel(double k);
+  cv::Mat WsharpKernel(double k);
   void SetTransparent(cv::Mat& img, cv::Mat& mask, uchar aTrue, uchar aFalse = 255);
 }
 
