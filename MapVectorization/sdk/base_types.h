@@ -129,19 +129,17 @@ public:
 	void setWidth(double width);
 	double getWidth() { return m_width; };
 	void setColor(WColor color) { m_color = color; };
-	WColor getColor() { return m_color; }
 
 	// points
 	void AddPoint(const CvPoint& point) { m_points.push_back(point); };
 	bool AddPointAt(const CvPoint& point, size_t idx);
 	CvPoint getPoint(size_t idx) { return m_points.size() > idx ? m_points[idx] : CvPoint::CvPoint(); };
 	bool RemovePoint(size_t idx);
-	int Lenght() { return m_points.size(); };
+	size_t Lenght() { return m_points.size(); };
 	WCVPointsContainer & getPoints() { return m_points; }
-	void concat(WPolyline& line); 
+	void concat(WPolyline& line);
+	void concatTornLine(WPolyline& line, bool firstOrder, bool secondOrder);
 
-	int getScaler() { return m_scaler; };
-	void setScaler(int scaler);
 
 	WCVPointsContainer simplifyLine(WCVPointsContainer &vectorline, double EPSILON, int delta);
 

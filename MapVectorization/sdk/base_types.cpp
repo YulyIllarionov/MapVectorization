@@ -218,15 +218,40 @@ bool WPolyline::RemovePoint(size_t idx)
 
 void WPolyline::concat(WPolyline& line)
 {
-	m_points.insert(m_points.end(), line.getPoints().begin(), line.getPoints().end());
+	std::vector<CvPoint> tmp = line.m_points;
+	std::reverse(tmp.begin(), tmp.end());
+	m_points.insert(m_points.end(), tmp.begin(), tmp.end());
+}
+
+void WPolyline::concatTornLine(WPolyline& line, bool firstOrder, bool secondOrder)
+{
+	std::vector<CvPoint> tmp = line.m_points;
+	if (firstOrder && secondOrder)
+	{
+		m_points.insert(m_points.end(), tmp.begin(), tmp.end());
+	}
+	else if (firstOrder && !secondOrder)
+	{
+		std::reverse(tmp.begin(), tmp.end());
+		m_points.insert(m_points.end(), tmp.begin(), tmp.end());
+	}
+	else if (!firstOrder && secondOrder)
+	{
+		std::reverse(tmp.begin(), tmp.end());
+		m_points.insert(m_points.begin(), tmp.begin(), tmp.end());
+	}
+	else if (!firstOrder && !secondOrder)
+	{
+		m_points.insert(m_points.begin(), tmp.begin(), tmp.end());
+	}
 }
 
 WCVPointsContainer WPolyline::simplifyLine(WCVPointsContainer &linevector, double EPSILON, int delta)
 {
 	int i = 0;
-	int k; // curvature
+	double k; // curvature
 	WCVPointsContainer m_outpoints;
-	while (i <= linevector.size())
+	while ( (i + 2 * delta) <= linevector.size())
 	{
 		k = (((linevector[i + 2 * delta].y - linevector[i + delta].y) / (linevector[i + 2 * delta].x - linevector[i + delta].x)) / ((linevector[i + delta].y - linevector[i].y) / (linevector[i + delta].x - linevector[i].x))) / pow((1 + pow((linevector[i + delta].y - linevector[i].y) / (linevector[i + delta].x - linevector[i].x), 2)), 3 / 2);
 		if (k < EPSILON)
