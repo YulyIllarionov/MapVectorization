@@ -12,6 +12,7 @@ public:
     explicit ImageViewer(QImage image,QWidget *parent = 0);
     MyPixmapItem* GetPixItem() const;
     void SetImage(const QImage &image);
+    QImage& GetImage();
 
 signals:
 

@@ -11,8 +11,8 @@
 
 #include "ui_mapappmain.h"
 
-#include "sdk/app/sdk_const.h"
-#include "sdk/base_types.h"
+#include "../sdk/app/sdk_const.h"
+#include "../sdk/base_types.h"
 
 #include "imageviewer.h"
 #include "layersviewer.h"
@@ -54,7 +54,7 @@ private:
     int                       m_idCounter;  // Если ведется работа с несколькими проектами
     QTabWidget*               m_tabs;       // Виджет вкладок
     QList<tab_info>           m_tabsInfo;   // Информация
-    SDK_NAMESPACE::WRaster*   m_image;
+    SDK_NAMESPACE::WRaster    m_image;
 
 private:
     

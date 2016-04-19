@@ -21,7 +21,7 @@ namespace utils
 {  
   std::string WSTR2STR(const std::wstring& wide);
   cv::Mat WsharpKernel(double k);
-  void SetTransparent(cv::Mat& img, cv::Mat& mask, uchar aTrue, int aFalse = -1);
+  void SetTransparent(cv::Mat& img, cv::Mat& mask, uchar aTrue, uchar aFalse = 255);
 }
 
 SDK_END_NAMESPACE

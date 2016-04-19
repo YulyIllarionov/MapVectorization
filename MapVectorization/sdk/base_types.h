@@ -17,6 +17,7 @@
 typedef std::vector<CvPoint>                WCVPointsContainer;
 typedef unsigned char                      WColor;
 
+
 SDK_BEGIN_NAMESPACE
 
 //  Enumerator
@@ -37,14 +38,30 @@ struct WLayer
 {
   enum class LAYER_TYPE
   {
-    TEXT_AND_LINES = 0,
-    AREAS,
-    OTHER
+    LT_TEXT_AND_LINES = 0,
+    LT_AREAS,
+    LT_OTHER
   };
 
   LAYER_TYPE  m_type;
   cv::Mat     m_data;
   cv::Vec3b   m_color;
+  std::string m_name;
+
+};
+// ------------------------------------------------------------
+struct w_color
+{
+    w_color(uchar r, uchar g, uchar b);
+    w_color(cv::Vec4b color);
+    cv::Vec3b& toVec3b();
+    friend inline bool operator <= (const w_color &first, const cv::Vec4b &second);
+    friend inline bool operator >= (const w_color &first, const cv::Vec4b &second);
+
+private:
+    uchar r;
+    uchar g;
+    uchar b;
 };
 // ------------------------------------------------------------
 typedef std::vector<WLayer> LayersContainer;
@@ -52,18 +69,26 @@ typedef std::vector<WLayer> LayersContainer;
 class WRaster //: public IEnumItem<cv::Mat>
 {
 public:
-  WRaster(std::string img_path);
+  WRaster(std::string img_path = "");
 
   virtual ~WRaster(){}
 
   void IncreaseSharpness(double k);
 
-  void WRaster::AddLayer();
+  void AddLayer();
 
-  int WRaster::SetLayerMask(int layerNumber, std::vector<uchar> rgbScope);
+  int SetLayerMask(int layerNumber, const w_color &colorLow, const w_color &colorHigh);
 
-  int WRaster::SetLayerColor(int layerNumber, std::vector<uchar> rgbColor);
-    
+  int WRaster::SetLayerColor(int layerNumber);
+
+  int SetLayerColor(int layerNumber, w_color& rgbColor);
+
+  int SetLayerType(int layerNumber, WLayer::LAYER_TYPE type);
+
+  int SetLayerName(int layerNumber, std::string name);
+
+  std::vector<cv::Rect> detectLetters(int layerNumber);
+
 public:
 
   //bool NextLayer(cv::Mat* layer) const { return Next(layer); }
@@ -118,9 +143,12 @@ public:
 	int getScaler() { return m_scaler; };
 	void setScaler(int scaler);
 
+	WCVPointsContainer simplifyLine(WCVPointsContainer &vectorline, double EPSILON, int delta);
+
 private:
 	double            m_width;
 	WCVPointsContainer  m_points;
+	
 	int m_scaler;
 	WColor m_color;
 };
