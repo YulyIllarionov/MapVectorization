@@ -251,7 +251,9 @@ WCVPointsContainer WPolyline::simplifyLine(WCVPointsContainer &linevector, doubl
 					m_outpoints.push_back((*it));
 			}
 		}
+		i += delta;
 	}
+	return m_outpoints;
 }
 
   SDK_END_NAMESPACE
