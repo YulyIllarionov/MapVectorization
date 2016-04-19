@@ -32,7 +32,7 @@ bool LayerConfigureDialog::event(QEvent *event)
 
 void LayerConfigureDialog::closeEvent(QCloseEvent *event)
 {
-    utils::SetTransparent(m_image->m_raster,cv::Mat(), 255);
+    utils::SetTransparent(m_image->m_raster, cv::Mat(m_image->m_raster.size(), CV_8UC1, 1), 255);
     m_widget->UpdatePixmap();
 }
 

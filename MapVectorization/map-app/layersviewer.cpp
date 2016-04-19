@@ -35,14 +35,16 @@ bool LayersViewer::event(QEvent *event)
         this->setWindowOpacity(1.0);
     if(event->type() == QEvent::WindowDeactivate)
         this->setWindowOpacity(0.5);
+   
     return QWidget::event(event);
 }
 
 void LayersViewer::closeEvent(QCloseEvent *event)
 {
-    utils::SetTransparent(m_image->m_raster,cv::Mat(), 255);
-    m_widget->UpdatePixmap();
+        utils::SetTransparent(m_image->m_raster, cv::Mat(m_image->m_raster.size(), CV_8UC1, 1), 255);
+        m_widget->UpdatePixmap();
 }
+
 void LayersViewer::UpdateList()
 {
     m_ui->listWidget->clear();
