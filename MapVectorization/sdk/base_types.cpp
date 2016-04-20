@@ -66,8 +66,8 @@ inline bool operator >= (const w_color &first, const cv::Vec3b &second)
 
 w_range::w_range()
 {
-    this->low = Vec3b(-1, -1, -1);
-    this->high = Vec3b(-1, -1, -1);
+    this->low = Vec3b(255, 255, 255);
+    this->high = Vec3b(0, 0, 0);
 }
 
 // ------------------------------------------------------------
