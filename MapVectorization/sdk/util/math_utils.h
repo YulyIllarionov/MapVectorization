@@ -14,6 +14,7 @@ SDK_BEGIN_NAMESPACE
 
 class MathUtils
 {
+public:
   // return maximum of two values
   template<typename T> static T Max(T val1, T val2);
   // return minimum of two values

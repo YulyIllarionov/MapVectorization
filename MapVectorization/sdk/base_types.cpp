@@ -8,6 +8,7 @@
 #include "opencv2/highgui/highgui.hpp"
 
 #include  "util/utils.h"
+#include  "util/math_utils.h"
 
 #include "base_types.h"
 
@@ -25,6 +26,15 @@ w_color::w_color(uchar r, uchar g, uchar b)
 // ------------------------------------------------------------
 
 // ------------------------------------------------------------
+w_color::w_color(cv::Vec3b color)
+{
+    this->r = color[2];
+    this->g = color[1];
+    this->b = color[0];
+}
+// ------------------------------------------------------------
+
+// ------------------------------------------------------------
 w_color::w_color(cv::Vec4b color)
 {
     this->r = color[2];
@@ -34,23 +44,62 @@ w_color::w_color(cv::Vec4b color)
 // ------------------------------------------------------------
 
 // ------------------------------------------------------------
-cv::Vec3b& w_color::toVec3b()
+cv::Vec3b w_color::toVec3b() const
 {
     return Vec3b(this->b, this->g, this->r);
 }
 // ------------------------------------------------------------
 
 // ------------------------------------------------------------
-inline bool operator <= (const w_color &first, const cv::Vec4b &second)
+inline bool operator <= (const w_color &first, const cv::Vec3b &second)
 {
     return bool((first.r <= second[2]) && (first.g <= second[1]) && (first.b <= second[0]));
 }
 // ------------------------------------------------------------
 
 // ------------------------------------------------------------
-inline bool operator >= (const w_color &first, const cv::Vec4b &second)
+inline bool operator >= (const w_color &first, const cv::Vec3b &second)
 {
     return bool((first.r >= second[2]) && (first.g >= second[1]) && (first.b >= second[0]));
+}
+// ------------------------------------------------------------
+
+w_range::w_range()
+{
+    this->low = Vec3b(-1, -1, -1);
+    this->high = Vec3b(-1, -1, -1);
+}
+
+// ------------------------------------------------------------
+void w_range::addColor(const w_color& color)
+{
+    this->low[2] = std::min<uchar>(color.r, low[2]);
+    this->low[1] = std::min<uchar>(color.g, low[1]);
+    this->low[0] = std::min<uchar>(color.b,low[0]);
+    this->high[2] = std::max<uchar>(color.r, high[2]);
+    this->high[1] = std::max<uchar>(color.g, high[1]);
+    this->high[0] = std::max<uchar>(color.b, high[0]);
+}
+// ------------------------------------------------------------
+
+// ------------------------------------------------------------
+inline bool w_range::ñontains(const cv::Vec3b& color)
+{
+    return ((color >= this->low) && (color <= this->high));
+}
+// ------------------------------------------------------------
+
+// ------------------------------------------------------------
+w_color w_range::getLow()
+{
+    return w_color(this->low);
+}
+// ------------------------------------------------------------
+
+// ------------------------------------------------------------
+w_color w_range::getHigh()
+{
+    return w_color(this->high);
 }
 // ------------------------------------------------------------
 
@@ -83,61 +132,29 @@ void WRaster::AddLayer()
 {
     WLayer layer;
     layer.m_data = Mat(m_raster.size(), CV_8UC1);
-    layer.m_color = Vec3b(-1, -1, -1);
     m_layers.push_back(layer);
 }
 // ------------------------------------------------------------
 
 // ------------------------------------------------------------
-int WRaster::SetLayerMask(int layerNumber, const w_color& colorLow, const w_color &colorHigh)
+int WRaster::AddColorToLayer(int layerNumber, const w_color& color)
 {
     if (layerNumber >= m_layers.size())
         return 1;
     if (m_raster.size() != (m_layers[layerNumber]).m_data.size())
         return 2;
 
+    m_layers[layerNumber].m_color_range.addColor(color);
+
     for (int y = 0; y < m_raster.rows; y++)
     {
         for (int x = 0; x < m_raster.cols; x++)
         {
-            const Vec4b currentColor = m_raster.at<Vec4b>(y, x);
+            const Vec3b currentColor = m_raster.at<Vec3b>(y, x);
             m_layers.at(layerNumber).m_data.at<uchar>(y, x) =
-                ((colorLow <= currentColor) && (colorHigh >= currentColor)) ? 1 : 0;
+                (m_layers.at(layerNumber).m_color_range.ñontains(currentColor)) ? 1 : 0;
         }
     }
-    return 0;
-}
-// ------------------------------------------------------------
-
-// ------------------------------------------------------------
-int WRaster::SetLayerColor(int layerNumber, w_color& rgbColor)
-{
-    if (layerNumber >= m_layers.size())
-        return 1;
-    m_layers.at(layerNumber).m_color = rgbColor.toVec3b();
-    return 0;
-}
-// ------------------------------------------------------------
-
-// ------------------------------------------------------------
-int WRaster::SetLayerColor(int layerNumber)
-{
-    if (layerNumber >= m_layers.size())
-        return 1;
-    Vec3b  averageColor(0,0,0);
-    int number = 0;
-    for (int y = 0; y < m_raster.rows; y++)
-    {
-        for (int x = 0; x < m_raster.cols; x++)
-        {
-            if (m_layers[layerNumber].m_data.at<uchar>(y, x)>0)
-            {
-                averageColor += m_raster.at<Vec3b>(y, x);
-                number++;
-            }
-        }
-    }
-    m_layers[layerNumber].m_color = averageColor / number;
     return 0;
 }
 // ------------------------------------------------------------

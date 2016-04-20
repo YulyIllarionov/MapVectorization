@@ -30,34 +30,52 @@ protected:
   virtual ~IEnumItem() {}
 };
 // ------------------------------------------------------------
-struct WLayer
+struct w_color;
+// ------------------------------------------------------------
+struct w_range
 {
-  enum class LAYER_TYPE
-  {
-    LT_TEXT_AND_LINES = 0,
-    LT_AREAS,
-    LT_OTHER
-  };
+    w_range();
+    void addColor(const w_color& color);
+    inline bool ñontains(const cv::Vec3b& color);
+    w_color getLow();
+    w_color getHigh();
 
-  LAYER_TYPE  m_type;
-  cv::Mat     m_data;
-  cv::Vec3b   m_color;
-  std::string m_name;
-
+private:
+    cv::Vec3b low;
+    cv::Vec3b high;
 };
 // ------------------------------------------------------------
 struct w_color
 {
+    //friend w_range;
     w_color(uchar r, uchar g, uchar b);
+    w_color(cv::Vec3b color);
     w_color(cv::Vec4b color);
-    cv::Vec3b& toVec3b();
-    friend inline bool operator <= (const w_color &first, const cv::Vec4b &second);
-    friend inline bool operator >= (const w_color &first, const cv::Vec4b &second);
+    cv::Vec3b toVec3b() const;
+    friend inline bool operator <= (const w_color &first, const cv::Vec3b &second);
+    friend inline bool operator >= (const w_color &first, const cv::Vec3b &second);
+    friend void w_range::addColor(const w_color& color);
 
 private:
     uchar r;
     uchar g;
     uchar b;
+};
+// ------------------------------------------------------------
+struct WLayer
+{
+    enum class LAYER_TYPE
+    {
+        LT_TEXT_AND_LINES = 0,
+        LT_AREAS,
+        LT_OTHER
+    };
+
+    LAYER_TYPE  m_type;
+    cv::Mat     m_data;
+    w_range     m_color_range;
+    std::string m_name;
+
 };
 // ------------------------------------------------------------
 typedef std::vector<WLayer> LayersContainer;
@@ -73,12 +91,8 @@ public:
 
   void AddLayer();
 
-  int SetLayerMask(int layerNumber, const w_color &colorLow, const w_color &colorHigh);
-
-  int WRaster::SetLayerColor(int layerNumber);
-
-  int SetLayerColor(int layerNumber, w_color& rgbColor);
-
+  int AddColorToLayer(int layerNumber, const w_color& color);
+  
   int SetLayerType(int layerNumber, WLayer::LAYER_TYPE type);
 
   int SetLayerName(int layerNumber, std::string name);

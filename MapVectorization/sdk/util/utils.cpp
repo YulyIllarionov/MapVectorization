@@ -57,5 +57,29 @@ namespace utils {
                 img.at<cv::Vec4b>(y, x)[3] = (mask.at<uchar>(y, x) > 0) ? aTrue : aFalse;
     }
     // ----------------------------------------------------
+    inline bool operator < (cv::Vec3b& first, cv::Vec3b& second)
+    {
+        if (first[0] < second[0])
+            if (first[1] < second[1])
+                if (first[1] < second[1])
+                    return true;
+        return false;
+    }
+    // ----------------------------------------------------
+    inline bool operator > (cv::Vec3b& first, cv::Vec3b& second)
+    {
+        return (second < first);
+    }
+    // ----------------------------------------------------
+    inline bool operator <= (cv::Vec3b& first, cv::Vec3b& second)
+    {
+        return !(second < first);
+    }
+    // ----------------------------------------------------
+    inline bool operator >= (cv::Vec3b& first, cv::Vec3b& second)
+    {
+        return !(first < second);
+    }
+    // ----------------------------------------------------
 }
 SDK_END_NAMESPACE
