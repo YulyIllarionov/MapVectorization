@@ -23,8 +23,9 @@ void LayersViewer::on_Add_clicked()
 {
     int num = m_image->m_layers.size();
     m_image->AddLayer();
+    utils::SetTransparent(m_image->m_raster, cv::Mat(m_image->m_raster.size(), CV_8UC1, 1), 255);
+    m_widget->UpdatePixmap();
     LayerConfigureDialog* dlg = new LayerConfigureDialog(m_image, m_widget, num);
-
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     dlg->setWindowFlags(Qt::WindowStaysOnTopHint);
     QObject::connect(dlg, SIGNAL(Accept()), this, SLOT(UpdateList()));

@@ -40,7 +40,7 @@ bool LayerConfigureDialog::eventFilter(QObject *obj, QEvent *event)
 {
     if(event->type()==QEvent::MouseButtonPress)
     {
-        if (obj == m_ui->SapleFrame)
+        if (obj == m_ui->LeftSample || obj == m_ui->RightSample)
         {
             QColor temp_color = QColorDialog::getColor(QColor(m_r, m_g, m_b));
             if (temp_color.isValid())
