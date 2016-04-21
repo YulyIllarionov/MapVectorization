@@ -49,9 +49,7 @@ private:
     WRaster*   m_image;
     int m_layerNum;
 
-    //int   m_leftR, m_leftG, m_leftB, m_rightR, m_rightG, m_rightB;
     int   m_r, m_g, m_b;
-    bool  m_firstColor;
 };
 
 #endif // LAYERCONFIGUREDIALOG_H

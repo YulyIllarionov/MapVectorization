@@ -11,7 +11,6 @@ LayerConfigureDialog::LayerConfigureDialog(WRaster* image, ImageViewer* widget,i
     m_image = image;
     m_widget = widget;
     m_layerNum = layerNum;
-    m_firstColor = true;
     QObject::connect(m_widget->GetPixItem(), SIGNAL(sendCoord(int, int)), this, SLOT(GetCoord(int, int)));
     m_ui->LeftSample->installEventFilter(this);
     m_ui->RightSample->installEventFilter(this);
@@ -39,29 +38,22 @@ void LayerConfigureDialog::closeEvent(QCloseEvent *event)
 
 bool LayerConfigureDialog::eventFilter(QObject *obj, QEvent *event)
 {
-    /*if(event->type()==QEvent::MouseButtonPress)
+    if(event->type()==QEvent::MouseButtonPress)
     {
-        if(obj==m_ui->LeftSample)
+        if (obj == m_ui->SapleFrame)
         {
-           QColor temp_color=QColorDialog::getColor(QColor(m_leftR,m_leftG,m_leftB));
-           m_leftR=temp_color.red();
-           m_leftG=temp_color.green();
-           m_leftB=temp_color.blue();
-           UpdateSamples();
-           UpdatesMask();
-        }
-        if(obj==m_ui->RightSample)
-        {
-           QColor temp_color=QColorDialog::getColor(QColor(m_rightR,m_rightG,m_rightB));
-           m_rightR=temp_color.red();
-           m_rightG=temp_color.green();
-           m_rightB=temp_color.blue();
-           UpdateSamples();
-           UpdatesMask();
-        }
+            QColor temp_color = QColorDialog::getColor(QColor(m_r, m_g, m_b));
+            if (temp_color.isValid())
+            {
+                m_r = temp_color.red();
+                m_g = temp_color.green();
+                m_b = temp_color.blue();
+                on_AddColor_clicked();
+            }
 
-        return true;
-    }*/
+            return true;
+        }
+    }
     return false;
 }
 
