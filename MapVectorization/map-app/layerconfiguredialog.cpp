@@ -4,12 +4,13 @@
 #include "ui_layerconfiguredialog.h"
 
 
-LayerConfigureDialog::LayerConfigureDialog(WRaster* image, ImageViewer* widget,QWidget *parent) :
+LayerConfigureDialog::LayerConfigureDialog(WRaster* image, ImageViewer* widget,int layerNum,QWidget *parent) :
     QWidget(parent), m_ui(new Ui::LayerConfigureDialog)
 {
     m_ui->setupUi(this);
     m_image = image;
     m_widget = widget;
+    m_layerNum = layerNum;
     m_firstColor = true;
     QObject::connect(m_widget->GetPixItem(), SIGNAL(sendCoord(int, int)), this, SLOT(GetCoord(int, int)));
     m_ui->LeftSample->installEventFilter(this);
@@ -38,7 +39,7 @@ void LayerConfigureDialog::closeEvent(QCloseEvent *event)
 
 bool LayerConfigureDialog::eventFilter(QObject *obj, QEvent *event)
 {
-    if(event->type()==QEvent::MouseButtonPress)
+    /*if(event->type()==QEvent::MouseButtonPress)
     {
         if(obj==m_ui->LeftSample)
         {
@@ -60,7 +61,7 @@ bool LayerConfigureDialog::eventFilter(QObject *obj, QEvent *event)
         }
 
         return true;
-    }
+    }*/
     return false;
 }
 
@@ -76,77 +77,43 @@ void LayerConfigureDialog::GetCoord(int x, int y)
         palette.setColor(QPalette::Background, QColor(rgb));
         m_ui->SapleFrame->setPalette(palette);
         m_ui->Pipette->setChecked(false);
-        //activateWindow();
+        activateWindow();
     }
 }
 
 void LayerConfigureDialog::UpdateSamples()
 {
-    if(!m_firstColor)
-    {
         QPalette palette;
-        palette.setColor(QPalette::Background, QColor(m_leftR, m_leftG, m_leftB));
+        w_color tempColor=m_image->m_layers.at(m_layerNum).m_color_range.getLow();
+        palette.setColor(QPalette::Background,QColor(tempColor.r, tempColor.g, tempColor.b));
         m_ui->LeftSample->setPalette(palette);
-        palette.setColor(QPalette::Background, QColor(m_rightR, m_rightG, m_rightB));
+        tempColor = m_image->m_layers.at(m_layerNum).m_color_range.getHigh();
+        palette.setColor(QPalette::Background,QColor(tempColor.r, tempColor.g, tempColor.b));
         m_ui->RightSample->setPalette(palette);
-    }
 }
 
 void LayerConfigureDialog::on_AddColor_clicked()
 {
-    if(m_firstColor)
-    {
-        m_rightR = m_leftR = m_r;
-        m_rightG = m_leftG = m_g;
-        m_rightB = m_leftB = m_b;
-        m_firstColor = false;
-    }
-    else
-    {
-        if(m_r > m_rightR) m_rightR = m_r;
-        else if (m_r < m_leftR) m_leftR = m_r;
-
-        if(m_g > m_rightG) m_rightG = m_g;
-        else if (m_g < m_leftG) m_leftG = m_g;
-
-        if(m_b > m_rightB) m_rightB = m_b;
-        else if (m_r < m_leftB) m_leftB = m_b;
-    }
+    m_image->AddColorToLayer(m_layerNum, w_color(m_r,m_g,m_b));
     UpdateSamples();
     UpdatesMask();
-
 
 }
 
 void LayerConfigureDialog::UpdatesMask()
 {
-    int number = m_image->m_layers.size();
-    m_image->AddLayer();
-    w_color wc2(m_leftR, m_leftG, m_leftB);
-    w_color wc3(m_rightR, m_rightG, m_rightB);
-
-    m_image->SetLayerMask(number, wc2,wc3);
-
-    utils::SetTransparent(m_image->m_raster, m_image->m_layers.at(number).m_data, 50);
+    w_color wc2 = m_image->m_layers.at(m_layerNum).m_color_range.getLow();
+    w_color wc3= m_image->m_layers.at(m_layerNum).m_color_range.getHigh();
+    utils::SetTransparent(m_image->m_raster, m_image->m_layers.at(m_layerNum).m_data, 50);
     m_widget->UpdatePixmap();
     QObject::connect(m_widget->GetPixItem(), SIGNAL(sendCoord(int, int)), this, SLOT(GetCoord(int, int)));
-    m_image->m_layers.pop_back();
 }
 
 void LayerConfigureDialog::on_buttonBox_accepted()
 {
-    int number = m_image->m_layers.size();
-    m_image->AddLayer();
-    w_color wc1((m_rightR + m_leftR) / 2, (m_rightG + m_leftG) / 2, (m_rightB + m_leftB) / 2);
-    m_image->SetLayerColor(number, wc1);
     
-    w_color wc2(m_leftR, m_leftG, m_leftB);
-    w_color wc3(m_rightR, m_rightG, m_rightB);
-
-    m_image->SetLayerMask(number,wc2,wc3);
-
-    m_image->SetLayerType(number,(WLayer::LAYER_TYPE)(m_ui->Type->currentIndex()));
-    m_image->SetLayerName(number, m_ui->Name->text().toStdString());
+    m_image->SetLayerType(m_layerNum,(WLayer::LAYER_TYPE)(m_ui->Type->currentIndex()));
+    m_image->SetLayerName(m_layerNum, m_ui->Name->text().toStdString());
     emit Accept();
 
     this->close();

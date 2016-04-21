@@ -56,7 +56,6 @@ struct w_color
     friend inline bool operator >= (const w_color &first, const cv::Vec3b &second);
     friend void w_range::addColor(const w_color& color);
 
-private:
     uchar r;
     uchar g;
     uchar b;

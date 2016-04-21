@@ -22,7 +22,7 @@ class LayerConfigureDialog : public QWidget
     Q_OBJECT
 
 public:
-    explicit LayerConfigureDialog(WRaster* image, ImageViewer* widget, QWidget *parent = 0);
+    explicit LayerConfigureDialog(WRaster* image, ImageViewer* widget,int layerNum, QWidget *parent = 0);
     ~LayerConfigureDialog();
 
 protected:
@@ -47,8 +47,9 @@ private:
     Ui::LayerConfigureDialog*   m_ui;
     ImageViewer*              m_widget;
     WRaster*   m_image;
+    int m_layerNum;
 
-    int   m_leftR, m_leftG, m_leftB, m_rightR, m_rightG, m_rightB;
+    //int   m_leftR, m_leftG, m_leftB, m_rightR, m_rightG, m_rightB;
     int   m_r, m_g, m_b;
     bool  m_firstColor;
 };

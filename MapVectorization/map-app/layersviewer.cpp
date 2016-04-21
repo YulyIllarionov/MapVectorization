@@ -21,7 +21,9 @@ LayersViewer::~LayersViewer()
 
 void LayersViewer::on_Add_clicked()
 {
-    LayerConfigureDialog* dlg = new LayerConfigureDialog(m_image, m_widget);
+    int num = m_image->m_layers.size();
+    m_image->AddLayer();
+    LayerConfigureDialog* dlg = new LayerConfigureDialog(m_image, m_widget, num);
 
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     dlg->setWindowFlags(Qt::WindowStaysOnTopHint);
