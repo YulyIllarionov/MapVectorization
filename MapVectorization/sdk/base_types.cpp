@@ -145,8 +145,8 @@ SDKResult WRaster::AddColorToLayer(const LayerUUID& layerId, const w_color& colo
     {
       const Vec3b currentColor = m_raster.at<Vec3b>(y, x);
       layer->m_data.at<uchar>(y, x) = layer->m_color_range.contains(currentColor) ? 1 : 0;
-        }
     }
+  }
 
   return kSDKResult_Succeeded;
 }
