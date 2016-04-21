@@ -54,14 +54,15 @@ typedef std::vector<LayerUUID>  LayerIDs;
 struct WLayer
 {
   typedef uint LAYER_TYPE;
-  enum/* class*/ LAYER_TYPE_ENUM //: uint
+  enum/* class*/ LAYER_TYPE_ENUM : uint
   {
-    LT_NONE = 0x0,
-    LT_TEXT = 0x1,
-    LT_LINES = 0x2,
-    LT_AREAS = 0x4,
-    LT_OTHER = 0x8,
-    // = 0x10  
+    LT_NONE   = 0x0000,
+    LT_TEXT   = 0x0001,
+    LT_LINES  = 0x0002,
+    LT_AREAS  = 0x0004,
+    LT_OTHER  = 0x0008,
+    // = 0x10 
+    LT_ALL    = 0xFFFF, 
   };
   friend class WRaster;
 
@@ -140,11 +141,12 @@ public:
   SDKResult GetLayersByType (WLayer::LAYER_TYPE type, LayerIDs& layerIds) const;
   // split layer by function
   SDKResult SplitLayer      (const LayerUUID& layerId, LayerIDs& splittedLayers);
+  // get layers count
+  size_t    GetLayersCount  () { return m_layers.size(); }
   //}
-
-  
+ 
 public:
-    int GetLayersContainerSize() { return m_layers.size(); }
+
 
 private:
   SDKResult SetLayerType (const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite) const;
