@@ -142,8 +142,9 @@ public:
   SDKResult SplitLayer      (const LayerUUID& layerId, LayerIDs& splittedLayers);
   //}
 
+  
 public:
-
+    int GetLayersContainerSize() { return m_layers.size(); }
 
 private:
   SDKResult SetLayerType (const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite) const;
@@ -171,8 +172,10 @@ private:
   //  return *this;
   //}
 
-  cv::Mat           m_raster;
+  
   LayersContainer   m_layers;
+public:
+  cv::Mat           m_raster;
 
 private:
 
