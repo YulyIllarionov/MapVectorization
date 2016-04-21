@@ -114,5 +114,6 @@ void LayerConfigureDialog::on_buttonBox_accepted()
 
 void LayerConfigureDialog::on_buttonBox_rejected()
 {
+    emit Reject();
     this->close();
 }

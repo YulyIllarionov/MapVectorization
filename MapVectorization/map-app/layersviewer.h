@@ -25,7 +25,7 @@ protected:
     void closeEvent(QCloseEvent *event);
 private slots:
     void on_Add_clicked();
-
+    void onReject();
     void on_listWidget_currentRowChanged(int currentRow);
 
 private:

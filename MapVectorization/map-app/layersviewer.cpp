@@ -28,6 +28,7 @@ void LayersViewer::on_Add_clicked()
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     dlg->setWindowFlags(Qt::WindowStaysOnTopHint);
     QObject::connect(dlg, SIGNAL(Accept()), this, SLOT(UpdateList()));
+    QObject::connect(dlg, SIGNAL(Reject()), this, SLOT(onReject()));
     dlg->show();
 }
 
@@ -68,4 +69,9 @@ void LayersViewer::on_listWidget_currentRowChanged(int currentRow)
 {
     utils::SetTransparent(m_image->m_raster, m_image->m_layers.at(currentRow).m_data,50);
     m_widget->UpdatePixmap();
+}
+
+void LayersViewer::onReject()
+{
+    m_image->m_layers.pop_back();
 }
