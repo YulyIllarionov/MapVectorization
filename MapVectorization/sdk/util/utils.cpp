@@ -5,6 +5,15 @@
 
 #include "stdafx.h"
 
+extern "C"
+{
+#ifdef WIN32
+#include <Rpc.h>
+#else
+#include <uuid/uuid.h>
+#endif
+}
+
 #include <iostream>
 
 #include "utils.h"
@@ -42,7 +51,7 @@ namespace utils {
     //       1. именование: WsharpKernel(float k) функция возвращающая ядро свертки для увеличения резкости 
     //       2. аргументы функции:  k - коэффицент ядра
     // ----------------------------------------------------
-    cv::Mat WsharpKernel(double k)
+    cv::Mat SharpKernel(double k)
     {
         cv::Mat kernel(3, 3, CV_64F, -0.125);
         kernel *= k;
@@ -55,6 +64,27 @@ namespace utils {
         for (int y = 0; y < img.rows; y++)
             for (int x = 0; x < img.cols; x++)
                 img.at<cv::Vec4b>(y, x)[3] = (mask.at<uchar>(y, x) > 0) ? aTrue : aFalse;
+    } 
+    // ----------------------------------------------------
+    std::string genUUID()
+    {
+    #ifdef WIN32
+      UUID uuid;
+      UuidCreate ( &uuid );
+
+      unsigned char * str;
+      UuidToStringA ( &uuid, &str );
+
+      std::string s( ( char* ) str );
+
+      RpcStringFreeA ( &str );
+    #else
+      uuid_t uuid;
+      uuid_generate_random ( uuid );
+      char s[37];
+      uuid_unparse ( uuid, s );
+    #endif
+      return s;
     }
     // ----------------------------------------------------
     inline bool operator < (cv::Vec3b& first, cv::Vec3b& second)
@@ -81,5 +111,6 @@ namespace utils {
         return !(first < second);
     }
     // ----------------------------------------------------
+
 }
 SDK_END_NAMESPACE

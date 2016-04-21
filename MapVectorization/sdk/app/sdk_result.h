@@ -6,7 +6,7 @@
 #ifndef SDK_RESULT_H_
 #define SDK_RESULT_H_
 #pragma once
-
+ 
 #include "sdk_const.h"
 
 
@@ -29,13 +29,9 @@ static const SDKResult kSDKResult_InternalError = 4;
 //
 static const SDKResult kSDKResult_NullPointer   = 5;
 
-
-static bool S_Suc(const SDKResult& result) { return result == kSDKResult_Succeeded; }
-static bool S_ERR(const SDKResult& result) { return (result & 0x11111111) != 0; }
-static bool S_OK(const SDKResult& result) { return !S_ERR(result); }
-
-
-
+inline bool S_Suc(const SDKResult& result) { return result == kSDKResult_Succeeded; }
+inline bool S_ERR(const SDKResult& result) { return (result & 0x11111111) != 0; }
+inline bool S_OK(const SDKResult& result) { return !S_ERR(result); }
 
 
 
