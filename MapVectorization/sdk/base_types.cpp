@@ -143,7 +143,7 @@ SDKResult WRaster::AddColorToLayer(const LayerUUID& layerId, const w_color& colo
   {
     for (int x = 0; x < m_raster.cols; x++)
     {
-      const Vec3b currentColorOld = m_raster.at<Vec3b>(y, x);
+      const Vec4b currentColorOld = m_raster.at<Vec4b>(y, x);
       const Vec3b currentColor(currentColorOld[0], currentColorOld[1], currentColorOld[2]);
       layer->m_data.at<uchar>(y, x) = layer->m_color_range.contains(currentColor) ? 1 : 0;
     }
