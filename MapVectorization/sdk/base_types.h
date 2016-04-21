@@ -85,8 +85,10 @@ public:
 
   std::vector<cv::Rect> detectLetters(int layerNumber);
 
-public:
+  int deleteObjects (int layerNumber1, int layerNumber2);
 
+  w_color getBackgroundColor ();
+public:	
   //bool NextLayer(cv::Mat* layer) const { return Next(layer); }
   //void ResetLayerEnum() const { Reset(); }
 

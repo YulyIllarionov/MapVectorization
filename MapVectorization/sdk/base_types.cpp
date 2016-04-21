@@ -89,6 +89,25 @@ void WRaster::AddLayer()
 // ------------------------------------------------------------
 
 // ------------------------------------------------------------
+int WRaster::deleteObjects(int layerText, int layerNumber2)
+{
+	std::vector<std::vector<Point> > contours;
+	std::vector<Vec4i> hierarchy;
+ 
+	findContours(  m_layers.at(layerText).m_data, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+	for( int i = 0; i < contours.size(); i++ )
+	{
+		int erosion_size = 6;  
+		Mat element = getStructuringElement(cv::MORPH_CROSS,
+              cv::Size(2 * erosion_size + 1, 2 * erosion_size + 1),
+              cv::Point(erosion_size, erosion_size) );
+		erode(contours[i],m_layers.at(layerNumber2).m_data, m_layers.at(layerNumber2).m_data);
+	}
+	return 0;
+}
+// ------------------------------------------------------------
+
+// ------------------------------------------------------------
 int WRaster::SetLayerMask(int layerNumber, const w_color& colorLow, const w_color &colorHigh)
 {
     if (layerNumber >= m_layers.size())
@@ -186,5 +205,4 @@ std::vector<cv::Rect> WRaster::detectLetters(int layerNumber)
     return boundRect;
 }
 // ------------------------------------------------------------
-
   SDK_END_NAMESPACE
