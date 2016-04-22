@@ -103,8 +103,14 @@ void LayerConfigureDialog::UpdatesMask()
 
 void LayerConfigureDialog::on_buttonBox_accepted()
 {
-    
-    m_image->SetLayerType(m_tempLayer->getID(),(WLayer::LAYER_TYPE)(1<<(m_ui->Type->currentIndex()-1)));
+    QCheckBox * mas[4] = {m_ui->checkBox,m_ui->checkBox_2,m_ui->checkBox_3,m_ui->checkBox_4};
+    int tempType = 0;
+    for (int i = 0;i < 4;i++)
+    {
+        if (mas[i]->isChecked()) 
+            tempType += 1 << i;
+    }
+    m_image->SetLayerType(m_tempLayer->getID(),(WLayer::LAYER_TYPE)tempType);
     
     
     m_image->SetLayerName(m_tempLayer->getID(), m_ui->Name->text().toStdString());

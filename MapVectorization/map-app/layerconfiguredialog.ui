@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>204</width>
-    <height>306</height>
+    <width>223</width>
+    <height>402</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="3,1,5,1,1,1">
+  <layout class="QVBoxLayout" name="verticalLayout_5" stretch="2,1,3,1,1,1">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,10">
      <item>
@@ -165,50 +165,41 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QLabel" name="label_4">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Тип слоя:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="Type">
-       <item>
-        <property name="text">
-         <string>Не определен</string>
-        </property>
-       </item>
-       <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Тип слоя</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QCheckBox" name="checkBox">
         <property name="text">
          <string>Текст</string>
         </property>
-       </item>
-       <item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_2">
         <property name="text">
          <string>Линии</string>
         </property>
-       </item>
-       <item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_3">
         <property name="text">
          <string>Области</string>
         </property>
-       </item>
-       <item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_4">
         <property name="text">
          <string>Другое</string>
         </property>
-       </item>
-      </widget>
-     </item>
-    </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">

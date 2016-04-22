@@ -56,7 +56,7 @@ void LayersViewer::UpdateList()
     m_ui->listWidget->clear();
     for (int i = 0; i < m_layers->size(); i++)
     {
-        QString temp;
+        /*QString temp;
         switch(m_layers->at(i)->getType())
         {
         case WLayer::LAYER_TYPE_ENUM::LT_TEXT:
@@ -69,8 +69,8 @@ void LayersViewer::UpdateList()
             temp = "other"; break;
         case WLayer::LAYER_TYPE_ENUM::LT_NONE:
             temp = "none"; break;
-        }
-
+        }*/
+        QString temp= QString::number((int)m_layers->at(i)->getType());
         m_ui->listWidget->addItem(QString::fromStdString(m_layers->at(i)->getName())+" - "+temp);
     }
 
