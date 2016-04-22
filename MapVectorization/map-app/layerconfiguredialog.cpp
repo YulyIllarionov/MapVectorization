@@ -70,6 +70,7 @@ void LayerConfigureDialog::GetCoord(int x, int y)
         m_ui->Pipette->setChecked(false);
         activateWindow();
     }
+    on_AddColor_clicked();
 }
 
 void LayerConfigureDialog::UpdateSamples()
