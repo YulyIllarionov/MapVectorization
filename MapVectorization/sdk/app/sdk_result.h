@@ -30,8 +30,8 @@ static const SDKResult kSDKResult_InternalError = 0x00000008;
 static const SDKResult kSDKResult_NullPointer   = 0x00000010;
 
 inline bool S_Suc(const SDKResult& result) { return result == kSDKResult_Succeeded; }
-inline bool S_ERR(const SDKResult& result) { return (result & 0xFF) != 0; }
-inline bool S_OK(const SDKResult& result) { return !S_ERR(result); }
+inline bool S_Err(const SDKResult& result) { return (result & 0xFFFFFFFF) != 0; }
+inline bool S_Ok(const SDKResult& result) { return !S_Err(result); }
 
 
 

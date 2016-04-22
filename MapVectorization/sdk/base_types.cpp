@@ -287,7 +287,7 @@ SDKResult WRaster::SplitLayer(const LayerUUID& layerId, LayerIDs& splittedLayers
   }
   __finally
   {
-    if (S_OK(result))
+    if (S_Ok(result))
       RemoveLayer(layer->m_uuid);
     layer = nullptr;
   }
