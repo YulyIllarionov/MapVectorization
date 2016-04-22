@@ -22,7 +22,7 @@ class LayerConfigureDialog : public QWidget
     Q_OBJECT
 
 public:
-    explicit LayerConfigureDialog(WRaster* image, ImageViewer* widget,int layerNum, QWidget *parent = 0);
+    explicit LayerConfigureDialog(WRaster* image, ImageViewer* widget,WLayer *tempLayer, QWidget *parent = 0);
     ~LayerConfigureDialog();
 
 protected:
@@ -48,7 +48,7 @@ private:
     Ui::LayerConfigureDialog*   m_ui;
     ImageViewer*              m_widget;
     WRaster*   m_image;
-    int m_layerNum;
+    WLayer *m_tempLayer;
 
     int   m_r, m_g, m_b;
 };
