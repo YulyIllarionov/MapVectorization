@@ -95,12 +95,46 @@ void WRaster::Initialize(const std::string& imgPath)
 {
   // Read the file
   Mat raster = imread(String(imgPath), CV_LOAD_IMAGE_COLOR);   
-  cvtColor(raster, m_raster, CV_RGB2RGBA, 4);
+  cvtColor(raster, m_raster, CV_BGR2BGRA, 4);
 }
 // ------------------------------------------------------------
 SDKResult WRaster::IncreaseSharpness(double k) const
 {
-  filter2D(m_raster, m_raster, m_raster.depth(), utils::SharpKernel(k));
+  //filter2D(m_raster, m_raster, m_raster.depth(), utils::SharpKernel(k));
+
+  Mat kernel = utils::SharpKernel(k);
+  Mat img;
+  cvtColor(m_raster, img, CV_BGRA2BGR);
+  Mat imgOut(img);
+  Mat imgGray;
+  Mat imgEdges;
+
+  cvtColor(m_raster, imgGray, COLOR_RGB2GRAY);
+  Canny(imgGray, imgEdges, 90, 200);
+  
+  for (int y = 1; y < img.rows - 1; y++)
+  {
+      for (int x = 1; x < img.cols - 1; x++)
+      {
+          if (imgEdges.at<uchar>(y, x) > 0)
+          {
+              Rect region_of_interest = Rect(x - 1, y - 1, 3, 3);
+              Mat image_roi = img(region_of_interest);
+              Vec3d sum(0.0, 0.0, 0.0);
+              Vec3d currentColor;
+              for (int y1 = 0; y1 < image_roi.rows; y1++)
+              {
+                  for (int x1 = 0; x1 < image_roi.cols; x1++)
+                  {
+                      currentColor = image_roi.at<Vec3b>(y1, x1);
+                      sum += kernel.at<double>(y1, x1)*currentColor;
+                  }
+              }
+              imgOut.at<Vec3b>(y, x) = sum;
+          }
+      }
+  }
+  cvtColor(imgOut, m_raster, CV_BGR2BGRA);
   return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
