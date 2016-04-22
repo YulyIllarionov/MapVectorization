@@ -183,7 +183,17 @@
       <widget class="QComboBox" name="Type">
        <item>
         <property name="text">
-         <string>Линии и текст</string>
+         <string>Не определен</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Текст</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Линии</string>
         </property>
        </item>
        <item>

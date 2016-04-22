@@ -12,8 +12,7 @@ LayerConfigureDialog::LayerConfigureDialog(WRaster* image, ImageViewer* widget,W
     m_widget = widget;
     m_tempLayer = tempLayer;
     QObject::connect(m_widget->GetPixItem(), SIGNAL(sendCoord(int, int)), this, SLOT(GetCoord(int, int)));
-    m_ui->LeftSample->installEventFilter(this);
-    m_ui->RightSample->installEventFilter(this);
+    m_ui->SapleFrame->installEventFilter(this);
 }
 
 LayerConfigureDialog::~LayerConfigureDialog()
@@ -40,7 +39,7 @@ bool LayerConfigureDialog::eventFilter(QObject *obj, QEvent *event)
 {
     if(event->type()==QEvent::MouseButtonPress)
     {
-        if (obj == m_ui->LeftSample || obj == m_ui->RightSample)
+        if (obj == m_ui->SapleFrame)
         {
             QColor temp_color = QColorDialog::getColor(QColor(m_r, m_g, m_b));
             if (temp_color.isValid())

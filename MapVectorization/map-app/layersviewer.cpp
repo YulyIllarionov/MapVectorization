@@ -6,11 +6,12 @@
 
 
 LayersViewer::LayersViewer(WRaster* image, ImageViewer* widget, QList<WLayer*> *layers,QWidget* parent) :
-    QWidget(parent), m_ui(new Ui::LayersViewer), m_widget(widget), m_image(image)
+    QWidget(parent), m_ui(new Ui::LayersViewer)
 {
     m_ui->setupUi(this);
     m_image = image;
     m_widget = widget;
+    m_layers = layers;
     UpdateList();
 }
 
@@ -53,7 +54,6 @@ void LayersViewer::closeEvent(QCloseEvent *event)
 void LayersViewer::UpdateList()
 {
     m_ui->listWidget->clear();
-
     for (int i = 0; i < m_layers->size(); i++)
     {
         QString temp;
@@ -77,12 +77,21 @@ void LayersViewer::UpdateList()
 }
 void LayersViewer::on_listWidget_currentRowChanged(int currentRow)
 {
-    utils::SetTransparent(m_image->m_raster, m_layers->at(currentRow)->m_data,50);
-    m_widget->UpdatePixmap();
+    if (m_layers->size() > 0)
+    {
+        utils::SetTransparent(m_image->m_raster, m_layers->at(currentRow)->m_data, 50);
+        m_widget->UpdatePixmap();
+    }
 }
 
 void LayersViewer::onReject()
 {
     m_image->RemoveLayer(m_tempLayer->getID());
     m_layers->pop_back();
+}
+void LayersViewer::on_Remove_clicked()
+{
+    m_image->RemoveLayer(m_layers->at(m_ui->listWidget->currentRow())->getID());
+    m_layers->removeAt(m_ui->listWidget->currentRow());
+    UpdateList();
 }

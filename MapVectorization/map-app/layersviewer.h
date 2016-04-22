@@ -18,15 +18,17 @@ class LayersViewer : public QWidget
 public:
     explicit LayersViewer(WRaster* image, ImageViewer* widget, QList<WLayer*> *layers, QWidget* parent = 0);
     ~LayersViewer();
-public slots:
+    public slots:
     void UpdateList();
 protected:
     bool event(QEvent *event);
     void closeEvent(QCloseEvent *event);
-private slots:
+    private slots:
     void on_Add_clicked();
     void onReject();
     void on_listWidget_currentRowChanged(int currentRow);
+
+    void on_Remove_clicked();
 
 private:
     Ui::LayersViewer*         m_ui;
@@ -35,5 +37,4 @@ private:
     QList<WLayer*>           *m_layers;
     WLayer                   *m_tempLayer;
 };
-
 #endif // LAYERSVIEWER_H
