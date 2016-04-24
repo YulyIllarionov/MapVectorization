@@ -49,6 +49,7 @@ private:
 
 // ------------------------------------------------------------
 typedef std::string             LayerUUID;
+typedef std::string             GroupID;
 typedef std::vector<LayerUUID>  LayerIDs;
 // ------------------------------------------------------------
 struct WLayer
@@ -56,13 +57,13 @@ struct WLayer
   typedef uint LAYER_TYPE;
   enum/* class*/ LAYER_TYPE_ENUM : uint
   {
-    LT_NONE   = 0x0000,
-    LT_TEXT   = 0x0001,
-    LT_LINES  = 0x0002,
-    LT_AREAS  = 0x0004,
-    LT_OTHER  = 0x0008,
-    // = 0x10 
-    LT_ALL    = 0xFFFF, 
+    LT_NONE    = 0x0000,
+    LT_TEXT    = 0x0001,
+    LT_LINES   = 0x0002,
+    LT_AREAS   = 0x0004,
+    LT_SYMBOLS = 0x0008,
+    LT_OTHER   = 0x0010, 
+    LT_ALL     = 0xFFFF, 
   };
   friend class WRaster;
 
@@ -78,10 +79,11 @@ public:
     return !(lhs == rhs);
   }
 
-  LayerUUID   getID()    const { return m_uuid; }
-  LAYER_TYPE  getType()  const { return m_type; }
-  w_range     getRange() const { return m_color_range; }
-  std::string getName()  const { return m_name; }
+  LayerUUID   getID()        const { return m_uuid; }
+  LAYER_TYPE  getType()      const { return m_type; }
+  w_range     getRange()     const { return m_color_range; }
+  std::string getName()      const { return m_name; }
+  GroupID     getGroupId()   const { return m_group_id; }
 
   cv::Mat     m_data;
 
@@ -90,6 +92,7 @@ private:
   LAYER_TYPE  m_type;
   w_range     m_color_range;
   std::string m_name;
+  GroupID     m_group_id;
 };
 // ------------------------------------------------------------
 typedef std::list<WLayer>       LayersContainer;
@@ -123,7 +126,7 @@ public:
 
   //{ layer
   // create and add new layer
-  WLayer*   AddLayer();      
+  WLayer*   AddLayer(const GroupID& groupId = "");      
   // create and add new layer
   SDKResult RemoveLayer     (const LayerUUID& layerId);
   // add layer color
@@ -143,6 +146,8 @@ public:
   SDKResult SplitLayer      (const LayerUUID& layerId, LayerIDs& splittedLayers);
   // get layers count
   size_t    GetLayersCount  () { return m_layers.size(); }
+  // get related layers
+SDKResult WRaster::GetLayersByGroupId(const GroupID& groupId, LayerIDs& relatedLayers) const;
   //}
  
 public:

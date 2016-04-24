@@ -27,9 +27,9 @@ w_color::w_color(uchar r, uchar g, uchar b)
 // ------------------------------------------------------------
 w_color::w_color(cv::Vec3b color)
 {
-    this->r = color[2];
-    this->g = color[1];
-    this->b = color[0];
+  this->r = color[2];
+  this->g = color[1];
+  this->b = color[0];
 }
 // ------------------------------------------------------------
 w_color::w_color(cv::Vec4b color)
@@ -56,18 +56,18 @@ inline bool operator >= (const w_color &first, const cv::Vec3b &second)
 // ------------------------------------------------------------
 w_range::w_range()
 {
-    this->low = Vec3b(255, 255, 255);
-    this->high = Vec3b(0, 0, 0);
+  this->low = Vec3b(255, 255, 255);
+  this->high = Vec3b(0, 0, 0);
 }
 // ------------------------------------------------------------
 void w_range::addColor(const w_color& color)
 {
-    this->low[2] = std::min<uchar>(color.r, low[2]);
-    this->low[1] = std::min<uchar>(color.g, low[1]);
-    this->low[0] = std::min<uchar>(color.b,low[0]);
-    this->high[2] = std::max<uchar>(color.r, high[2]);
-    this->high[1] = std::max<uchar>(color.g, high[1]);
-    this->high[0] = std::max<uchar>(color.b, high[0]);
+  this->low[2] = std::min<uchar>(color.r, low[2]);
+  this->low[1] = std::min<uchar>(color.g, low[1]);
+  this->low[0] = std::min<uchar>(color.b,low[0]);
+  this->high[2] = std::max<uchar>(color.r, high[2]);
+  this->high[1] = std::max<uchar>(color.g, high[1]);
+  this->high[0] = std::max<uchar>(color.b, high[0]);
 }
 // ------------------------------------------------------------
 inline bool w_range::contains(const cv::Vec3b& color)
@@ -114,35 +114,36 @@ SDKResult WRaster::IncreaseSharpness(double k) const
   
   for (int y = 1; y < img.rows - 1; y++)
   {
-      for (int x = 1; x < img.cols - 1; x++)
+    for (int x = 1; x < img.cols - 1; x++)
+    {
+      if (imgEdges.at<uchar>(y, x) > 0)
       {
-          if (imgEdges.at<uchar>(y, x) > 0)
+        Rect region_of_interest = Rect(x - 1, y - 1, 3, 3);
+        Mat image_roi = img(region_of_interest);
+        Vec3d sum(0.0, 0.0, 0.0);
+        Vec3d currentColor;
+        for (int y1 = 0; y1 < image_roi.rows; y1++)
+        {
+          for (int x1 = 0; x1 < image_roi.cols; x1++)
           {
-              Rect region_of_interest = Rect(x - 1, y - 1, 3, 3);
-              Mat image_roi = img(region_of_interest);
-              Vec3d sum(0.0, 0.0, 0.0);
-              Vec3d currentColor;
-              for (int y1 = 0; y1 < image_roi.rows; y1++)
-              {
-                  for (int x1 = 0; x1 < image_roi.cols; x1++)
-                  {
-                      currentColor = image_roi.at<Vec3b>(y1, x1);
-                      sum += kernel.at<double>(y1, x1)*currentColor;
-                  }
-              }
-              imgOut.at<Vec3b>(y, x) = sum;
+            currentColor = image_roi.at<Vec3b>(y1, x1);
+            sum += kernel.at<double>(y1, x1)*currentColor;
           }
+        }
+        imgOut.at<Vec3b>(y, x) = sum;
       }
+    }
   }
   cvtColor(imgOut, m_raster, CV_BGR2BGRA);
   return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
-WLayer* WRaster::AddLayer()
+WLayer* WRaster::AddLayer(const GroupID& groupId)
 {
   WLayer layer;
   layer.m_data = Mat(m_raster.size(), CV_8UC1);
   layer.m_uuid = utils::genUUID();
+  layer.m_group_id = groupId.empty() ? utils::genUUID() : groupId;
   m_layers.push_back(layer);
 
   return &m_layers.back();
@@ -276,57 +277,63 @@ SDKResult WRaster::SplitLayer(const LayerUUID& layerId, LayerIDs& splittedLayers
 
   SDKResult result = kSDKResult_Error;
 
-  __try{
-    switch(layer->m_type)
-    {
-      case WLayer::LAYER_TYPE_ENUM::LT_NONE:
-        break;
-
-      case WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT:
-        {
-        }
-        break;
-
-      case WLayer::LAYER_TYPE_ENUM::LT_LINES:
-        {
-        }
-        break;
-
-      case WLayer::LAYER_TYPE_ENUM::LT_TEXT:
-        {
-        }
-        break;
-
-      case WLayer::LAYER_TYPE_ENUM::LT_AREAS:
-        {
-        }
-        break;
-
-      case WLayer::LAYER_TYPE_ENUM::LT_OTHER:
-        {
-        }
-        break;
-
-      default:
-        {   
-          WLayer* l1 = AddLayer();
-          WLayer* l2 = AddLayer();
-          splitFuncExample(layer, l1, l2);
-          l1 = nullptr;
-          l2 = nullptr;
-        }
-        break;
-    
-    }
-  }
-  __finally
+  switch(layer->m_type)
   {
-    if (S_Ok(result))
-      RemoveLayer(layer->m_uuid);
-    layer = nullptr;
+    case WLayer::LAYER_TYPE_ENUM::LT_NONE:
+      break;
+
+    case WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT:
+      {
+      }
+      break;
+
+    case WLayer::LAYER_TYPE_ENUM::LT_LINES:
+      {
+      }
+      break;
+
+    case WLayer::LAYER_TYPE_ENUM::LT_TEXT:
+      {
+      }
+      break;
+
+    case WLayer::LAYER_TYPE_ENUM::LT_AREAS:
+      {
+      }
+      break;
+
+    case WLayer::LAYER_TYPE_ENUM::LT_OTHER:
+      {
+      }
+      break;
+
+    default:
+      {   
+        WLayer* l1 = AddLayer();
+        WLayer* l2 = AddLayer();
+        result = splitFuncExample(layer, l1, l2);
+        l1 = nullptr;
+        l2 = nullptr;
+        if (S_Ok(result))
+          RemoveLayer(layer->m_uuid);
+        layer = nullptr;
+      }
+      break;
   }
   
   return result;
+}
+// ------------------------------------------------------------
+SDKResult WRaster::GetLayersByGroupId(const GroupID& groupId, LayerIDs& relatedLayers) const
+{
+  relatedLayers.clear();
+  for (LayersContainer::const_iterator cit = m_layers.begin(); cit != m_layers.end(); ++cit)
+  {
+    if (cit->m_group_id == groupId)
+      relatedLayers.push_back(cit->m_uuid);      
+  }
+  
+  return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
 std::vector<cv::Rect> WRaster::DetectLetters(const LayerUUID& layerId) const
