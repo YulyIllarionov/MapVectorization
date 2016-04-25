@@ -21,8 +21,7 @@ typedef unsigned char                      WColor;
 
 
 SDK_BEGIN_NAMESPACE
-typedef std::vector<WText>					WTextList;
-typedef std::vector<WPolyline>				WPolylineList;
+
 
 //  Enumerator
 class IEnumItem {
@@ -119,58 +118,6 @@ private:
 };
 // ------------------------------------------------------------
 
-//Класс для хранения всех объектов
-class WVector
-{
-public:
-	WVector(void) {};
-	~WVector(void) {};
-
-	WTextList GetTextList() {
-		return m_listTexts;
-	}
-
-	void SetTextList(WTextList & textlist) {
-		m_listTexts = textlist;
-	}
-
-	WText& GetTextById(int id) {
-		return m_listTexts[id];
-	}
-
-	void AddText(WText &text) {
-		return m_listTexts.push_back(text);
-	}
-
-	void RemoveText(WText &text) {
-		m_listTexts.erase(m_listTexts.begin() + std::find(m_listTexts.begin(), m_listTexts.end(), text));
-	}
-
-	WPolylineList GetPolylineList() {
-		return m_listPolylines;
-	}
-
-	void SetPolylineList(WPolylineList listpolylines) {
-		m_listPolylines = listpolylines;
-	}
-
-	WPolyline& GetPolylineById(int id) {
-		return m_listPolylines[id];
-	}
-
-	void AddPolyline(WPolyline &polyline) {
-		m_listPolylines.push_back(polyline);
-	}
-
-	void RemovePolyline(WPolyline *polyline) {
-		m_listPolylines.erase(m_listPolylines.begin() + std::find(m_listPolylines.begin(), m_listPolylines.end(), polyline));
-	}
-
-private:
-	WTextList m_listTexts;//Коллекция текстов
-	WPolylineList m_listPolylines;//Коллекция линий
-};
-
 //Общий интерфейс обращения к объектам
 class WVectorObject
 {
@@ -181,6 +128,45 @@ public:
 	virtual CvPoint getPoint(size_t idx) const = 0;
 	virtual bool RemovePoint(size_t idx) const = 0;
 private:
+};
+
+
+class WText : public WVectorObject
+{
+public:
+	WText(CvPoint &point1, CvPoint &point2, std::string &text)
+	{
+		m_point_left_down = point1;
+		m_point_right_up = point2;
+		m_text = text;
+	}
+	~WText();
+	void AddPoints(const CvPoint& point1, const CvPoint& point2) {
+		m_point_left_down = point1;
+		m_point_right_up = point2;
+	}
+	CvPoint getPointLeft() {
+		return m_point_left_down;
+	}
+
+	CvPoint getPointRight() {
+		return m_point_right_up;
+	}
+
+	void AddText(std::string &text) {
+		m_text = text;
+	}
+
+	std::string GetText() {
+		return m_text;
+	}
+	//Конкатенация текста
+	void Concat(WText &text, bool leftOrRight);
+private:
+	CvPoint m_point_left_down;//Левая нижняя точка текста
+	CvPoint m_point_right_up;//Правая верхняя точка текста
+	std::string m_text;//Запись
+
 };
 
 class WPolyline : public WVectorObject
@@ -227,42 +213,57 @@ private:
 };
 
 
-class WText : public WVectorObject
+
+//Класс для хранения всех объектов
+class WVector
 {
 public:
-	WText(CvPoint &point1, CvPoint &point2, std::string &text)
-	{
-		m_point_left_down = point1;
-		m_point_right_up = point2;
-		m_text = text;
-	}
-	~WText();
-	void AddPoints(const CvPoint& point1, const CvPoint& point2) {
-		m_point_left_down = point1;
-		m_point_right_up = point2;
-	}
-	CvPoint getPointLeft() {
-		return m_point_left_down;
+	WVector(void) {};
+	~WVector(void) {};
+
+	std::vector<WText> GetTextList() {
+		return m_listTexts;
 	}
 
-	CvPoint getPointRight() {
-		return m_point_right_up;
-	}
-	
-	void AddText(std::string &text) {
-		m_text = text;
+	void SetTextList(std::vector<WText> & textlist) {
+		m_listTexts = textlist;
 	}
 
-	std::string GetText() {
-		return m_text;
+	WText& GetTextById(int id) {
+		return m_listTexts[id];
 	}
-	//Конкатенация текста
-	void Concat(WText &text, bool leftOrRight);
+
+	void AddText(WText &text) {
+		return m_listTexts.push_back(text);
+	}
+
+	void RemoveText(WText &text) {
+		m_listTexts.erase(std::remove(m_listTexts.begin(), m_listTexts.end(), text),m_listTexts.end());
+	}
+
+	std::vector<WPolyline> GetPolylineList() {
+		return m_listPolylines;
+	}
+
+	void SetPolylineList(std::vector<WPolyline> listpolylines) {
+		m_listPolylines = listpolylines;
+	}
+
+	WPolyline& GetPolylineById(int id) {
+		return m_listPolylines[id];
+	}
+
+	void AddPolyline(WPolyline &polyline) {
+		m_listPolylines.push_back(polyline);
+	}
+
+	void RemovePolyline(WPolyline *polyline) {
+		m_listPolylines.erase(std::remove(m_listPolylines.begin(), m_listPolylines.end(), polyline),m_listPolylines.end());
+	}
+
 private:
-	CvPoint m_point_left_down;//Левая нижняя точка текста
-	CvPoint m_point_right_up;//Правая верхняя точка текста
-	std::string m_text;//Запись
-
+	std::vector<WText> m_listTexts;//Коллекция текстов
+	std::vector<WPolyline> m_listPolylines;//Коллекция линий
 };
 
 SDK_END_NAMESPACE
