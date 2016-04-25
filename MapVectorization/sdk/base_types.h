@@ -14,7 +14,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv/cxcore.h"
 
-
+//
 typedef std::vector<CvPoint>                WCVPointsContainer;
 typedef unsigned char                      WColor;
 
