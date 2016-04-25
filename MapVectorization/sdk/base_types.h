@@ -119,67 +119,67 @@ private:
 };
 // ------------------------------------------------------------
 
+//Класс для хранения всех объектов
 class WVector
 {
 public:
-	WVector();
-	~WVector();
+	WVector(void) {};
+	~WVector(void) {};
 
-	WTextList getTextList() {
+	WTextList GetTextList() {
 		return m_listTexts;
 	}
 
-	void setTextList(WTextList & textlist) {
+	void SetTextList(WTextList & textlist) {
 		m_listTexts = textlist;
 	}
 
-	WText getTextById(int id) {
+	WText& GetTextById(int id) {
 		return m_listTexts[id];
 	}
 
-	void addText(WText &text) {
+	void AddText(WText &text) {
 		return m_listTexts.push_back(text);
 	}
 
-	void removeText(WText &text) {
+	void RemoveText(WText &text) {
 		m_listTexts.erase(m_listTexts.begin() + std::find(m_listTexts.begin(), m_listTexts.end(), text));
 	}
 
-	WPolylineList getPolylineList() {
+	WPolylineList GetPolylineList() {
 		return m_listPolylines;
 	}
 
-	void setPolylineList(WPolylineList listpolylines) {
+	void SetPolylineList(WPolylineList listpolylines) {
 		m_listPolylines = listpolylines;
 	}
 
-	WPolyline getPolylineById(int id) {
+	WPolyline& GetPolylineById(int id) {
 		return m_listPolylines[id];
 	}
 
-	void addPolyline(WPolyline &polyline) {
+	void AddPolyline(WPolyline &polyline) {
 		m_listPolylines.push_back(polyline);
 	}
 
-	void removePolyline(WPolyline *polyline) {
+	void RemovePolyline(WPolyline *polyline) {
 		m_listPolylines.erase(m_listPolylines.begin() + std::find(m_listPolylines.begin(), m_listPolylines.end(), polyline));
 	}
 
 private:
-	WTextList m_listTexts;
-	WPolylineList m_listPolylines;
+	WTextList m_listTexts;//Коллекция текстов
+	WPolylineList m_listPolylines;//Коллекция линий
 };
 
+//Общий интерфейс обращения к объектам
 class WVectorObject
 {
 public:
-	WVectorObject();
-	virtual ~WVectorObject();
-	virtual void clearPoints();
-	virtual void setColor(WColor color);
-	virtual void AddPoint(const CvPoint& point);
-	virtual CvPoint getPoint(size_t idx);
-	virtual bool RemovePoint(size_t idx);
+	virtual void clearPoints() const = 0;
+	virtual void setColor(WColor color) const = 0;
+	virtual void AddPoint(const CvPoint& point) const = 0;
+	virtual CvPoint getPoint(size_t idx) const = 0;
+	virtual bool RemovePoint(size_t idx) const = 0;
 private:
 };
 
@@ -187,9 +187,9 @@ class WPolyline : public WVectorObject
 {
 public:
 	WPolyline();
-	virtual ~WPolyline();
+	~WPolyline();
 
-	WPolyline& operator=(WPolyline other);
+	WPolyline& operator=(WPolyline& other);
 	void clearPoints();
 
 	// line width
@@ -208,19 +208,19 @@ public:
 	void concatTornLine(WPolyline& line, bool firstOrder, bool secondOrder);
 
 
-	void AddText(WText text) {
+	void AddText(WText& text) {
 		m_linetext = text;
 	}
-	WText GetText() {
+	WText& GetText() {
 		return m_linetext;
 	}
-
+	//Упростить линию
 	WCVPointsContainer simplifyLine(WCVPointsContainer &vectorline, double EPSILON, int delta);
 
 private:
 	double            m_width;
 	WCVPointsContainer  m_points;
-	WText				m_linetext;
+	WText&				m_linetext;
 	
 	int m_scaler;
 	WColor m_color;
@@ -256,12 +256,12 @@ public:
 	std::string GetText() {
 		return m_text;
 	}
-
+	//Конкатенация текста
 	void Concat(WText &text, bool leftOrRight);
 private:
-	CvPoint m_point_left_down;
-	CvPoint m_point_right_up;
-	std::string m_text;
+	CvPoint m_point_left_down;//Левая нижняя точка текста
+	CvPoint m_point_right_up;//Правая верхняя точка текста
+	std::string m_text;//Запись
 
 };
 
