@@ -281,4 +281,12 @@ WCVPointsContainer WPolyline::simplifyLine(WCVPointsContainer &linevector, doubl
 	return m_outpoints;
 }
 
+void WText::Concat(WText &text, bool leftOrRight) {
+	if (leftOrRight)
+		m_point_left_down = text.getPointLeft();
+	else
+		m_point_right_up = text.getPointRight();
+	m_text = m_text + text.GetText();
+}
+
   SDK_END_NAMESPACE

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 #include "app/sdk_const.h"
 #include "opencv2/highgui/highgui.hpp"
@@ -18,7 +19,10 @@ typedef std::vector<CvPoint>                WCVPointsContainer;
 typedef unsigned char                      WColor;
 
 
+
 SDK_BEGIN_NAMESPACE
+typedef std::vector<WText>					WTextList;
+typedef std::vector<WPolyline>				WPolylineList;
 
 //  Enumerator
 class IEnumItem {
@@ -115,8 +119,71 @@ private:
 };
 // ------------------------------------------------------------
 
+class WVector
+{
+public:
+	WVector();
+	~WVector();
 
-class WPolyline
+	WTextList getTextList() {
+		return m_listTexts;
+	}
+
+	void setTextList(WTextList & textlist) {
+		m_listTexts = textlist;
+	}
+
+	WText getTextById(int id) {
+		return m_listTexts[id];
+	}
+
+	void addText(WText &text) {
+		return m_listTexts.push_back(text);
+	}
+
+	void removeText(WText &text) {
+		m_listTexts.erase(m_listTexts.begin() + std::find(m_listTexts.begin(), m_listTexts.end(), text));
+	}
+
+	WPolylineList getPolylineList() {
+		return m_listPolylines;
+	}
+
+	void setPolylineList(WPolylineList listpolylines) {
+		m_listPolylines = listpolylines;
+	}
+
+	WPolyline getPolylineById(int id) {
+		return m_listPolylines[id];
+	}
+
+	void addPolyline(WPolyline &polyline) {
+		m_listPolylines.push_back(polyline);
+	}
+
+	void removePolyline(WPolyline *polyline) {
+		m_listPolylines.erase(m_listPolylines.begin() + std::find(m_listPolylines.begin(), m_listPolylines.end(), polyline));
+	}
+
+private:
+	WTextList m_listTexts;
+	WPolylineList m_listPolylines;
+};
+
+class WVectorObject
+{
+public:
+	WVectorObject();
+	virtual ~WVectorObject();
+	virtual void clearPoints();
+	virtual void setColor(WColor color);
+	virtual void AddPoint(const CvPoint& point);
+	virtual CvPoint getPoint(size_t idx);
+	virtual bool RemovePoint(size_t idx);
+private:
+};
+
+class WPolyline : public WVectorObject
 {
 public:
 	WPolyline();
@@ -141,16 +208,62 @@ public:
 	void concatTornLine(WPolyline& line, bool firstOrder, bool secondOrder);
 
 
+	void AddText(WText text) {
+		m_linetext = text;
+	}
+	WText GetText() {
+		return m_linetext;
+	}
+
 	WCVPointsContainer simplifyLine(WCVPointsContainer &vectorline, double EPSILON, int delta);
 
 private:
 	double            m_width;
 	WCVPointsContainer  m_points;
+	WText				m_linetext;
 	
 	int m_scaler;
 	WColor m_color;
 };
 
+
+class WText : public WVectorObject
+{
+public:
+	WText(CvPoint &point1, CvPoint &point2, std::string &text)
+	{
+		m_point_left_down = point1;
+		m_point_right_up = point2;
+		m_text = text;
+	}
+	~WText();
+	void AddPoints(const CvPoint& point1, const CvPoint& point2) {
+		m_point_left_down = point1;
+		m_point_right_up = point2;
+	}
+	CvPoint getPointLeft() {
+		return m_point_left_down;
+	}
+
+	CvPoint getPointRight() {
+		return m_point_right_up;
+	}
+	
+	void AddText(std::string &text) {
+		m_text = text;
+	}
+
+	std::string GetText() {
+		return m_text;
+	}
+
+	void Concat(WText &text, bool leftOrRight);
+private:
+	CvPoint m_point_left_down;
+	CvPoint m_point_right_up;
+	std::string m_text;
+
+};
 
 SDK_END_NAMESPACE
 
