@@ -67,10 +67,10 @@ void LayerConfigureDialog::GetCoord(int x, int y)
         QPalette palette;
         palette.setColor(QPalette::Background, QColor(rgb));
         m_ui->SapleFrame->setPalette(palette);
-        m_ui->Pipette->setChecked(false);
-        activateWindow();
+        //m_ui->Pipette->setChecked(false);
+        //activateWindow();
+        on_AddColor_clicked();
     }
-    on_AddColor_clicked();
 }
 
 void LayerConfigureDialog::UpdateSamples()

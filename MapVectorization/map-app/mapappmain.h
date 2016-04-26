@@ -49,6 +49,10 @@ private slots:
     void on_SharpenAction_triggered();
     void temp(int,int);
 
+    void on_actionBilateral_triggered();
+
+    void on_actionMeanshift_triggered();
+
 private:
     Ui::mapAppMainClass       m_ui;
     int                       m_idCounter;  // Если ведется работа с несколькими проектами

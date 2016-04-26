@@ -70,6 +70,9 @@
    </item>
    <item>
     <widget class="QPushButton" name="AddColor">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>Добавить цвет</string>
      </property>
