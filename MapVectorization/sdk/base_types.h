@@ -122,6 +122,8 @@ public:
   virtual ~WRaster(){}
 
   SDKResult IncreaseSharpness(double k) const;
+  SDKResult SegmentationBilateral();
+  SDKResult SegmentationMeanshift();
   std::vector<cv::Rect> DetectLetters(const LayerUUID& layerId) const;
 
   //{ layer

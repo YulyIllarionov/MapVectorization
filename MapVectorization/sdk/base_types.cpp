@@ -138,6 +138,24 @@ SDKResult WRaster::IncreaseSharpness(double k) const
   return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
+SDKResult WRaster::SegmentationBilateral()
+{
+    Mat img;
+    Mat imgOut;
+    cvtColor(m_raster, img, CV_BGRA2BGR);
+    bilateralFilter(img, imgOut, 9, 50, 0);
+    cvtColor(imgOut, m_raster, CV_BGR2BGRA);
+}
+// ------------------------------------------------------------
+SDKResult WRaster::SegmentationMeanshift()
+{
+    Mat img;
+    Mat imgOut;
+    cvtColor(m_raster, img, CV_BGRA2BGR);
+    pyrMeanShiftFiltering(img, imgOut, 5, 40, 0);
+    cvtColor(imgOut, m_raster, CV_BGR2BGRA);
+}
+// ------------------------------------------------------------
 WLayer* WRaster::AddLayer(const GroupID& groupId)
 {
   WLayer layer;
