@@ -67,6 +67,7 @@ void mapAppMain::temp(int x, int y)
 
 void mapAppMain::on_actionBilateral_triggered()
 {
+    static_cast<ImageViewer *>(m_tabs->currentWidget())->DeletePixmap();
     m_image->SegmentationBilateral();
     static_cast<ImageViewer *>(m_tabs->currentWidget())->UpdatePixmap();
 }
