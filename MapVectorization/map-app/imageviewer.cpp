@@ -49,5 +49,6 @@ MyPixmapItem* ImageViewer::GetPixItem() const
 void ImageViewer::DeletePixmap()
 {
     delete m_pixItem;
+    m_pixItem = NULL;
 }
 
