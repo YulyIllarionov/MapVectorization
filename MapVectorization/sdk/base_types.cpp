@@ -138,7 +138,7 @@ SDKResult WRaster::IncreaseSharpness(double k) const
   return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
-SDKResult WRaster::SegmentationBilateral()
+void WRaster::SegmentationBilateral()
 {
     Mat img;
     Mat imgOut;
@@ -147,7 +147,7 @@ SDKResult WRaster::SegmentationBilateral()
     cvtColor(imgOut, m_raster, CV_BGR2BGRA);
 }
 // ------------------------------------------------------------
-SDKResult WRaster::SegmentationMeanshift()
+void WRaster::SegmentationMeanshift()
 {
     Mat img;
     Mat imgOut;

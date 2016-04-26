@@ -67,12 +67,12 @@ void mapAppMain::temp(int x, int y)
 
 void mapAppMain::on_actionBilateral_triggered()
 {
-    //SDKResult res=m_image->SegmentationBilateral();
+    m_image->SegmentationBilateral();
     static_cast<ImageViewer *>(m_tabs->currentWidget())->UpdatePixmap();
 }
 
 void mapAppMain::on_actionMeanshift_triggered()
 {
-    //SDKResult res = m_image->SegmentationMeanshift();
+    m_image->SegmentationMeanshift();
     static_cast<ImageViewer *>(m_tabs->currentWidget())->UpdatePixmap();
 }
