@@ -95,3 +95,12 @@ void LayersViewer::on_Remove_clicked()
     m_layers->removeAt(m_ui->listWidget->currentRow());
     UpdateList();
 }
+
+void LayersViewer::on_SavePngButton_clicked()
+{
+    int index;
+    if((index=m_ui->listWidget->currentRow())>-1)
+    {
+        cv::imwrite(m_layers->at(index)->getName()+".png", m_layers->at(index)->m_data);
+    }
+}
