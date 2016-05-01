@@ -99,8 +99,13 @@ void LayersViewer::on_Remove_clicked()
 void LayersViewer::on_SavePngButton_clicked()
 {
     int index;
+
     if((index=m_ui->listWidget->currentRow())>-1)
     {
-        cv::imwrite(m_layers->at(index)->getName()+".png", m_layers->at(index)->m_data);
+        cv::Mat toSave;
+        cv::normalize(m_layers->at(index)->m_data, toSave, 0, 255, cv::NORM_MINMAX, CV_8UC1);
+        //cv::imshow("1", toSave);
+        //cv::waitKey(0);
+        cv::imwrite(m_layers->at(index)->getName()+".png", toSave);
     }
 }
