@@ -2,25 +2,101 @@
 //
 
 #include "stdafx.h"
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
 #include <iostream>
 
-using namespace cv;
-using namespace std;
+#include "opencv2/opencv.hpp" 
+#include "opencv/cv.h"
+#include "opencv/highgui.h"
 
-
-
-int main()
-{
-    Mat image;
-    image = imread("../sample/map/a2056.jpg", CV_LOAD_IMAGE_COLOR);
-
-    namedWindow("map", WINDOW_KEEPRATIO);// Create a window for display.
-    imshow("map", image);
-
-    waitKey(0);
-
-    return 0;
+//---------------------------Не для проекта-----------------------
+void saveImage(const std::string &filename, cv::Mat *img) {
+	std::string output("C:/projects/MapVectorization/MapVectorization/sample/output/");
+	output += filename;
+	cv::imwrite(output, *img);
 }
 
+//---------------------------Для проекта -------------------------
+std::vector<cv::Rect> detectLetters(cv::Mat &img, unsigned char elementId)
+{
+	std::vector<cv::Rect> boundRect;
+	cv::Mat img_gray, img_sobel, img_threshold, element;
+
+	cvtColor(img, img_gray, CV_BGR2GRAY);
+	cv::Sobel(img_gray, img_sobel, CV_8U, 1, 0, 3, 1, 0, cv::BORDER_DEFAULT);
+	cv::threshold(img_sobel, img_threshold, 0, 255, CV_THRESH_OTSU + CV_THRESH_BINARY);
+	element = getStructuringElement(cv::MORPH_RECT, cv::Size(20 * (int)pow(2, elementId), 3 * (int)pow(2, elementId)));
+	cv::morphologyEx(img_threshold, img_threshold, CV_MOP_CLOSE, element);
+
+	std::vector< std::vector< cv::Point> > contours;
+	cv::findContours(img_threshold, contours, 0, 1);
+
+	std::vector<std::vector<cv::Point> > contours_poly(contours.size());
+
+	for (int i = 0; i < contours.size(); i++)
+	{
+		if ((contours.at(i).size() > 86 * pow(2, elementId)) && (contours.at(i).size() < 600 * pow(2, elementId)))
+		{
+			cv::approxPolyDP(cv::Mat(contours.at(i)), contours_poly.at(i), 3, true);
+			cv::Rect appRect(boundingRect(cv::Mat(contours_poly.at(i))));
+
+			if (appRect.width > appRect.height)
+				boundRect.push_back(appRect);
+		}
+	}
+
+	return boundRect;
+}
+
+
+cv::Mat makeElementOfPyramid(cv::Mat &img, int n)
+{ //TODO: Размывать Гауссом
+	cv::Mat result = img;
+
+	for (int i = 1; i < n; i++)
+		cv::pyrDown(result, result, cv::Size(result.cols / 2, result.rows / 2));
+
+	for (int i = 1; i < n; i++)
+		cv::pyrUp(result, result, cv::Size(result.cols * 2, result.rows * 2));
+
+	return result;
+}
+
+//std::vector<cv::Rect> FindRegionsWithText(cv::Mat &img)
+//{
+//	const int number_of_pyramid_elements = 4;
+//	cv::Mat tmp;
+//	std::vector<cv::Rect> result;
+//
+//	for (int i = 1; i <= number_of_pyramid_elements; i++) {
+//		tmp = makeElementOfPiramid(img, i);
+//		result.push_back
+//	}
+//
+//}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	std::string imgPath("C:/projects/MapVectorization/MapVectorization/sample/map/a2056.jpg");
+
+	cv::Mat img = cv::imread(imgPath);
+	std::vector<cv::Rect> letterBBoxes = detectLetters(img, 0);
+
+	cv::Mat img1 = makeElementOfPyramid(img, 2);
+	std::vector<cv::Rect> letterBBoxes1 = detectLetters(img1, 1);
+
+	cv::Mat img2 = makeElementOfPyramid(img, 3);
+	std::vector<cv::Rect> letterBBoxes2 = detectLetters(img2, 2);
+
+	for (int i = 0; i< letterBBoxes.size(); i++)
+		cv::rectangle(img, letterBBoxes.at(i), cv::Scalar(0, 255, 0), 3, 8, 0);
+
+	for (int i = 0; i< letterBBoxes1.size(); i++)
+		cv::rectangle(img, letterBBoxes1.at(i), cv::Scalar(0, 0, 255), 3, 8, 0);
+
+	for (int i = 0; i< letterBBoxes2.size(); i++)
+		cv::rectangle(img, letterBBoxes2.at(i), cv::Scalar(255, 0, 0), 3, 8, 0);
+
+	saveImage("output.jpg", &img);
+
+	return 0;
+}
