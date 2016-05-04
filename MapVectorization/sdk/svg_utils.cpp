@@ -1,16 +1,16 @@
 #include "stdafx.h"
 #include "svg_utils.h"
 
-
+// ----------------------------------------------------
 SVGUtils::SVGUtils(void)
 {
 }
-
-
+// ----------------------------------------------------
+// ----------------------------------------------------
 SVGUtils::~SVGUtils(void)
 {
 }
-
+// ----------------------------------------------------
 void SVGUtils::WriteSVG (SDK_NAMESPACE::WVector wvector)
 {
 	std::ofstream fout;
@@ -39,7 +39,7 @@ void SVGUtils::WriteSVG (SDK_NAMESPACE::WVector wvector)
 	}
 
 }
-
+// ----------------------------------------------------
 void SVGUtils::writeLine (std::vector<CvPoint> points, std::ofstream& fout)
 {
 	for (int i = 0; i<points.size()-1; i++)
@@ -48,7 +48,7 @@ void SVGUtils::writeLine (std::vector<CvPoint> points, std::ofstream& fout)
 		fout<<"x2=\""<<points[i+1].x<<"\" y2=\""<<points[i+1].y<<"\"/>"<<endl;
 	}
 }
-
+// ----------------------------------------------------
 void SVGUtils::writeText(SDK_NAMESPACE::WText& text,std::ofstream& fout)
 {
 	double height = text.getPointRight().y - text.getPointLeft().y;
@@ -57,3 +57,4 @@ void SVGUtils::writeText(SDK_NAMESPACE::WText& text,std::ofstream& fout)
 		"\" lengthAdjust=\"spacing\">"<<text.GetText()<<"</text>"<<endl;
 
 }
+// ----------------------------------------------------
