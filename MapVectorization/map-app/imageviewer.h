@@ -21,6 +21,7 @@ public slots:
     void ZoomOut();
     void FitView();
     void UpdatePixmap();
+    void DeletePixmap();
 
 private:
      QGraphicsScene     m_scene;

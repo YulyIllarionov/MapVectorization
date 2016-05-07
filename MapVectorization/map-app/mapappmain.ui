@@ -2,7 +2,7 @@
 <ui version="4.0">
  <class>mapAppMainClass</class>
  <widget class="QMainWindow" name="mapAppMainClass">
-    <property name="geometry">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -35,8 +35,16 @@
     <property name="title">
      <string>Инструменты</string>
     </property>
+    <widget class="QMenu" name="menu_4">
+     <property name="title">
+      <string>Сегментация</string>
+     </property>
+     <addaction name="actionBilateral"/>
+     <addaction name="actionMeanshift"/>
+    </widget>
     <addaction name="LayersEditor"/>
     <addaction name="SharpenAction"/>
+    <addaction name="menu_4"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -93,6 +101,16 @@
   <action name="FitImage">
    <property name="text">
     <string>Fit Image</string>
+   </property>
+  </action>
+  <action name="actionBilateral">
+   <property name="text">
+    <string>Bilateral</string>
+   </property>
+  </action>
+  <action name="actionMeanshift">
+   <property name="text">
+    <string>Meanshift</string>
    </property>
   </action>
  </widget>
