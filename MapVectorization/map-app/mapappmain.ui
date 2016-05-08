@@ -45,6 +45,7 @@
     <addaction name="LayersEditor"/>
     <addaction name="SharpenAction"/>
     <addaction name="menu_4"/>
+    <addaction name="actionRegimentBlackColor"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -111,6 +112,11 @@
   <action name="actionMeanshift">
    <property name="text">
     <string>Meanshift</string>
+   </property>
+  </action>
+  <action name="actionRegimentBlackColor">
+   <property name="text">
+    <string>Классификация черного цвета</string>
    </property>
   </action>
  </widget>

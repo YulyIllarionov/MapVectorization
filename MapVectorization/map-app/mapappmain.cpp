@@ -77,3 +77,8 @@ void mapAppMain::on_actionMeanshift_triggered()
     m_image->SegmentationMeanshift();
     static_cast<ImageViewer *>(m_tabs->currentWidget())->UpdatePixmap();
 }
+
+void mapAppMain::on_actionRegimentBlackColor_triggered()
+{
+
+}

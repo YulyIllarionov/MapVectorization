@@ -12,6 +12,7 @@ public:
     explicit MyPixmapItem(QGraphicsItem *parent = 0);
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 signals:
     void sendCoord(int x,int y);
 public slots:
