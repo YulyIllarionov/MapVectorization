@@ -79,7 +79,29 @@ cv::Mat makeElementOfPyramid(cv::Mat &img, int n)
 //	}
 //
 //}
+cv::Mat rotateImage(cv::Mat image) 
+{
+	 cv::Mat thr,dst;
+	 threshold(image,thr,200,255,cv::THRESH_BINARY_INV);
+	 imshow("thr",thr);
 
+	  std::vector<cv::Point> points;
+	  cv::Mat_<uchar>::iterator it = thr.begin<uchar>();
+	  cv::Mat_<uchar>::iterator end = thr.end<uchar>();
+	  for (; it != end; ++it)
+		if (*it)
+		  points.push_back(it.pos());
+
+	  cv::RotatedRect box = cv::minAreaRect(cv::Mat(points));
+	  cv::Mat rot_mat = cv::getRotationMatrix2D(box.center, box.angle, 1);
+
+	  //cv::Mat rotated(src.size(),src.type(),Scalar(255,255,255));
+	  cv::Mat rotated;
+	  cv::warpAffine(image, rotated, rot_mat, image.size(), cv::INTER_CUBIC);
+	  imshow("rotated",rotated);
+	  
+	  return rotated;
+}
 int _tmain(int argc, _TCHAR* argv[])
 {
 	std::string imgPath("C:/projects/MapVectorization/MapVectorization/sample/map/black/1.png");
@@ -106,6 +128,5 @@ int _tmain(int argc, _TCHAR* argv[])
 		cv::rectangle(img, letterBBoxes2.at(i), cv::Scalar(255, 0, 0), 3, 8, 0);
 
 	saveImage("output1.jpg", &img);
-
 	return 0;
 }
