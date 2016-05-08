@@ -9,6 +9,7 @@ ClassificWidget::ClassificWidget(WRaster *image, ImageViewer *widget,QList<WLaye
     m_ui->setupUi(this);
     m_image = image;
     m_widget = widget;
+    m_polygon=NULL;
     for(int i=0;i<layers->size();i++)
     {
         WLayer* tlay=layers->at(i);
@@ -18,6 +19,7 @@ ClassificWidget::ClassificWidget(WRaster *image, ImageViewer *widget,QList<WLaye
         m_layers.append(tlay);
     }
     if(!m_layers.isEmpty()) m_ui->listWidget->setCurrentRow(0);
+    QObject::connect(m_widget->GetPixItem(), SIGNAL(sendCoordAndType(int,int,int)), this, SLOT(GetCoordAndType(int,int,int)));
     UpdateList();
 }
 void ClassificWidget::closeEvent(QCloseEvent *event)
@@ -29,6 +31,7 @@ void ClassificWidget::closeEvent(QCloseEvent *event)
 ClassificWidget::~ClassificWidget()
 {
     delete m_ui;
+    delete m_polygon;
 }
 
 void ClassificWidget::UpdateList()
@@ -43,6 +46,15 @@ void ClassificWidget::UpdateList()
     }
 }
 
+bool ClassificWidget::event(QEvent *event)
+{
+    if(event->type() == QEvent::WindowActivate)
+        this->setWindowOpacity(1.0);
+    if(event->type() == QEvent::WindowDeactivate)
+        this->setWindowOpacity(0.5);
+    return QWidget::event(event);
+}
+
 void ClassificWidget::on_listWidget_currentRowChanged(int currentRow)
 {
     utils::SetTransparent(m_image->m_raster, cv::Mat(m_image->m_raster.size(), CV_8UC1, 1), 50);
@@ -53,4 +65,26 @@ void ClassificWidget::on_listWidget_currentRowChanged(int currentRow)
             //utils::SetTransparent(m_image->m_raster, m_layers->at(i)->m_data, 150);
     }
 
+}
+
+void ClassificWidget::GetCoordAndType(int x, int y, int type)
+{
+    if(m_ui->lasso->isChecked())
+    {
+        if(type==2)
+        {
+            delete m_polygon;
+            m_polygon = NULL;
+            m_ui->lasso->setChecked(false);
+            m_selectPoints.clear();
+        }
+        if(type==1)
+        {
+            delete m_polygon;
+            m_polygon = NULL;
+            m_selectPoints.append(QPointF(x,y));
+            m_polygon=m_widget->AddSelection(QPolygonF(m_selectPoints));
+        }
+
+    }
 }

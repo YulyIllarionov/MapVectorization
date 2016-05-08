@@ -15,6 +15,7 @@ protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 signals:
     void sendCoord(int x,int y);
+    void sendCoordAndType(int x, int y, int type);
 public slots:
 };
 

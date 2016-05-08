@@ -6,6 +6,7 @@
 #include "../sdk/base_types.h"
 #include "../sdk/util/utils.h"
 #include "ui_classificwidget.h"
+#include <QGraphicsPolygonItem>
 #include "imageviewer.h"
 using namespace SDK_NAMESPACE;
 
@@ -19,15 +20,19 @@ public:
 public slots:
     void UpdateList();
 protected:
+    bool event(QEvent *event);
     void closeEvent(QCloseEvent *event);
 private slots:
     void on_listWidget_currentRowChanged(int currentRow);
+    void GetCoordAndType(int x, int y, int type);
 
 private:
     Ui::ClassificWidget *     m_ui;
     ImageViewer*              m_widget;
     SDK_NAMESPACE::WRaster*   m_image;
     QList<WLayer*>            m_layers;
+    QGraphicsPolygonItem*     m_polygon;
+    QVector<QPointF>          m_selectPoints;
 };
 
 #endif // CLASSIFICWIDGET_H

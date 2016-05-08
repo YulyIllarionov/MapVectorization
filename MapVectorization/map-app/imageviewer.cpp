@@ -41,6 +41,13 @@ QImage& ImageViewer::GetImage()
     return m_image;
 }
 
+QGraphicsPolygonItem* ImageViewer::AddSelection(QPolygonF polygon)
+{
+    QPen pen(Qt::DashLine);
+    QBrush brush(QColor(17,107,209,100));
+    return scene()->addPolygon(polygon,pen,brush);
+}
+
 
 MyPixmapItem* ImageViewer::GetPixItem() const
 {

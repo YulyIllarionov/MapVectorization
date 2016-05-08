@@ -16,6 +16,7 @@
 
 #include "imageviewer.h"
 #include "layersviewer.h"
+#include "classificwidget.h"
 
 
 // Тип виджета
