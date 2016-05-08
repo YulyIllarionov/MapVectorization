@@ -49,12 +49,17 @@ private slots:
     void on_SharpenAction_triggered();
     void temp(int,int);
 
+    void on_actionBilateral_triggered();
+
+    void on_actionMeanshift_triggered();
+
 private:
     Ui::mapAppMainClass       m_ui;
     int                       m_idCounter;  // Если ведется работа с несколькими проектами
     QTabWidget*               m_tabs;       // Виджет вкладок
     QList<tab_info>           m_tabsInfo;   // Информация
-    SDK_NAMESPACE::WRaster    m_image;
+    SDK_NAMESPACE::WRaster    *m_image;
+    QList<WLayer *>           m_layers;
 
 private:
     

@@ -4,16 +4,15 @@
 #include "ui_layerconfiguredialog.h"
 
 
-LayerConfigureDialog::LayerConfigureDialog(WRaster* image, ImageViewer* widget,QWidget *parent) :
+LayerConfigureDialog::LayerConfigureDialog(WRaster* image, ImageViewer* widget,WLayer *tempLayer,QWidget *parent) :
     QWidget(parent), m_ui(new Ui::LayerConfigureDialog)
 {
     m_ui->setupUi(this);
     m_image = image;
     m_widget = widget;
-    m_firstColor = true;
+    m_tempLayer = tempLayer;
     QObject::connect(m_widget->GetPixItem(), SIGNAL(sendCoord(int, int)), this, SLOT(GetCoord(int, int)));
-    m_ui->LeftSample->installEventFilter(this);
-    m_ui->RightSample->installEventFilter(this);
+    m_ui->SapleFrame->installEventFilter(this);
 }
 
 LayerConfigureDialog::~LayerConfigureDialog()
@@ -32,7 +31,7 @@ bool LayerConfigureDialog::event(QEvent *event)
 
 void LayerConfigureDialog::closeEvent(QCloseEvent *event)
 {
-    utils::SetTransparent(m_image->m_raster,cv::Mat(), 255);
+    utils::SetTransparent(m_image->m_raster, cv::Mat(m_image->m_raster.size(), CV_8UC1, 1), 255);
     m_widget->UpdatePixmap();
 }
 
@@ -40,26 +39,19 @@ bool LayerConfigureDialog::eventFilter(QObject *obj, QEvent *event)
 {
     if(event->type()==QEvent::MouseButtonPress)
     {
-        if(obj==m_ui->LeftSample)
+        if (obj == m_ui->SapleFrame)
         {
-           QColor temp_color=QColorDialog::getColor(QColor(m_leftR,m_leftG,m_leftB));
-           m_leftR=temp_color.red();
-           m_leftG=temp_color.green();
-           m_leftB=temp_color.blue();
-           UpdateSamples();
-           UpdatesMask();
-        }
-        if(obj==m_ui->RightSample)
-        {
-           QColor temp_color=QColorDialog::getColor(QColor(m_rightR,m_rightG,m_rightB));
-           m_rightR=temp_color.red();
-           m_rightG=temp_color.green();
-           m_rightB=temp_color.blue();
-           UpdateSamples();
-           UpdatesMask();
-        }
+            QColor temp_color = QColorDialog::getColor(QColor(m_r, m_g, m_b));
+            if (temp_color.isValid())
+            {
+                m_r = temp_color.red();
+                m_g = temp_color.green();
+                m_b = temp_color.blue();
+                on_AddColor_clicked();
+            }
 
-        return true;
+            return true;
+        }
     }
     return false;
 }
@@ -75,78 +67,53 @@ void LayerConfigureDialog::GetCoord(int x, int y)
         QPalette palette;
         palette.setColor(QPalette::Background, QColor(rgb));
         m_ui->SapleFrame->setPalette(palette);
-        m_ui->Pipette->setChecked(false);
+        //m_ui->Pipette->setChecked(false);
         //activateWindow();
+        on_AddColor_clicked();
     }
 }
 
 void LayerConfigureDialog::UpdateSamples()
 {
-    if(!m_firstColor)
-    {
         QPalette palette;
-        palette.setColor(QPalette::Background, QColor(m_leftR, m_leftG, m_leftB));
+        w_color tempColor = m_tempLayer->getRange().getLow();
+        palette.setColor(QPalette::Background,QColor(tempColor.r, tempColor.g, tempColor.b));
         m_ui->LeftSample->setPalette(palette);
-        palette.setColor(QPalette::Background, QColor(m_rightR, m_rightG, m_rightB));
+        tempColor = m_tempLayer->getRange().getHigh();
+        palette.setColor(QPalette::Background,QColor(tempColor.r, tempColor.g, tempColor.b));
         m_ui->RightSample->setPalette(palette);
-    }
 }
 
 void LayerConfigureDialog::on_AddColor_clicked()
 {
-    if(m_firstColor)
-    {
-        m_rightR = m_leftR = m_r;
-        m_rightG = m_leftG = m_g;
-        m_rightB = m_leftB = m_b;
-        m_firstColor = false;
-    }
-    else
-    {
-        if(m_r > m_rightR) m_rightR = m_r;
-        else if (m_r < m_leftR) m_leftR = m_r;
-
-        if(m_g > m_rightG) m_rightG = m_g;
-        else if (m_g < m_leftG) m_leftG = m_g;
-
-        if(m_b > m_rightB) m_rightB = m_b;
-        else if (m_r < m_leftB) m_leftB = m_b;
-    }
+    m_image->AddColorToLayer(m_tempLayer->getID(), w_color(m_r,m_g,m_b));
     UpdateSamples();
     UpdatesMask();
-
 
 }
 
 void LayerConfigureDialog::UpdatesMask()
 {
-    int number = m_image->m_layers.size();
-    m_image->AddLayer();
-    w_color wc2(m_leftR, m_leftG, m_leftB);
-    w_color wc3(m_rightR, m_rightG, m_rightB);
-
-    m_image->SetLayerMask(number, wc2,wc3);
-
-    utils::SetTransparent(m_image->m_raster, m_image->m_layers.at(number).m_data, 50);
+    w_color wc2 = m_tempLayer->getRange().getLow();
+    w_color wc3= m_tempLayer->getRange().getHigh();
+    utils::SetTransparent(m_image->m_raster, m_tempLayer->m_data, 50);
     m_widget->UpdatePixmap();
     QObject::connect(m_widget->GetPixItem(), SIGNAL(sendCoord(int, int)), this, SLOT(GetCoord(int, int)));
-    m_image->m_layers.pop_back();
 }
 
 void LayerConfigureDialog::on_buttonBox_accepted()
 {
-    int number = m_image->m_layers.size();
-    m_image->AddLayer();
-    w_color wc1((m_rightR + m_leftR) / 2, (m_rightG + m_leftG) / 2, (m_rightB + m_leftB) / 2);
-    m_image->SetLayerColor(number, wc1);
+    QCheckBox * mas[4] = {m_ui->checkBox,m_ui->checkBox_2,m_ui->checkBox_3,m_ui->checkBox_4};
+    int tempType = 0;
+    for (int i = 0;i < 4;i++)
+    {
+        if (mas[i]->isChecked()) 
+            tempType += 1 << i;
+    }
+    m_image->SetLayerType(m_tempLayer->getID(),(WLayer::LAYER_TYPE)tempType);
     
-    w_color wc2(m_leftR, m_leftG, m_leftB);
-    w_color wc3(m_rightR, m_rightG, m_rightB);
-
-    m_image->SetLayerMask(number,wc2,wc3);
-
-    m_image->SetLayerType(number,(WLayer::LAYER_TYPE)(m_ui->Type->currentIndex()));
-    m_image->SetLayerName(number, m_ui->Name->text().toStdString());
+    
+    m_image->SetLayerName(m_tempLayer->getID(), m_ui->Name->text().toStdString());
     emit Accept();
 
     this->close();
@@ -155,5 +122,6 @@ void LayerConfigureDialog::on_buttonBox_accepted()
 
 void LayerConfigureDialog::on_buttonBox_rejected()
 {
+    emit Reject();
     this->close();
 }
