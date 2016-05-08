@@ -10,7 +10,7 @@ SVGUtils::SVGUtils(void)
 SVGUtils::~SVGUtils(void)
 {
 }
-
+/*
 void SVGUtils::WriteSVG (SDK_NAMESPACE::WVector wvector)
 {
 	std::ofstream fout;
@@ -56,4 +56,4 @@ void SVGUtils::writeText(SDK_NAMESPACE::WText& text,std::ofstream& fout)
 	fout<<"<text x=\""<<text.getPointLeft().x<<"\" y=\""<<text.getPointLeft().y<<"\" textLength=\""<<width<<
 		"\" lengthAdjust=\"spacing\">"<<text.GetText()<<"</text>"<<endl;
 
-}
+}*/
