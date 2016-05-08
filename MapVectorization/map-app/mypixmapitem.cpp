@@ -12,3 +12,8 @@ void MyPixmapItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     emit sendCoord(event->pos().x(),event->pos().y());
 }
 
+void MyPixmapItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+
+}
+
