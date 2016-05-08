@@ -13,7 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QComboBox>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QGroupBox>
@@ -31,7 +31,7 @@ QT_BEGIN_NAMESPACE
 class Ui_LayerConfigureDialog
 {
 public:
-    QVBoxLayout *verticalLayout_4;
+    QVBoxLayout *verticalLayout_5;
     QHBoxLayout *horizontalLayout_3;
     QVBoxLayout *verticalLayout;
     QPushButton *Pipette;
@@ -49,18 +49,21 @@ public:
     QHBoxLayout *horizontalLayout;
     QLabel *label_3;
     QLineEdit *Name;
-    QHBoxLayout *horizontalLayout_2;
-    QLabel *label_4;
-    QComboBox *Type;
+    QGroupBox *groupBox_2;
+    QVBoxLayout *verticalLayout_4;
+    QCheckBox *checkBox;
+    QCheckBox *checkBox_2;
+    QCheckBox *checkBox_3;
+    QCheckBox *checkBox_4;
     QDialogButtonBox *buttonBox;
 
     void setupUi(QWidget *LayerConfigureDialog)
     {
         if (LayerConfigureDialog->objectName().isEmpty())
             LayerConfigureDialog->setObjectName(QStringLiteral("LayerConfigureDialog"));
-        LayerConfigureDialog->resize(204, 306);
-        verticalLayout_4 = new QVBoxLayout(LayerConfigureDialog);
-        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
+        LayerConfigureDialog->resize(223, 402);
+        verticalLayout_5 = new QVBoxLayout(LayerConfigureDialog);
+        verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
         verticalLayout = new QVBoxLayout();
@@ -97,12 +100,13 @@ public:
         horizontalLayout_3->setStretch(0, 1);
         horizontalLayout_3->setStretch(1, 10);
 
-        verticalLayout_4->addLayout(horizontalLayout_3);
+        verticalLayout_5->addLayout(horizontalLayout_3);
 
         AddColor = new QPushButton(LayerConfigureDialog);
         AddColor->setObjectName(QStringLiteral("AddColor"));
+        AddColor->setEnabled(false);
 
-        verticalLayout_4->addWidget(AddColor);
+        verticalLayout_5->addWidget(AddColor);
 
         groupBox = new QGroupBox(LayerConfigureDialog);
         groupBox->setObjectName(QStringLiteral("groupBox"));
@@ -152,7 +156,7 @@ public:
         horizontalLayout_4->addLayout(verticalLayout_2);
 
 
-        verticalLayout_4->addWidget(groupBox);
+        verticalLayout_5->addWidget(groupBox);
 
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
@@ -172,38 +176,48 @@ public:
         horizontalLayout->addWidget(Name);
 
 
-        verticalLayout_4->addLayout(horizontalLayout);
+        verticalLayout_5->addLayout(horizontalLayout);
 
-        horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
-        label_4 = new QLabel(LayerConfigureDialog);
-        label_4->setObjectName(QStringLiteral("label_4"));
-        sizePolicy2.setHeightForWidth(label_4->sizePolicy().hasHeightForWidth());
-        label_4->setSizePolicy(sizePolicy2);
+        groupBox_2 = new QGroupBox(LayerConfigureDialog);
+        groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
+        verticalLayout_4 = new QVBoxLayout(groupBox_2);
+        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
+        checkBox = new QCheckBox(groupBox_2);
+        checkBox->setObjectName(QStringLiteral("checkBox"));
 
-        horizontalLayout_2->addWidget(label_4);
+        verticalLayout_4->addWidget(checkBox);
 
-        Type = new QComboBox(LayerConfigureDialog);
-        Type->setObjectName(QStringLiteral("Type"));
+        checkBox_2 = new QCheckBox(groupBox_2);
+        checkBox_2->setObjectName(QStringLiteral("checkBox_2"));
 
-        horizontalLayout_2->addWidget(Type);
+        verticalLayout_4->addWidget(checkBox_2);
+
+        checkBox_3 = new QCheckBox(groupBox_2);
+        checkBox_3->setObjectName(QStringLiteral("checkBox_3"));
+
+        verticalLayout_4->addWidget(checkBox_3);
+
+        checkBox_4 = new QCheckBox(groupBox_2);
+        checkBox_4->setObjectName(QStringLiteral("checkBox_4"));
+
+        verticalLayout_4->addWidget(checkBox_4);
 
 
-        verticalLayout_4->addLayout(horizontalLayout_2);
+        verticalLayout_5->addWidget(groupBox_2);
 
         buttonBox = new QDialogButtonBox(LayerConfigureDialog);
         buttonBox->setObjectName(QStringLiteral("buttonBox"));
         buttonBox->setOrientation(Qt::Horizontal);
         buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
 
-        verticalLayout_4->addWidget(buttonBox);
+        verticalLayout_5->addWidget(buttonBox);
 
-        verticalLayout_4->setStretch(0, 3);
-        verticalLayout_4->setStretch(1, 1);
-        verticalLayout_4->setStretch(2, 5);
-        verticalLayout_4->setStretch(3, 1);
-        verticalLayout_4->setStretch(4, 1);
-        verticalLayout_4->setStretch(5, 1);
+        verticalLayout_5->setStretch(0, 2);
+        verticalLayout_5->setStretch(1, 1);
+        verticalLayout_5->setStretch(2, 3);
+        verticalLayout_5->setStretch(3, 1);
+        verticalLayout_5->setStretch(4, 1);
+        verticalLayout_5->setStretch(5, 1);
 
         retranslateUi(LayerConfigureDialog);
 
@@ -219,13 +233,11 @@ public:
         label->setText(QApplication::translate("LayerConfigureDialog", "\320\236\321\202:", 0));
         label_2->setText(QApplication::translate("LayerConfigureDialog", "\320\224\320\276:", 0));
         label_3->setText(QApplication::translate("LayerConfigureDialog", "\320\230\320\274\321\217 \321\201\320\273\320\276\321\217:", 0));
-        label_4->setText(QApplication::translate("LayerConfigureDialog", "\320\242\320\270\320\277 \321\201\320\273\320\276\321\217:", 0));
-        Type->clear();
-        Type->insertItems(0, QStringList()
-         << QApplication::translate("LayerConfigureDialog", "\320\233\320\270\320\275\320\270\320\270 \320\270 \321\202\320\265\320\272\321\201\321\202", 0)
-         << QApplication::translate("LayerConfigureDialog", "\320\236\320\261\320\273\320\260\321\201\321\202\320\270", 0)
-         << QApplication::translate("LayerConfigureDialog", "\320\224\321\200\321\203\320\263\320\276\320\265", 0)
-        );
+        groupBox_2->setTitle(QApplication::translate("LayerConfigureDialog", "\320\242\320\270\320\277 \321\201\320\273\320\276\321\217", 0));
+        checkBox->setText(QApplication::translate("LayerConfigureDialog", "\320\242\320\265\320\272\321\201\321\202", 0));
+        checkBox_2->setText(QApplication::translate("LayerConfigureDialog", "\320\233\320\270\320\275\320\270\320\270", 0));
+        checkBox_3->setText(QApplication::translate("LayerConfigureDialog", "\320\236\320\261\320\273\320\260\321\201\321\202\320\270", 0));
+        checkBox_4->setText(QApplication::translate("LayerConfigureDialog", "\320\224\321\200\321\203\320\263\320\276\320\265", 0));
     } // retranslateUi
 
 };
