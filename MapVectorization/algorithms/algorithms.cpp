@@ -19,13 +19,19 @@ void saveImage(const std::string &filename, cv::Mat *img) {
 std::vector<cv::Rect> detectLetters(cv::Mat &img, unsigned char elementId)
 {
 	std::vector<cv::Rect> boundRect;
-	cv::Mat img_gray, img_sobel, img_threshold, element;
+	cv::Mat img_reversed, img_sobel, img_threshold, element, img_gray;
 
-	cvtColor(img, img_gray, CV_BGR2GRAY);
-	cv::Sobel(img_gray, img_sobel, CV_8U, 1, 0, 3, 1, 0, cv::BORDER_DEFAULT);
+	cv::threshold(img, img_reversed, 0, 255, CV_THRESH_BINARY_INV);
+	//cvtColor(img_reversed, img_reversed, CV_BGR2GRAY);
+	saveImage("rever1.jpg", &img_reversed);
+
+	//saveImage("rever1.jpg", &img_reversed);
+	cv::Sobel(img_sobel, img_reversed, CV_8U, 1, 0, 3, 1, 0, cv::BORDER_DEFAULT);
+	saveImage("obel1.jpg", &img_sobel);
 	cv::threshold(img_sobel, img_threshold, 0, 255, CV_THRESH_OTSU + CV_THRESH_BINARY);
 	element = getStructuringElement(cv::MORPH_RECT, cv::Size(20 * (int)pow(2, elementId), 3 * (int)pow(2, elementId)));
 	cv::morphologyEx(img_threshold, img_threshold, CV_MOP_CLOSE, element);
+	saveImage("morf.jpg", &img_threshold);
 
 	std::vector< std::vector< cv::Point> > contours;
 	cv::findContours(img_threshold, contours, 0, 1);
@@ -76,9 +82,12 @@ cv::Mat makeElementOfPyramid(cv::Mat &img, int n)
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	std::string imgPath("C:/projects/MapVectorization/MapVectorization/sample/map/a2056.jpg");
+	std::string imgPath("C:/projects/MapVectorization/MapVectorization/sample/map/black/1.png");
 
 	cv::Mat img = cv::imread(imgPath);
+	cv::threshold(img, img, 0, 255, CV_THRESH_BINARY);
+	//saveImage("output1.jpg", &img);
+
 	std::vector<cv::Rect> letterBBoxes = detectLetters(img, 0);
 
 	cv::Mat img1 = makeElementOfPyramid(img, 2);
@@ -96,7 +105,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	for (int i = 0; i< letterBBoxes2.size(); i++)
 		cv::rectangle(img, letterBBoxes2.at(i), cv::Scalar(255, 0, 0), 3, 8, 0);
 
-	saveImage("output.jpg", &img);
+	saveImage("output1.jpg", &img);
 
 	return 0;
 }
