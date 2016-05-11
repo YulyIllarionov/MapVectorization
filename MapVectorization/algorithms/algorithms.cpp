@@ -23,29 +23,30 @@ std::vector<cv::Rect> detectLetters(cv::Mat &img, unsigned char elementId)
 
 	cv::threshold(img, img_reversed, 0, 255, CV_THRESH_BINARY_INV);
 	//cvtColor(img_reversed, img_reversed, CV_BGR2GRAY);
-	saveImage("rever1.jpg", &img_reversed);
+	//saveImage("rever1.jpg", &img_reversed);
 
 	//saveImage("rever1.jpg", &img_reversed);
-	cv::Sobel(img_sobel, img_reversed, CV_8U, 1, 0, 3, 1, 0, cv::BORDER_DEFAULT);
-	saveImage("obel1.jpg", &img_sobel);
-	cv::threshold(img_sobel, img_threshold, 0, 255, CV_THRESH_OTSU + CV_THRESH_BINARY);
-	element = getStructuringElement(cv::MORPH_RECT, cv::Size(20 * (int)pow(2, elementId), 3 * (int)pow(2, elementId)));
-	cv::morphologyEx(img_threshold, img_threshold, CV_MOP_CLOSE, element);
+	cv::Sobel(img_reversed, img_sobel, CV_8U, 1, 0, 3, 1, 0, cv::BORDER_DEFAULT);
+	//saveImage("obel1.jpg", &img_sobel);
+	//cv::threshold(img_sobel, img_threshold, 0, 255, CV_THRESH_OTSU + CV_THRESH_BINARY);
+	element = getStructuringElement(cv::MORPH_RECT, cv::Size(55 * (int)pow(2, elementId), 3 * (int)pow(2, elementId)));
+	cv::morphologyEx(img_sobel, img_threshold, CV_MOP_CLOSE, element);
+	cv::cvtColor(img_threshold, img_threshold, CV_RGB2GRAY);
 	saveImage("morf.jpg", &img_threshold);
 
 	std::vector< std::vector< cv::Point> > contours;
-	cv::findContours(img_threshold, contours, 0, 1);
+	cv::findContours(img_threshold, contours, cv::CHAIN_APPROX_NONE, cv::RETR_LIST);
 
 	std::vector<std::vector<cv::Point> > contours_poly(contours.size());
 
 	for (int i = 0; i < contours.size(); i++)
 	{
-		if ((contours.at(i).size() > 86 * pow(2, elementId)) && (contours.at(i).size() < 600 * pow(2, elementId)))
+		//if ((contours.at(i).size() > 86 * pow(2, elementId)) && (contours.at(i).size() < 600 * pow(2, elementId)))
 		{
 			cv::approxPolyDP(cv::Mat(contours.at(i)), contours_poly.at(i), 3, true);
 			cv::Rect appRect(boundingRect(cv::Mat(contours_poly.at(i))));
 
-			if (appRect.width > appRect.height)
+			//if (appRect.width > appRect.height)
 				boundRect.push_back(appRect);
 		}
 	}
@@ -102,9 +103,10 @@ cv::Mat rotateImage(cv::Mat image)
 	  
 	  return rotated;
 }
+
 int _tmain(int argc, _TCHAR* argv[])
 {
-	std::string imgPath("C:/projects/MapVectorization/MapVectorization/sample/map/black/1.png");
+	std::string imgPath("C:/projects/MapVectorization/MapVectorization/sample/map/black/27045Black.png");
 
 	cv::Mat img = cv::imread(imgPath);
 	cv::threshold(img, img, 0, 255, CV_THRESH_BINARY);
@@ -112,21 +114,21 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	std::vector<cv::Rect> letterBBoxes = detectLetters(img, 0);
 
-	cv::Mat img1 = makeElementOfPyramid(img, 2);
-	std::vector<cv::Rect> letterBBoxes1 = detectLetters(img1, 1);
+	//cv::Mat img1 = makeElementOfPyramid(img, 2);
+	//std::vector<cv::Rect> letterBBoxes1 = detectLetters(img1, 1);
 
-	cv::Mat img2 = makeElementOfPyramid(img, 3);
-	std::vector<cv::Rect> letterBBoxes2 = detectLetters(img2, 2);
+	//cv::Mat img2 = makeElementOfPyramid(img, 3);
+	//std::vector<cv::Rect> letterBBoxes2 = detectLetters(img2, 2);
 
 	for (int i = 0; i< letterBBoxes.size(); i++)
 		cv::rectangle(img, letterBBoxes.at(i), cv::Scalar(0, 255, 0), 3, 8, 0);
 
-	for (int i = 0; i< letterBBoxes1.size(); i++)
-		cv::rectangle(img, letterBBoxes1.at(i), cv::Scalar(0, 0, 255), 3, 8, 0);
+	//for (int i = 0; i< letterBBoxes1.size(); i++)
+	//	cv::rectangle(img, letterBBoxes1.at(i), cv::Scalar(0, 0, 255), 3, 8, 0);
 
-	for (int i = 0; i< letterBBoxes2.size(); i++)
-		cv::rectangle(img, letterBBoxes2.at(i), cv::Scalar(255, 0, 0), 3, 8, 0);
-
+	//for (int i = 0; i< letterBBoxes2.size(); i++)
+	//	cv::rectangle(img, letterBBoxes2.at(i), cv::Scalar(255, 0, 0), 3, 8, 0);
+	
 	saveImage("output1.jpg", &img);
 	return 0;
 }
