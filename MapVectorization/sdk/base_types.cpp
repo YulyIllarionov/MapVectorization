@@ -392,6 +392,21 @@ std::vector<cv::Rect> WRaster::DetectLetters(const LayerUUID& layerId) const
 }
 // ------------------------------------------------------------
 
+// define objects inside polygon
+std::vector<int> WRaster::DefineObjectsInsidePolygon(WVector<WVectorObject> &vectorObjects, std::vector<SMapPoint> & mapPoints)
+{
+	std::vector<int> indexes;//Коллекция индексов внутри коллекции
+
+	return indexes;
+}
+
+// copy object from one layer to another
+void WRaster::CopyObjectToAnotherLayer(const LayerUUID& layerId, std::vector<SMapPoint> & mapPoints)
+{
+
+}
+
+
 //Реализация функций для работы с объектами
 //Добавить точку в линии
 bool WLine::AddPointAt(const Point& point, size_t idx)
