@@ -463,6 +463,14 @@ void WLine::concatTornLine(WLine& line, bool firstOrder, bool secondOrder)
 	}
 }
 
+bool WLine::BelongsTo(WPolygon polygon)
+{
+    for (int i = 0; i < m_points.size(); i++)
+        if (pointPolygonTest(polygon.m_points, m_points[i], false) < 0)
+            return false;
+    return true;
+}
+
 WPointsContainer WLine::simplifyLine(WPointsContainer &linevector, double EPSILON, int delta)
 {
 	int i = 0;

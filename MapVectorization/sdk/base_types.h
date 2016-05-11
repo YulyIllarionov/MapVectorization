@@ -75,7 +75,7 @@ public:
 	size_t Lenght() { return m_points.size(); };
 	WPointsContainer & getPoints() { return m_points; }
 
-private:
+//private:
 	WPointsContainer  m_points;
 	int m_scaler;
 };
@@ -109,6 +109,9 @@ public:
 	WPointsContainer & getPoints() { return m_points; }
 	void concat(WLine& line);
 	void concatTornLine(WLine& line, bool firstOrder, bool secondOrder);
+
+    //находитс€ внутри полигона 
+    bool BelongsTo(WPolygon polygon);
 
 	//”простить линию
 	WPointsContainer simplifyLine(WPointsContainer &vectorline, double EPSILON, int delta);
