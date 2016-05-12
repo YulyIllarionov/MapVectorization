@@ -176,9 +176,11 @@ BundleArtifacts/
 !*.[Cc]ache/
 
 # Others
+GeneratedFiles/
 ClientBin/
 ~$*
 *~
+*.db
 *.dbmdl
 *.dbproj.schemaview
 *.pfx

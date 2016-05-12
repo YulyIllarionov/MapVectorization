@@ -1,4 +1,8 @@
 <RCC>
-    <qresource prefix="mapAppMain">
+    <qresource prefix="/mapAppMain">
+        <file>resources/icons/add.ico</file>
+        <file>resources/icons/pipette.ico</file>
+        <file>resources/icons/remove.ico</file>
+        <file>resources/icons/lasso.ico</file>
     </qresource>
 </RCC>

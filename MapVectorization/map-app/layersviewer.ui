@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LayersViewer</class>
+ <widget class="QWidget" name="LayersViewer">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>198</width>
+    <height>165</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QListWidget" name="listWidget"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="Add">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="mapappmain.qrc">
+         <normaloff>:/mapAppMain/resources/icons/add.ico</normaloff>:/mapAppMain/resources/icons/add.ico</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Remove">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="mapappmain.qrc">
+         <normaloff>:/mapAppMain/resources/icons/remove.ico</normaloff>:/mapAppMain/resources/icons/remove.ico</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="SavePngButton">
+       <property name="text">
+        <string>Save as PNG</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="mapappmain.qrc"/>
+ </resources>
+ <connections/>
+</ui>
