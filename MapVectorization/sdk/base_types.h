@@ -55,12 +55,7 @@ class WPolygon : public WVectorObject
 {
 public:
 	WPolygon();
-	WPolygon(std::vector<SMapPoint> & mapPoints)
-	{
-		for (int i = 0; i < mapPoints.size(); i++) {
-			m_points.push_back(Point::Point_(mapPoints[i].GetX(), mapPoints[i].GetY()));
-		}
-	};
+    WPolygon(std::vector<SMapPoint> & mapPoints);
 	~WPolygon();
 
 	WPolygon& operator=(WPolygon& other);
@@ -73,9 +68,11 @@ public:
 	//Удалить точку
 	bool RemovePoint(size_t idx);
 	size_t Lenght() { return m_points.size(); };
-	WPointsContainer & getPoints() { return m_points; }
+	WPointsContainer & GetPoints() { return m_points; }
+    //Проверка точки на принадлежность
+    inline bool Contains(const Point& point);
 
-//private:
+private:
 	WPointsContainer  m_points;
 	int m_scaler;
 };
@@ -481,8 +478,9 @@ public:
   std::vector<int> DefineObjectsInsidePolygon(WVector<WVectorObject> &vectorObjects, std::vector<SMapPoint> & mapPoints);
 	
   // copy object from one layer to another
-  void CopyObjectToAnotherLayer(const LayerUUID& layerId, std::vector<SMapPoint> & mapPoints);
-  //}
+  void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, WPolygon mapPoints);
+  // удаление объектов со слоя 
+  void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoints);
  
 public:
 
