@@ -42,11 +42,11 @@ SDK_BEGIN_NAMESPACE
 class WVectorObject
 {
 public:
-	virtual void clearPoints();
-	virtual void setColor(WColor color);
-	virtual void Add(const Point& point);
-	virtual Point getPoint(size_t idx);
-	virtual bool RemovePoint(size_t idx);
+	//virtual void clearPoints();
+	//virtual void setColor(WColor color);
+	//virtual void Add(const Point& point);
+	//virtual Point getPoint(size_t idx);
+	//virtual bool RemovePoint(size_t idx);
 private:
 };
 
@@ -56,7 +56,7 @@ class WPolygon : public WVectorObject
 public:
 	WPolygon();
     WPolygon(std::vector<SMapPoint> & mapPoints);
-	~WPolygon();
+    ~WPolygon() {};
 
 	WPolygon& operator=(WPolygon& other);
 	//Добавить точку
