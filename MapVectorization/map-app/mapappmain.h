@@ -1,4 +1,4 @@
-﻿#ifndef MAPAPPMAIN_H
+#ifndef MAPAPPMAIN_H
 #define MAPAPPMAIN_H
 
 #include <QMainWindow>
