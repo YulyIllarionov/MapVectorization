@@ -59,7 +59,7 @@ namespace utils {
         return kernel;
     }
     // ----------------------------------------------------
-    void SetTransparent(cv::Mat& img, cv::Mat& mask, bool needTrue, uchar alphaTrue, bool needFalse, uchar alphaFalse)
+    void SetTransparent(cv::Mat& img, cv::Mat& mask, uchar alphaTrue, uchar alphaFalse, bool needTrue, bool needFalse)
     {
         for (int y = 0; y < img.rows; y++)
             for (int x = 0; x < img.cols; x++)
@@ -67,8 +67,13 @@ namespace utils {
                 {
                     if (needTrue)
                         img.at<cv::Vec4b>(y, x)[3] = alphaTrue;
+                    
+                }
+                else
+                {
                     if (needFalse)
                         img.at<cv::Vec4b>(y, x)[3] = alphaFalse;
+
                 }
                     
     } 

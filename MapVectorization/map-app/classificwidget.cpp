@@ -60,10 +60,13 @@ void ClassificWidget::on_listWidget_currentRowChanged(int currentRow)
     utils::SetTransparent(m_image->m_raster, cv::Mat(m_image->m_raster.size(), CV_8UC1, 1), 50);
     for(int i=0; i<m_layers.size();i++)
     {
-        if(i!=currentRow) ;
-            // Здесь нужно просуммировать слои
-            //utils::SetTransparent(m_image->m_raster, m_layers->at(i)->m_data, 150);
+        // Здесь нужно просуммировать слои
+        if(i!=currentRow)    
+        utils::SetTransparent(m_image->m_raster, m_layers.at(i)->m_data, 150,0,1,0);
     }
+    utils::SetTransparent(m_image->m_raster, m_layers.at(currentRow)->m_data, 255, 0, 1, 0);
+    m_widget->UpdatePixmap();
+    QObject::connect(m_widget->GetPixItem(), SIGNAL(sendCoordAndType(int, int, int)), this, SLOT(GetCoordAndType(int, int, int)));
 
 }
 
@@ -98,7 +101,7 @@ void ClassificWidget::GetCoordAndType(int x, int y, int type)
                 vec.push_back(SMapPoint((int)pf.x(), (int)pf.y()));
             }
             m_image->DeleteOblectsFromLayer(m_layers.at(m_ui->listWidget->currentRow())->getID(), WPolygon(vec));
-
+            on_listWidget_currentRowChanged(m_ui->listWidget->currentRow());
         }
 
     }
