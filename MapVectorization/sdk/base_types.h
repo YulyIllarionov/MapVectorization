@@ -47,7 +47,21 @@ public:
 	virtual void Add(const Point& point);
 	virtual Point getPoint(size_t idx);
 	virtual bool RemovePoint(size_t idx);
+	//Изменить флаг готовности текста
+	void setReadyTrue()
+	{
+		textready = true;
+	}
+	void SetReadyFalse()
+	{
+		textready = false;
+	}
+	bool GetReady()
+	{
+		return textready;
+	}
 private:
+	bool textready;//Флаг готовности: 0 - объект не готов для записи в SVG файл, 1 - объект готов для записи в SVG файл
 };
 
 //Объект полигон
@@ -89,6 +103,7 @@ public:
 	{
 		m_width = width;
 		m_points = points;
+		this->SetReadyFalse();
 	};
 	~WLine();
 
@@ -130,6 +145,7 @@ public:
 	WText(WPolygon &polygon)
 	{
 		m_polygon = polygon;
+		this->SetReadyFalse();
 	}
 
 	WText(std::string &text, WPolygon &polygon, WLine &textline)
@@ -137,7 +153,8 @@ public:
 		m_polygon = polygon;
 		m_text = text;
 		m_textline = textline;
-		state = false;
+		textstate = false;
+		this->SetReadyFalse();
 	}
 	~WText();
 
@@ -169,25 +186,24 @@ public:
 		return m_textline;
 	}
 
-	//Изменить флаг
+	//Изменить флаг состояния
 	void setStateTrue()
 	{
-		state = true;
+		textstate = true;
 	}
 	void SetStateFalse()
 	{
-		state = false;
+		textstate = false;
 	}
-
 	bool GetState()
 	{
-		return state;
+		return textstate;
 	}
 private:
 	WPolygon m_polygon;//Границы текста на карте
 	WLine m_textline; // Линия, обозначающая направление текста внутри полигона
 	std::string m_text;//Запись
-	bool state;//Флаг состояний: 0 - текст локализован, 1 - текст распознан
+	bool textstate;//Флаг состояний: 0 - текст локализован, 1 - текст распознан
 };
 
 class WMapObject : public WVectorObject
@@ -231,7 +247,7 @@ public:
 	virtual int GetLength() = 0;
 
 	//Клонировать коллекцию
-	virtual WVector* Clone(WVector* newCollection) = 0;
+	virtual WVector* Clone(WVector* newCollection);
 };
 
 //Класс коллекции объектов
@@ -248,14 +264,16 @@ public:
 		std::vector<WText> m_newlisttextObjects;
 		for (int i = 0; i < textVector->GetLength(); i++)
 		{
-			if (textVector->GetObjectByID(i).GetState())
+			if (textVector->GetObjectByID(i).GetState()) {
 				m_newlisttextObjects.push_back(textVector->GetObjectByID(i));
+				textVector->Remove(textVector->GetObjectByID(i));
+			}
 		}
 		this.m_listTextObjects = m_newlisttextObjects;
 	}
 
 	//Взять объекты
-	std::vector<WText> GetTextObjectList() {
+	std::vector<WText> GetObjectList() {
 		return m_listTextObjects;
 	}
 
@@ -305,8 +323,21 @@ public:
 	WLineVector(void) {};
 	~WLineVector(void) {};
 
+	WLineVector(WLineVector* lineVector)
+	{
+		std::vector<WLine> m_newlistLineObjects;
+		for (int i = 0; i < lineVector->GetLength(); i++)
+		{
+			if (lineVector->GetObjectByID(i).GetState()) {
+				m_newlistLineObjects.push_back(lineVector->GetObjectByID(i));
+				lineVector->Remove(lineVector->GetObjectByID(i));
+			}
+		}
+		this.m_listLineObjects = m_newlistLineObjects;
+	}
+
 	//Взять объекты
-	std::vector<WLine> GetLineObjectList() {
+	std::vector<WLine> GetObjectList() {
 		return m_listLineObjects;
 	}
 
@@ -334,6 +365,20 @@ public:
 	void RemoveById(int id) {
 		m_listLineObjects.erase(m_listLineObjects.begin() + id);
 	}
+
+	//Взять длину коллекции
+	int GetLength()
+	{
+		return m_listLineObjects.size();
+	}
+
+	//Клонировать коллекцию
+	WLineVector& Clone(WLineVector* newCollection)
+	{
+		newCollection = new WLineVector(*this);
+		return newCollection;
+	}
+
 
 private:
 	std::vector<WLine> m_listLineObjects;//Коллекция объектов

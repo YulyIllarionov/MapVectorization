@@ -9,9 +9,11 @@ public:
 	SVGUtils(void);
 	~SVGUtils(void);
 
-	//void WriteSVG (SDK_NAMESPACE::WVector wvector);
+	void WriteLineToSVG (SDK_NAMESPACE::WLineVector<SDK_NAMESPACE::WLine> wvector, string filename);
+	void WriteTextToSVG (SDK_NAMESPACE::WTextVector<SDK_NAMESPACE::WText> wvector, string filename);
 private:
-	void writeLine (std::vector<CvPoint> points,std::ofstream& fout);
-	void writeText (SDK_NAMESPACE::WText& text,std::ofstream& fout);
+	void WriteLine (std::vector<Point> points,std::ofstream& fout);
+	void WriteText (SDK_NAMESPACE::WText& text,std::ofstream& fout);
+	void WritePolygon(std::vector<Point> points, std::ofstream& fout);
 };
 
