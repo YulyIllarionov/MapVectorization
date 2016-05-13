@@ -59,11 +59,18 @@ namespace utils {
         return kernel;
     }
     // ----------------------------------------------------
-    void SetTransparent(cv::Mat& img, cv::Mat& mask, uchar aTrue, uchar aFalse)
+    void SetTransparent(cv::Mat& img, cv::Mat& mask, bool needTrue, uchar alphaTrue, bool needFalse, uchar alphaFalse)
     {
         for (int y = 0; y < img.rows; y++)
             for (int x = 0; x < img.cols; x++)
-                img.at<cv::Vec4b>(y, x)[3] = (mask.at<uchar>(y, x) > 0) ? aTrue : aFalse;
+                if (mask.at<uchar>(y, x) > 0)
+                {
+                    if (needTrue)
+                        img.at<cv::Vec4b>(y, x)[3] = alphaTrue;
+                    if (needFalse)
+                        img.at<cv::Vec4b>(y, x)[3] = alphaFalse;
+                }
+                    
     } 
     // ----------------------------------------------------
     std::string genUUID()
