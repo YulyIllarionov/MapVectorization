@@ -401,11 +401,49 @@ std::vector<int> WRaster::DefineObjectsInsidePolygon(WVector<WVectorObject> &vec
 }
 
 // copy object from one layer to another
-void WRaster::CopyObjectToAnotherLayer(const LayerUUID& layerId, std::vector<SMapPoint> & mapPoints)
+void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, WPolygon mapPoints)
 {
-
+    Rect roi = boundingRect(mapPoints.GetPoints());
+    WLayer* departureLayer = GetLayerById(arrivalLayerId);
+    WLayer* arrivalLayer = GetLayerById(departureLayerId);
+    for (int y = roi.y; y < roi.y + roi.height; y++)
+    {
+        for (int x = roi.x; x < roi.x + roi.width; x++)
+        {
+            Point current(x, y);
+            if (mapPoints.Contains(current))
+                arrivalLayer->m_data.at<uchar>(current) =
+                    departureLayer->m_data.at<uchar>(current);
+        }
+    }
 }
 
+void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoints)
+{
+    Rect roi = boundingRect(mapPoints.GetPoints());
+    WLayer* layer = GetLayerById(layerId);
+    for (int y = roi.y; y < roi.y + roi.height; y++)
+    {
+        for (int x = roi.x; x < roi.x + roi.width; x++)
+        {
+            Point current(x, y);
+            if (mapPoints.Contains(current))
+                layer->m_data.at<uchar>(current) = 0;
+        }
+    }
+}
+
+WPolygon::WPolygon(std::vector<SMapPoint> & mapPoints)
+{
+    for (int i = 0; i < mapPoints.size(); i++) {
+        m_points.push_back(Point::Point_(mapPoints[i].GetX(), mapPoints[i].GetY()));
+    }
+};
+
+inline bool WPolygon::Contains(const Point& point)
+{
+    return (pointPolygonTest(m_points, point, false)>=0);
+}
 
 //Реализация функций для работы с объектами
 //Добавить точку в линии
@@ -461,6 +499,14 @@ void WLine::concatTornLine(WLine& line, bool firstOrder, bool secondOrder)
 	{
 		m_points.insert(m_points.begin(), tmp.begin(), tmp.end());
 	}
+}
+
+bool WLine::BelongsTo(WPolygon polygon)
+{
+    for (int i = 0; i < m_points.size(); i++)
+        if (!polygon.Contains(m_points[i]))
+            return false;
+    return true;
 }
 
 WPointsContainer WLine::simplifyLine(WPointsContainer &linevector, double EPSILON, int delta)

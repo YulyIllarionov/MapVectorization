@@ -16,4 +16,3 @@ private:
 	void WriteText (SDK_NAMESPACE::WText& text,std::ofstream& fout);
 	void WritePolygon(std::vector<Point> points, std::ofstream& fout);
 };
-
