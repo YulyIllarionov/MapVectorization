@@ -27,6 +27,11 @@ private:
 	int x;
 	int y;
 public:
+    SMapPoint(int x, int y)
+    {
+        this->x = x;
+        this->y = y;
+    }
 	int GetX() {
 		return x;
 	}

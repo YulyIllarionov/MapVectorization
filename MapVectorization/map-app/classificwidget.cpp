@@ -85,6 +85,21 @@ void ClassificWidget::GetCoordAndType(int x, int y, int type)
             m_selectPoints.append(QPointF(x,y));
             m_polygon=m_widget->AddSelection(QPolygonF(m_selectPoints));
         }
+        if (type == 9)
+        {
+            delete m_polygon;
+            m_polygon = NULL;
+            m_selectPoints.append(QPointF(x, y));
+            // Создание вектора
+            std::vector<SMapPoint> vec;
+            for (int i = 0;i < m_selectPoints.size();i++)
+            {
+                QPointF pf= m_selectPoints.at(i);
+                vec.push_back(SMapPoint((int)pf.x(), (int)pf.y()));
+            }
+            m_image->DeleteOblectsFromLayer(m_layers.at(m_ui->listWidget->currentRow())->getID(), WPolygon(vec));
+
+        }
 
     }
 }
