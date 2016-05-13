@@ -89,6 +89,7 @@ public:
 	bool RemovePoint(size_t idx);
 	size_t Lenght() { return m_points.size(); };
 	WPointsContainer & getPoints() { return m_points; }
+	inline bool Contains(const Point& point);
 
 private:
 	WPointsContainer  m_points;
@@ -125,7 +126,7 @@ public:
 	WPointsContainer & getPoints() { return m_points; }
 	void concat(WLine& line);
 	void concatTornLine(WLine& line, bool firstOrder, bool secondOrder);
-
+	bool BelongsTo(WPolygon polygon);
 	//”простить линию
 	WPointsContainer simplifyLine(WPointsContainer &vectorline, double EPSILON, int delta);
 
@@ -524,14 +525,16 @@ public:
   std::vector<int> DefineObjectsInsidePolygon(WVector<WVectorObject> &vectorObjects, std::vector<SMapPoint> & mapPoints);
 	
   // copy object from one layer to another
-  void CopyObjectToAnotherLayer(const LayerUUID& layerId, std::vector<SMapPoint> & mapPoints);
+  void CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, WPolygon mapPoints);
+
+
+  void DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoints);
   //}
  
-public:
 
 
 private:
-  SDKResult SetLayerType (const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite) const;
+	SDKResult SetLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite) const;
   void Initialize(const std::string& imgPath);
 
   // depricate copy and move operations

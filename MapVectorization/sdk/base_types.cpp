@@ -403,7 +403,7 @@ std::vector<int> WRaster::DefineObjectsInsidePolygon(WVector<WVectorObject> &vec
 // copy object from one layer to another
 void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, WPolygon mapPoints)
 {
-    Rect roi = boundingRect(mapPoints.GetPoints());
+    Rect roi = boundingRect(mapPoints.getPoints());
     WLayer* departureLayer = GetLayerById(arrivalLayerId);
     WLayer* arrivalLayer = GetLayerById(departureLayerId);
     for (int y = roi.y; y < roi.y + roi.height; y++)
@@ -420,7 +420,7 @@ void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const
 
 void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoints)
 {
-    Rect roi = boundingRect(mapPoints.GetPoints());
+    Rect roi = boundingRect(mapPoints.getPoints());
     WLayer* layer = GetLayerById(layerId);
     for (int y = roi.y; y < roi.y + roi.height; y++)
     {
@@ -432,14 +432,6 @@ void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoint
         }
     }
 }
-
-WPolygon::WPolygon(std::vector<SMapPoint> & mapPoints)
-{
-    for (int i = 0; i < mapPoints.size(); i++) {
-        m_points.push_back(Point::Point_(mapPoints[i].GetX(), mapPoints[i].GetY()));
-    }
-};
-
 inline bool WPolygon::Contains(const Point& point)
 {
     return (pointPolygonTest(m_points, point, false)>=0);
