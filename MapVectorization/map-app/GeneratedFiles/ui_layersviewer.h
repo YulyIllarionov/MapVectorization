@@ -30,6 +30,7 @@ public:
     QHBoxLayout *horizontalLayout;
     QPushButton *Add;
     QPushButton *Remove;
+    QPushButton *SavePngButton;
 
     void setupUi(QWidget *LayersViewer)
     {
@@ -61,6 +62,11 @@ public:
 
         horizontalLayout->addWidget(Remove);
 
+        SavePngButton = new QPushButton(LayersViewer);
+        SavePngButton->setObjectName(QStringLiteral("SavePngButton"));
+
+        horizontalLayout->addWidget(SavePngButton);
+
 
         verticalLayout->addLayout(horizontalLayout);
 
@@ -75,6 +81,7 @@ public:
         LayersViewer->setWindowTitle(QApplication::translate("LayersViewer", "Form", 0));
         Add->setText(QString());
         Remove->setText(QString());
+        SavePngButton->setText(QApplication::translate("LayersViewer", "Save as PNG", 0));
     } // retranslateUi
 
 };

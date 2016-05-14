@@ -21,7 +21,7 @@ namespace utils
 {  
   std::string WSTR2STR(const std::wstring& wide);
   cv::Mat SharpKernel(double k);
-  void SetTransparent(cv::Mat& img, cv::Mat& mask, uchar aTrue, uchar aFalse = 255);
+  void SetTransparent(cv::Mat& img, cv::Mat& mask, uchar alphaTrue, uchar alphaFalse=255, bool needTrue=true, bool needFalse=true);
   std::string genUUID();
   
   inline bool operator < (cv::Vec3b& first, cv::Vec3b& second);

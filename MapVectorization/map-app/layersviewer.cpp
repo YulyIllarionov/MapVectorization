@@ -95,3 +95,21 @@ void LayersViewer::on_Remove_clicked()
     m_layers->removeAt(m_ui->listWidget->currentRow());
     UpdateList();
 }
+
+void LayersViewer::on_SavePngButton_clicked()
+{
+    int index;
+
+    if((index=m_ui->listWidget->currentRow())>-1)
+    {
+        QString str = QFileDialog::getSaveFileName(0, "Save layer", QString(m_layers->at(index)->getName().c_str()) + ".png", "Image Files (*.png *.jpg *.bmp) ;; *.*");
+        if (!str.isEmpty())
+        {
+            cv::Mat toSave;
+            cv::normalize(m_layers->at(index)->m_data, toSave, 0, 255, cv::NORM_MINMAX, CV_8UC1);
+            //cv::imshow("1", toSave);
+            //cv::waitKey(0);
+            cv::imwrite(str.toStdString(), toSave);
+        }
+    }
+}

@@ -8,14 +8,346 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 #include "app/sdk_const.h"
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/core/core.hpp>
 #include "app/sdk_result.h"
-
 #include "opencv/cxcore.h"
 #include <list>
+using namespace cv;
+//
+typedef std::vector<Point>                WPointsContainer;
+typedef unsigned char                      WColor; 
+
+struct SMapPoint
+{
+private:
+	int x;
+	int y;
+public:
+    SMapPoint(int x, int y)
+    {
+        this->x = x;
+        this->y = y;
+    }
+	int GetX() {
+		return x;
+	}
+	int GetY() {
+		return y;
+	}
+
+    Point ToPoint() {
+        return Point(x, y);
+    }
+};
 
 SDK_BEGIN_NAMESPACE
+
+
+//Общий интерфейс всех объектов
+class WVectorObject
+{
+public:
+	//virtual void clearPoints();
+	//virtual void setColor(WColor color);
+	//virtual void Add(const Point& point);
+	//virtual Point getPoint(size_t idx);
+	//virtual bool RemovePoint(size_t idx);
+private:
+};
+
+//Объект полигон
+class WPolygon : public WVectorObject
+{
+public:
+	WPolygon();
+    WPolygon(std::vector<SMapPoint> & mapPoints);
+    ~WPolygon() {};
+
+	WPolygon& operator=(WPolygon& other);
+	//Добавить точку
+	void Add(const Point& point) { m_points.push_back(point); };
+	//Добавить точку в по указанному индексу
+	bool AddPointAt(const Point& point, size_t idx);
+	//Взять точку по индексу
+	Point GetPoint(size_t idx) { return m_points.size() > idx ? m_points[idx] : Point::Point_(); };
+	//Удалить точку
+	bool RemovePoint(size_t idx);
+	size_t Lenght() { return m_points.size(); };
+	WPointsContainer & GetPoints() { return m_points; }
+    //Проверка точки на принадлежность
+    inline bool Contains(const Point& point);
+
+private:
+	WPointsContainer  m_points;
+	int m_scaler;
+};
+
+class WLine : public WVectorObject
+{
+public:
+	WLine();
+
+	WLine(double &width, WPointsContainer &points)
+	{
+		m_width = width;
+		m_points = points;
+	};
+	~WLine();
+
+	WLine& operator=(WLine& other);
+	void clearPoints();
+
+	// line width
+	void setWidth(double width);
+	double getWidth() { return m_width; };
+	void setColor(WColor color) { m_color = color; };
+
+	// points
+	void Add(const Point& point) { m_points.push_back(point); };
+	bool AddPointAt(const Point& point, size_t idx);
+	Point getPoint(size_t idx) { return m_points.size() > idx ? m_points[idx] : Point::Point_(); };
+	bool RemovePoint(size_t idx);
+	size_t Lenght() { return m_points.size(); };
+	WPointsContainer & getPoints() { return m_points; }
+	void concat(WLine& line);
+	void concatTornLine(WLine& line, bool firstOrder, bool secondOrder);
+
+    //находится внутри полигона 
+    bool BelongsTo(WPolygon polygon);
+
+	//Упростить линию
+	WPointsContainer simplifyLine(WPointsContainer &vectorline, double EPSILON, int delta);
+
+private:
+	double            m_width;
+	WPointsContainer  m_points;
+	int m_scaler;
+	WColor m_color;
+};
+
+
+//Объект текст
+class WText : public WVectorObject
+{
+public:
+	WText();
+
+	WText(WPolygon &polygon)
+	{
+		m_polygon = polygon;
+	}
+
+	WText(std::string &text, WPolygon &polygon, WLine &textline)
+	{
+		m_polygon = polygon;
+		m_text = text;
+		m_textline = textline;
+		state = false;
+	}
+	~WText();
+
+	WText& operator=(WText& other);
+	//Добавить полигон
+	void AddPolygon(WPolygon& polygon) {
+		m_polygon = polygon;
+	}
+	WPolygon& getPolygon() {
+		return m_polygon;
+	}
+	//Добавить текст
+	void AddText(std::string &text) {
+		m_text = text;
+	}
+
+	std::string GetText() {
+		return m_text;
+	}
+
+	//Добавить линию текста
+	void AddTextLine(WLine &textline)
+	{
+		m_textline = textline;
+	}
+
+	WLine& GetTextLine()
+	{
+		return m_textline;
+	}
+
+	//Изменить флаг
+	void setStateTrue()
+	{
+		state = true;
+	}
+	void SetStateFalse()
+	{
+		state = false;
+	}
+
+	bool GetState()
+	{
+		return state;
+	}
+private:
+	WPolygon m_polygon;//Границы текста на карте
+	WLine m_textline; // Линия, обозначающая направление текста внутри полигона
+	std::string m_text;//Запись
+	bool state;//Флаг состояний: 0 - текст локализован, 1 - текст распознан
+};
+
+class WMapObject : public WVectorObject
+{
+public:
+	WMapObject();
+	~WMapObject();
+	void Add(const Point& point) { m_points.push_back(point); };
+	Point getPoint(size_t idx) { return m_points.size() > idx ? m_points[idx] : Point::Point_(); };
+	bool RemovePoint(size_t idx);
+private:
+	WPointsContainer  m_points;
+
+};
+
+//Класс коллекции объектов
+template<class T>
+class WVector
+{
+public:
+	//Конструктор
+	WVector(void) {};
+	~WVector(void) {};
+
+	//Взять объекты
+	virtual std::vector<T> GetObjectList() = 0;
+
+	//Установить новый список объектов
+	virtual void SetObjectList(std::vector<T>& listObjects) = 0;
+
+	//Взять объет по идентификатору
+	virtual T& GetObjectByID(int id) = 0;
+
+	//Добавить объект в коллекцию
+	virtual void Add(T &object) = 0;
+
+	//Удалить объект из коллекции
+	virtual void Remove(T &object) = 0;
+
+	//Взять количество элементов в коллекции
+	virtual int GetLength() = 0;
+
+	//Клонировать коллекцию
+	virtual WVector* Clone(WVector* newCollection) = 0;
+};
+
+//Класс коллекции объектов
+template<class WText>
+class WTextVector : public WVector<WText>
+{
+public:
+	//Конструктор
+	WTextVector(void) {};
+	~WTextVector(void) {};
+
+	WTextVector(WTextVector* textVector)
+	{
+		std::vector<WText> m_newlisttextObjects;
+		for (int i = 0; i < textVector->GetLength(); i++)
+		{
+			if (textVector->GetObjectByID(i).GetState())
+				m_newlisttextObjects.push_back(textVector->GetObjectByID(i));
+		}
+		this.m_listTextObjects = m_newlisttextObjects;
+	}
+
+	//Взять объекты
+	std::vector<WText> GetTextObjectList() {
+		return m_listTextObjects;
+	}
+
+	//Установить новый список объектов
+	void SetObjectList(std::vector<WText>& listObjects) {
+		m_listTextObjects = listObjects;
+	}
+
+	//Взять объет по идентификатору
+	WText& GetObjectByID(int id) {
+		return m_listTextObjects[id];
+	}
+
+	//Добавить объект в коллекцию
+	void Add(WText &object) {
+		return m_listTextObjects.push_back(object);
+	}
+
+	//Удалить объект из коллекции
+	void Remove(WText &object) {
+		m_listTextObjects.erase(std::remove(m_listTextObjects.begin(), m_listTextObjects.end(), object), m_listTextObjects.end());
+	}
+
+	//Взять длину коллекции
+	int GetLength()
+	{
+		return m_listTextObjects.size();
+	}
+
+	//Клонировать коллекцию
+	WTextVector& Clone(WTextVector* newCollection)
+	{
+		newCollection = new WTextVector(*this);
+		return newCollection;
+	}
+
+private:
+	std::vector<WText> m_listTextObjects;//Коллекция объектов
+};
+
+//Класс коллекции объектов
+template<class WLine>
+class WLineVector : public WVector<WLine>
+{
+public:
+	//Конструктор
+	WLineVector(void) {};
+	~WLineVector(void) {};
+
+	//Взять объекты
+	std::vector<WLine> GetLineObjectList() {
+		return m_listLineObjects;
+	}
+
+	//Установить новый список объектов
+	void SetObjectList(std::vector<WLine>& listObjects) {
+		m_listLineObjects = listObjects;
+	}
+
+	//Взять объет по идентификатору
+	WLine& GetObjectByID(int id) {
+		return m_listLineObjects[id];
+	}
+
+	//Добавить объект в коллекцию
+	void Add(WLine &object) {
+		return m_listLineObjects.push_back(object);
+	}
+
+	//Удалить объект из коллекции
+	void Remove(WLine &object) {
+		m_listLineObjects.erase(std::remove(m_listLineObjects.begin(), m_listLineObjects.end(), object), m_listLineObjects.end());
+	}
+
+	//Удалить объект по идентификатору
+	void RemoveById(int id) {
+		m_listLineObjects.erase(m_listLineObjects.begin() + id);
+	}
+
+private:
+	std::vector<WLine> m_listLineObjects;//Коллекция объектов
+};
+
 
 
 //  Enumerator
@@ -84,6 +416,7 @@ public:
   w_range     getRange()     const { return m_color_range; }
   std::string getName()      const { return m_name; }
   GroupID     getGroupId()   const { return m_group_id; }
+  void DrawCircle(SMapPoint point, uint radius, uchar color);
 
   cv::Mat     m_data;
 
@@ -149,8 +482,15 @@ public:
   // get layers count
   size_t    GetLayersCount  () { return m_layers.size(); }
   // get related layers
-SDKResult WRaster::GetLayersByGroupId(const GroupID& groupId, LayerIDs& relatedLayers) const;
-  //}
+  SDKResult WRaster::GetLayersByGroupId(const GroupID& groupId, LayerIDs& relatedLayers) const;
+
+  // define objects inside polygon
+  std::vector<int> DefineObjectsInsidePolygon(WVector<WVectorObject> &vectorObjects, std::vector<SMapPoint> & mapPoints);
+	
+  // copy object from one layer to another
+  void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, WPolygon mapPoints);
+  // удаление объектов со слоя 
+  void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoints);
  
 public:
 
@@ -191,7 +531,6 @@ private:
   std::wstring                      m_image_path;
 };
 // ------------------------------------------------------------
-
 
 SDK_END_NAMESPACE
 

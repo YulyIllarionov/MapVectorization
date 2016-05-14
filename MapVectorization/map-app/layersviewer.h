@@ -30,6 +30,8 @@ protected:
 
     void on_Remove_clicked();
 
+    void on_SavePngButton_clicked();
+
 private:
     Ui::LayersViewer*         m_ui;
     ImageViewer*              m_widget;

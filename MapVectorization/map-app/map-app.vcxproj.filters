@@ -36,6 +36,11 @@
     <Filter Include="Resource Files\icons">
       <UniqueIdentifier>{28cf8016-95a7-411b-b725-df0998e4587e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Generated Files\Release2">
+      <UniqueIdentifier>{33d416d6-3d01-4efe-b7fb-b6bb6780bfac}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -92,6 +97,18 @@
     <ClCompile Include="GeneratedFiles\Release\moc_imageviewer.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release2\moc_classificwidget.cpp">
+      <Filter>Generated Files\Release2</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_classificwidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_classificwidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="classificwidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -104,6 +121,9 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_layerconfiguredialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_classificwidget.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -134,6 +154,12 @@
     </CustomBuild>
     <CustomBuild Include="mypixmapitem.h">
       <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="classificwidget.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="classificwidget.ui">
+      <Filter>Form Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,4 @@
-﻿#ifndef MAPAPPMAIN_H
+#ifndef MAPAPPMAIN_H
 #define MAPAPPMAIN_H
 
 #include <QMainWindow>
@@ -16,6 +16,7 @@
 
 #include "imageviewer.h"
 #include "layersviewer.h"
+#include "classificwidget.h"
 
 
 // Тип виджета
@@ -52,6 +53,8 @@ private slots:
     void on_actionBilateral_triggered();
 
     void on_actionMeanshift_triggered();
+
+    void on_actionRegimentBlackColor_triggered();
 
 private:
     Ui::mapAppMainClass       m_ui;

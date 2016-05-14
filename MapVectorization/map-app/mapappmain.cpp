@@ -77,3 +77,11 @@ void mapAppMain::on_actionMeanshift_triggered()
     m_image->SegmentationMeanshift();
     static_cast<ImageViewer *>(m_tabs->currentWidget())->UpdatePixmap();
 }
+
+void mapAppMain::on_actionRegimentBlackColor_triggered()
+{
+    ClassificWidget* viewer = new ClassificWidget(m_image, static_cast<ImageViewer*>(m_tabs->currentWidget()),&m_layers);
+    viewer->setAttribute(Qt::WA_DeleteOnClose);
+    viewer->setWindowFlags(Qt::WindowStaysOnTopHint);
+    viewer->show();
+}

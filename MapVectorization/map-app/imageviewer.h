@@ -13,6 +13,7 @@ public:
     MyPixmapItem* GetPixItem() const;
     void SetImage(const QImage &image);
     QImage& GetImage();
+    QGraphicsPolygonItem *AddSelection(QPolygonF polygon);
 
 signals:
 
