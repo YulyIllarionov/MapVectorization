@@ -8,6 +8,8 @@
 #include "opencv/cv.h"
 #include "opencv/highgui.h"
 
+#include "RegionClassifierImpl.h"
+
 //---------------------------Не для проекта-----------------------
 void saveImage(const std::string &filename, cv::Mat *img) {
 	std::string output("C:/projects/MapVectorization/MapVectorization/sample/output/");
@@ -106,29 +108,56 @@ cv::Mat rotateImage(cv::Mat image)
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	std::string imgPath("C:/projects/MapVectorization/MapVectorization/sample/map/black/27045Black.png");
+	std::string imgPath("C:/projects/MapVectorization/MapVectorization/sample/map/black/d_110_1Black.png");
 
 	cv::Mat img = cv::imread(imgPath);
-	cv::threshold(img, img, 0, 255, CV_THRESH_BINARY);
+
+	//**
+	//Поиск текста
+	//**
+	//cv::threshold(img, img, 0, 255, CV_THRESH_BINARY);
+	////saveImage("output1.jpg", &img);
+
+	//std::vector<cv::Rect> letterBBoxes = detectLetters(img, 0);
+
+	////cv::Mat img1 = makeElementOfPyramid(img, 2);
+	////std::vector<cv::Rect> letterBBoxes1 = detectLetters(img1, 1);
+
+	////cv::Mat img2 = makeElementOfPyramid(img, 3);
+	////std::vector<cv::Rect> letterBBoxes2 = detectLetters(img2, 2);
+
+	//for (int i = 0; i< letterBBoxes.size(); i++)
+	//	cv::rectangle(img, letterBBoxes.at(i), cv::Scalar(0, 255, 0), 3, 8, 0);
+
+	////for (int i = 0; i< letterBBoxes1.size(); i++)
+	////	cv::rectangle(img, letterBBoxes1.at(i), cv::Scalar(0, 0, 255), 3, 8, 0);
+
+	////for (int i = 0; i< letterBBoxes2.size(); i++)
+	////	cv::rectangle(img, letterBBoxes2.at(i), cv::Scalar(255, 0, 0), 3, 8, 0);
+	//
 	//saveImage("output1.jpg", &img);
 
-	std::vector<cv::Rect> letterBBoxes = detectLetters(img, 0);
+	//**
+	//Поиск линий
+	//**
+	RegionClassifierImpl classifier(img);
+	output_data objects = classifier.GetOutputData();
 
-	//cv::Mat img1 = makeElementOfPyramid(img, 2);
-	//std::vector<cv::Rect> letterBBoxes1 = detectLetters(img1, 1);
+	//cv::Mat img1;
+	cv::Mat img1(img.size(), CV_8UC3);
+	uchar step = 0;
+	for (auto i : objects.regions)
+	{
+		
+		for (auto j : i)
+		{
+			cv::Vec3b color;
+			color[0] = ++step; color[1] = 255 - step; color[2] = step;
+			img.at <uchar>(j) = step;
+		}
+	}
+	 
 
-	//cv::Mat img2 = makeElementOfPyramid(img, 3);
-	//std::vector<cv::Rect> letterBBoxes2 = detectLetters(img2, 2);
-
-	for (int i = 0; i< letterBBoxes.size(); i++)
-		cv::rectangle(img, letterBBoxes.at(i), cv::Scalar(0, 255, 0), 3, 8, 0);
-
-	//for (int i = 0; i< letterBBoxes1.size(); i++)
-	//	cv::rectangle(img, letterBBoxes1.at(i), cv::Scalar(0, 0, 255), 3, 8, 0);
-
-	//for (int i = 0; i< letterBBoxes2.size(); i++)
-	//	cv::rectangle(img, letterBBoxes2.at(i), cv::Scalar(255, 0, 0), 3, 8, 0);
-	
-	saveImage("output1.jpg", &img);
+	saveImage("count1.jpg", &img);
 	return 0;
 }
