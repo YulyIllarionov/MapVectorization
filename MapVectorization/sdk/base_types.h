@@ -38,6 +38,10 @@ public:
 	int GetY() {
 		return y;
 	}
+
+    Point ToPoint() {
+        return Point(x, y);
+    }
 };
 
 SDK_BEGIN_NAMESPACE
@@ -412,6 +416,7 @@ public:
   w_range     getRange()     const { return m_color_range; }
   std::string getName()      const { return m_name; }
   GroupID     getGroupId()   const { return m_group_id; }
+  void DrawCircle(SMapPoint point, uint radius, uchar color);
 
   cv::Mat     m_data;
 

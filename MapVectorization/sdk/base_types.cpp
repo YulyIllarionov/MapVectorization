@@ -88,6 +88,11 @@ w_color w_range::getHigh()
   return w_color(this->high);
 }
 // ------------------------------------------------------------
+void WLayer::DrawCircle(SMapPoint point, uint radius, uchar color)
+{
+    circle(m_data, point.ToPoint(), radius, color, -1);
+}
+// ------------------------------------------------------------
 WRaster::WRaster(const std::string& imgPath)
 {
   if (imgPath != "")
