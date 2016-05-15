@@ -144,6 +144,9 @@ public:
 	~WText();
 
 	WText& operator=(WText& other);
+  bool operator==(const WText& other) {
+    return other.m_text == m_text;
+  }
 	//Добавить полигон
 	void AddPolygon(WPolygon& polygon) { m_polygon = polygon; }
 	WPolygon& GetPolygon() { return m_polygon; }
