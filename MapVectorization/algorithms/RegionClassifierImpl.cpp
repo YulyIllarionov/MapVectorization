@@ -46,37 +46,58 @@ void RegionClassifierImpl::fireMethod()
 			std::vector <cv::Point> currentRegion;
 			std::stack <cv::Point> stack;
 
-			cv::Point currentPoint = cv::Point(i, j);
-			stack.push(currentPoint);
+			stack.emplace(j, i);
 
 			while (!stack.empty())
 			{
-				currentPoint = stack.top();
+				cv::Point currentPoint = stack.top();
 				stack.pop(); // Удалить точку из стека
 				currentRegion.push_back(currentPoint); //Добавить точку к результату
-				m_inputPtr->at <uchar>(currentPoint.x, currentPoint.y) = 0; // Закрасить на изображении
 
-				for (int k = currentPoint.x - 1; k < currentPoint.x + 1; k++)
+				for (int k = currentPoint.x - 1; k <= currentPoint.x + 1; k++)
 				{
 					if (k == -1) // Следим за границами изображения
 						continue;
 					if (k == m_inputPtr->cols)
 						break;
 					
-					for (int l = currentPoint.y - 1; l < currentPoint.y + 1; l++)
+					for (int l = currentPoint.y - 1; l <= currentPoint.y + 1; l++)
 					{
-						if (l == -1)
+						if ((l == -1) || ((l == i) && (k == j)))
 							continue;
-						if (l == m_inputPtr->cols)
+						if (l == m_inputPtr->rows)
 							break;
 						
-						if (m_inputPtr->at <uchar>(k, l))
-							stack.push(cv::Point(k, l));
+						if (m_inputPtr->at <uchar>(l, k) != 0)
+							stack.emplace(k, l);
 					}
 				}
+				m_inputPtr->at <uchar>(currentPoint) = 0; // Закрасить на изображении
 			}
 			
-			m_result.regions.push_back(currentRegion);
+			regionClassifier(currentRegion);
 		}
 	}
+}
+
+void RegionClassifierImpl::regionClassifier(std::vector <cv::Point> &region)
+{
+	if (region.size() < 70)
+	{
+		m_result.trash.push_back(region);
+		return;
+	}
+
+	cv::Point2f center;
+	float radius;
+	std::vector <cv::Point> contours_poly(region.size());
+	
+	cv::approxPolyDP(cv::Mat(region), contours_poly, 3, true);
+	cv::minEnclosingCircle(cv::Mat(contours_poly), center, radius);
+
+	std::cout << radius / region.size() << std::endl;
+	if (radius / region.size() > m_radDivSquare)
+		m_result.lines.push_back(region);
+	else
+		m_result.regions.push_back(region);
 }
