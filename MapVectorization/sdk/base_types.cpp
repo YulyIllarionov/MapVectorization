@@ -398,7 +398,9 @@ std::vector<cv::Rect> WRaster::DetectLetters(const LayerUUID& layerId) const
 // ------------------------------------------------------------
 
 // define objects inside polygon
-std::vector<int> WRaster::DefineObjectsInsidePolygon(WVector<WVectorObject> &vectorObjects, std::vector<SMapPoint> & mapPoints)
+std::vector<int> WRaster::DefineObjectsInsidePolygon(
+  const WObjectContainer<WVectorObject>& vectorObjects, 
+  std::vector<SMapPoint>& mapPoints)
 {
 	std::vector<int> indexes;//Коллекция индексов внутри коллекции
 
@@ -408,6 +410,7 @@ std::vector<int> WRaster::DefineObjectsInsidePolygon(WVector<WVectorObject> &vec
 // copy object from one layer to another
 void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, WPolygon mapPoints)
 {
+    // copy raster
     Rect roi = boundingRect(mapPoints.GetPoints());
     WLayer* departureLayer = GetLayerById(arrivalLayerId);
     WLayer* arrivalLayer = GetLayerById(departureLayerId);
@@ -421,10 +424,107 @@ void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const
                     departureLayer->m_data.at<uchar>(current);
         }
     }
+
+    // copy vector objects
+    if (!departureLayer->IsSingleType() || !arrivalLayer->IsSingleType())
+      return;
+
+    WLayer::LAYER_TYPE departureType = departureLayer->getType();
+    WLayer::LAYER_TYPE arrivalType   = arrivalLayer->getType();
+
+    switch (departureType)
+    {
+      // from Text layer
+      case WLayer::LT_TEXT:
+      {
+        switch (arrivalType)
+        {
+        case WLayer::LT_LINES:
+          {
+            // from Text layer to Lines layer
+            
+            // e.g.
+            // get texts
+            std::vector<WText> texts = m_objects_text.GetObjectList();
+            // iterate and find
+            std::vector<WText>::const_iterator cit = texts.begin();
+            for (; cit != texts.end(); cit++)
+            {
+              // when found
+              break;
+            }
+            m_objects_text.Remove(*cit);
+            // create new line object
+            WLine line;
+            m_objects_line.Add(line);
+            // profit
+          }
+          break;
+        case WLayer::LT_AREAS:
+          {
+            // from Text layer to Areas layer
+          }
+          break;
+        case WLayer::LT_OTHER:
+          {
+            // from Text layer to Other layer
+          }
+          break;
+        }
+      }
+      break;
+      // from Lines layer
+      case WLayer::LT_LINES:
+      {
+        switch (arrivalType)
+        {
+        case WLayer::LT_TEXT:
+          {
+            // from Lines layer to Text layer
+          }
+          break;
+        case WLayer::LT_AREAS:
+          {
+            // from Lines layer to Areas layer
+          }
+          break;
+        case WLayer::LT_OTHER:
+          {
+            // from Lines layer to Other layer
+          }
+          break;
+        }
+      }
+      break;
+      // from Other layer
+      case WLayer::LT_OTHER:
+      {
+        switch (arrivalType)
+        {
+        case WLayer::LT_LINES:
+          {
+            // from Other layer to Lines layer
+          }
+          break;
+        case WLayer::LT_AREAS:
+          {
+            // from Other layer to Areas layer
+          }
+          break;
+        case WLayer::LT_TEXT:
+          {
+            // from Other layer to Text layer
+          }
+          break;
+        }
+      }
+      break;
+    }
 }
 
 void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoints)
 {
+    // delete raster
     Rect roi = boundingRect(mapPoints.GetPoints());
     WLayer* layer = GetLayerById(layerId);
     for (int y = roi.y; y < roi.y + roi.height; y++)
@@ -436,23 +536,41 @@ void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoint
                 layer->m_data.at<uchar>(current) = 0;
         }
     }
-}
 
-WPolygon::WPolygon(std::vector<SMapPoint> & mapPoints)
-{
-    for (int i = 0; i < mapPoints.size(); i++) {
-        m_points.push_back(Point::Point_(mapPoints[i].GetX(), mapPoints[i].GetY()));
+    
+    // delete vector objects
+    
+    if (!layer->IsSingleType())
+      return;
+
+    WLayer::LAYER_TYPE layerType = layer->getType();
+
+    switch (layerType)
+    {
+      // from Text layer
+      case WLayer::LT_TEXT:
+      {
+        
+      }
+      break;
+      // from Lines layer
+      case WLayer::LT_LINES:
+      {
+        
+      }
+      break;
+      // from Other layer
+      case WLayer::LT_OTHER:
+      {
+        
+      }
+      break;
     }
-};
-
-inline bool WPolygon::Contains(const Point& point)
-{
-    return (pointPolygonTest(m_points, point, false)>=0);
 }
 
 //Реализация функций для работы с объектами
-//Добавить точку в линии
-bool WLine::AddPointAt(const Point& point, size_t idx)
+//Добавить точку
+bool WVectorObject::AddPointAt(/*const*/ Point& point, size_t idx)
 {
 	if (idx < m_points.size())
 	{
@@ -464,7 +582,7 @@ bool WLine::AddPointAt(const Point& point, size_t idx)
 	return false;
 }
 
-bool WLine::RemovePoint(size_t idx)
+bool WVectorObject::RemovePoint(size_t idx)
 {
 	if (idx < m_points.size())
 	{
@@ -476,76 +594,103 @@ bool WLine::RemovePoint(size_t idx)
 	return false;
 }
 
-void WLine::concat(WLine& line)
+WPolygon::WPolygon(std::vector<SMapPoint> & mapPoints)
 {
-	std::vector<Point> tmp = line.m_points;
-	std::reverse(tmp.begin(), tmp.end());
-	m_points.insert(m_points.end(), tmp.begin(), tmp.end());
+    for (int i = 0; i < mapPoints.size(); i++) {
+        m_points.push_back(Point::Point_(mapPoints[i].GetX(), mapPoints[i].GetY()));
+    }
+};
+
+bool WPolygon::Contains(/*const*/ Point& point) const
+{
+    return (pointPolygonTest(m_points, point, false)>=0);
 }
 
-void WLine::concatTornLine(WLine& line, bool firstOrder, bool secondOrder)
+void WLine::Concat(const WLine& line)
 {
-	std::vector<Point> tmp = line.m_points;
+  //std::reverse(line.m_points.begin(), line.m_points.end());
+	//m_points.insert(m_points.end(), line.m_points.begin(), line.m_points.end());
+  m_points.insert(m_points.end(), line.m_points.rbegin(), line.m_points.rend());
+}
+
+void WLine::ConcatTornLine(const WLine& line, bool firstOrder, bool secondOrder)
+{
 	if (firstOrder && secondOrder)
 	{
-		m_points.insert(m_points.end(), tmp.begin(), tmp.end());
+		m_points.insert(m_points.end(), line.m_points.begin(), line.m_points.end());
 	}
 	else if (firstOrder && !secondOrder)
 	{
-		std::reverse(tmp.begin(), tmp.end());
-		m_points.insert(m_points.end(), tmp.begin(), tmp.end());
+		//std::reverse(line.m_points.begin(), line.m_points.end());
+		//m_points.insert(m_points.end(), line.m_points.begin(), line.m_points.end());
+    m_points.insert(m_points.end(), line.m_points.rbegin(), line.m_points.rend());
+
 	}
 	else if (!firstOrder && secondOrder)
 	{
-		std::reverse(tmp.begin(), tmp.end());
-		m_points.insert(m_points.begin(), tmp.begin(), tmp.end());
+		//std::reverse(line.m_points.begin(), line.m_points.end());
+		//m_points.insert(m_points.begin(), line.m_points.begin(), line.m_points.end());
+    m_points.insert(m_points.end(), line.m_points.rbegin(), line.m_points.rend());
 	}
 	else if (!firstOrder && !secondOrder)
 	{
-		m_points.insert(m_points.begin(), tmp.begin(), tmp.end());
+		m_points.insert(m_points.begin(), line.m_points.begin(), line.m_points.end());
 	}
 }
 
-bool WLine::BelongsTo(WPolygon polygon)
+bool WLine::BelongsTo(const WPolygon& polygon)
 {
-    for (int i = 0; i < m_points.size(); i++)
-        if (!polygon.Contains(m_points[i]))
-            return false;
-    return true;
+  if (m_points.size() == 0)
+    return false;
+  for (int i = 0; i < m_points.size(); i++)
+  {
+    if (!polygon.Contains(m_points[i]))
+      return false;
+  }
+  return true;
 }
 
-WPointsContainer WLine::simplifyLine(WPointsContainer &linevector, double EPSILON, int delta)
+WPointsContainer WLine::SimplifyLine(const WPointsContainer& linevector, double EPSILON, int delta)
 {
 	int i = 0;
 	double k; // curvature
-	WPointsContainer m_outpoints;
-	while ( (i + 2 * delta) <= linevector.size())
+	WPointsContainer outpoints;
+	while ((i + 2 * delta) <= linevector.size())
 	{
-		k = (((linevector[i + 2 * delta].y - linevector[i + delta].y) / (linevector[i + 2 * delta].x - linevector[i + delta].x)) / ((linevector[i + delta].y - linevector[i].y) / (linevector[i + delta].x - linevector[i].x))) / pow((1 + pow((linevector[i + delta].y - linevector[i].y) / (linevector[i + delta].x - linevector[i].x), 2)), 3 / 2);
+		k = (((linevector[i + 2 * delta].y - linevector[i + delta].y) 
+      / (linevector[i + 2 * delta].x - linevector[i + delta].x)) 
+      / ((linevector[i + delta].y - linevector[i].y) 
+      / (linevector[i + delta].x - linevector[i].x))) 
+      / pow((1 + pow((linevector[i + delta].y - linevector[i].y) 
+      / (linevector[i + delta].x - linevector[i].x), 2)), 3 / 2);
 		if (k < EPSILON)
 		{
-			std::vector<Point>::iterator it = std::find(m_outpoints.begin(), m_outpoints.end(), linevector[i + 2 * delta]);
-			if( (linevector[i + 2 * delta].x != (*it).x) && (linevector[i + 2 * delta].y != (*it).y) )
-				m_outpoints.push_back(linevector[i + 2 * delta]);
-			it = std::find(m_outpoints.begin(), m_outpoints.end(), linevector[i + delta]);
-			if( (linevector[i + delta].x != (*it).x) && (linevector[i + delta].y != (*it).y) )
-				m_outpoints.push_back(linevector[i + delta]);
-			it = std::find(m_outpoints.begin(), m_outpoints.end(), linevector[i + 2 * delta]);
-			if( (linevector[i].x != (*it).x) && (linevector[i].y != (*it).y) )
-				m_outpoints.push_back(linevector[i]);
+			std::vector<Point>::const_iterator cit = 
+        std::find(outpoints.begin(), outpoints.end(), linevector[i + 2 * delta]);
+			if((linevector[i + 2 * delta].x != (*cit).x) && (linevector[i + 2 * delta].y != (*cit).y))
+				outpoints.push_back(linevector[i + 2 * delta]);
+			
+      cit = std::find(outpoints.begin(), outpoints.end(), linevector[i + delta]);
+			if((linevector[i + delta].x != (*cit).x) && (linevector[i + delta].y != (*cit).y))
+				outpoints.push_back(linevector[i + delta]);
+			
+      cit = std::find(outpoints.begin(), outpoints.end(), linevector[i + 2 * delta]);
+			if((linevector[i].x != (*cit).x) && (linevector[i].y != (*cit).y))
+				outpoints.push_back(linevector[i]);
 		}
 		else
 		{
-			std::vector<Point>::iterator it = linevector.begin() + i;
-			while (it != (linevector.begin() + i + 2 * delta))
+			std::vector<Point>::const_iterator cit = linevector.begin() + i;
+			while (cit != (linevector.begin() + i + 2 * delta))
 			{
-				std::vector<Point>::iterator it2 = std::find(m_outpoints.begin(), m_outpoints.end(), linevector[i + 2 * delta]);
-				if (( (*it).x != (*it2).x) && ((*it).y != (*it2).y))
-					m_outpoints.push_back((*it));
+				std::vector<Point>::const_iterator cit2 = 
+          std::find(outpoints.begin(), outpoints.end(), linevector[i + 2 * delta]);
+				if (((*cit).x != (*cit2).x) && ((*cit).y != (*cit2).y))
+					outpoints.push_back((*cit));
 			}
 		}
 		i += delta;
 	}
-	return m_outpoints;
+	return outpoints;
 }
   SDK_END_NAMESPACE
