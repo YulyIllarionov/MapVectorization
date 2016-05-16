@@ -13,6 +13,7 @@ LayerConfigureDialog::LayerConfigureDialog(WRaster* image, ImageViewer* widget,W
     m_tempLayer = tempLayer;
     QObject::connect(m_widget->GetPixItem(), SIGNAL(sendCoord(int, int)), this, SLOT(GetCoord(int, int)));
     m_ui->SapleFrame->installEventFilter(this);
+    m_state=nothing;
 }
 
 LayerConfigureDialog::~LayerConfigureDialog()
@@ -124,4 +125,22 @@ void LayerConfigureDialog::on_buttonBox_rejected()
 {
     emit Reject();
     this->close();
+}
+
+void LayerConfigureDialog::on_PenButton_toggled(bool checked)
+{
+    if(checked) m_state=pen;
+    else m_state =nothing;
+}
+
+void LayerConfigureDialog::on_Pipette_toggled(bool checked)
+{
+    if(checked) m_state =pen;
+    else m_state =nothing;
+}
+
+void LayerConfigureDialog::on_EraseButton_toggled(bool checked)
+{
+    if (checked) m_state = eraser;
+    else m_state = nothing;
 }

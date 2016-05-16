@@ -25,6 +25,12 @@
     <Filter Include="Source Files\util">
       <UniqueIdentifier>{15c6c2a8-ab05-4ac9-8cb9-b36acd2a4849}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\graphics">
+      <UniqueIdentifier>{d6fdfeec-7534-4208-9895-c8899db7f065}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphics">
+      <UniqueIdentifier>{d48efceb-41ca-4508-b2e9-58211107ddf4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -51,8 +57,8 @@
     <ClInclude Include="app\sdk_result.h">
       <Filter>Header Files\app</Filter>
     </ClInclude>
-    <ClInclude Include="svg_utils.h">
-      <Filter>Header Files\util</Filter>
+    <ClInclude Include="graphics\skeletonization.h">
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -71,8 +77,8 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="svg_utils.cpp">
-      <Filter>Source Files\util</Filter>
+    <ClCompile Include="graphics\skeletonization.cpp">
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

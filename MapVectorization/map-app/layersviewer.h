@@ -32,10 +32,12 @@ protected:
 
     void on_SavePngButton_clicked();
 
+    void on_SplitButton_clicked();
+
 private:
-    Ui::LayersViewer*         m_ui;
-    ImageViewer*              m_widget;
-    SDK_NAMESPACE::WRaster*   m_image;
+    Ui::LayersViewer         *m_ui;
+    ImageViewer              *m_widget;
+    SDK_NAMESPACE::WRaster   *m_image;
     QList<WLayer*>           *m_layers;
     WLayer                   *m_tempLayer;
 };

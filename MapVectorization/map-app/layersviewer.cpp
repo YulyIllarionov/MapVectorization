@@ -81,6 +81,12 @@ void LayersViewer::on_listWidget_currentRowChanged(int currentRow)
     {
         utils::SetTransparent(m_image->m_raster, m_layers->at(currentRow)->m_data, 50);
         m_widget->UpdatePixmap();
+        if(m_layers->at(currentRow)->getType()==WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT| WLayer::LAYER_TYPE_ENUM::LT_OTHER)
+        {
+           m_ui->SplitButton->setEnabled(true);
+        }
+        else m_ui->SplitButton->setEnabled(false);
+
     }
 }
 
@@ -112,4 +118,18 @@ void LayersViewer::on_SavePngButton_clicked()
             cv::imwrite(str.toStdString(), toSave);
         }
     }
+}
+
+void LayersViewer::on_SplitButton_clicked()
+{
+    LayerIDs vec;
+    m_image->SplitLayer(m_layers->at(m_ui->listWidget->currentRow())->getID(),vec);
+    for(int i=0;i<vec.size();i++)
+    {
+        m_layers->append(m_image->GetLayerById(vec.at(i)));
+        if(m_image->GetLayerById(vec.at(i))->getType()==WLayer::LAYER_TYPE_ENUM::LT_LINES)
+            m_image->GetLayerById(vec.at(i))->InicializeVectorContainer();
+    }
+    UpdateList();
+
 }

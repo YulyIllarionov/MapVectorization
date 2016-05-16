@@ -23,6 +23,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QSpinBox>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -46,6 +47,11 @@ public:
     QVBoxLayout *verticalLayout_2;
     QLabel *label_2;
     QFrame *RightSample;
+    QGroupBox *groupBox_3;
+    QHBoxLayout *horizontalLayout_2;
+    QPushButton *PenButton;
+    QPushButton *EraseButton;
+    QSpinBox *RadiusSpinBox;
     QHBoxLayout *horizontalLayout;
     QLabel *label_3;
     QLineEdit *Name;
@@ -61,7 +67,7 @@ public:
     {
         if (LayerConfigureDialog->objectName().isEmpty())
             LayerConfigureDialog->setObjectName(QStringLiteral("LayerConfigureDialog"));
-        LayerConfigureDialog->resize(223, 402);
+        LayerConfigureDialog->resize(253, 494);
         verticalLayout_5 = new QVBoxLayout(LayerConfigureDialog);
         verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
         horizontalLayout_3 = new QHBoxLayout();
@@ -158,6 +164,30 @@ public:
 
         verticalLayout_5->addWidget(groupBox);
 
+        groupBox_3 = new QGroupBox(LayerConfigureDialog);
+        groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
+        horizontalLayout_2 = new QHBoxLayout(groupBox_3);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        PenButton = new QPushButton(groupBox_3);
+        PenButton->setObjectName(QStringLiteral("PenButton"));
+        PenButton->setCheckable(true);
+
+        horizontalLayout_2->addWidget(PenButton);
+
+        EraseButton = new QPushButton(groupBox_3);
+        EraseButton->setObjectName(QStringLiteral("EraseButton"));
+        EraseButton->setCheckable(true);
+
+        horizontalLayout_2->addWidget(EraseButton);
+
+        RadiusSpinBox = new QSpinBox(groupBox_3);
+        RadiusSpinBox->setObjectName(QStringLiteral("RadiusSpinBox"));
+
+        horizontalLayout_2->addWidget(RadiusSpinBox);
+
+
+        verticalLayout_5->addWidget(groupBox_3);
+
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         label_3 = new QLabel(LayerConfigureDialog);
@@ -218,6 +248,7 @@ public:
         verticalLayout_5->setStretch(3, 1);
         verticalLayout_5->setStretch(4, 1);
         verticalLayout_5->setStretch(5, 1);
+        verticalLayout_5->setStretch(6, 1);
 
         retranslateUi(LayerConfigureDialog);
 
@@ -232,6 +263,9 @@ public:
         groupBox->setTitle(QApplication::translate("LayerConfigureDialog", "\320\224\320\270\320\260\320\277\320\260\320\267\320\276\320\275 \321\206\320\262\320\265\321\202\320\276\320\262", 0));
         label->setText(QApplication::translate("LayerConfigureDialog", "\320\236\321\202:", 0));
         label_2->setText(QApplication::translate("LayerConfigureDialog", "\320\224\320\276:", 0));
+        groupBox_3->setTitle(QApplication::translate("LayerConfigureDialog", "\320\237\320\270\320\272\321\201\320\265\320\273\321\214\320\275\320\276\320\265 \320\264\320\276\320\261\320\260\320\262\320\273\320\265\320\275\320\270\320\265", 0));
+        PenButton->setText(QApplication::translate("LayerConfigureDialog", "\320\232\320\260\321\200\320\260\320\275\320\264\320\260\321\210", 0));
+        EraseButton->setText(QApplication::translate("LayerConfigureDialog", "\320\233\320\260\321\201\321\202\320\270\320\272", 0));
         label_3->setText(QApplication::translate("LayerConfigureDialog", "\320\230\320\274\321\217 \321\201\320\273\320\276\321\217:", 0));
         groupBox_2->setTitle(QApplication::translate("LayerConfigureDialog", "\320\242\320\270\320\277 \321\201\320\273\320\276\321\217", 0));
         checkBox->setText(QApplication::translate("LayerConfigureDialog", "\320\242\320\265\320\272\321\201\321\202", 0));

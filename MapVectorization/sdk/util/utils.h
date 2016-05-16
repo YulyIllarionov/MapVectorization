@@ -28,6 +28,8 @@ namespace utils
   inline bool operator > (cv::Vec3b& first, cv::Vec3b& second);
   inline bool operator <= (cv::Vec3b& first, cv::Vec3b& second);
   inline bool operator >= (cv::Vec3b& first, cv::Vec3b& second);
+  std::vector<cv::Point>& getNeghboursClockwise(cv::Point point, const cv::Mat& image);
+  int squaredDistanceBetween(const cv::Point& a, const cv::Point& b);
 }
 
 SDK_END_NAMESPACE
