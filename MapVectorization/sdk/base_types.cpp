@@ -307,7 +307,18 @@ SDKResult WRaster::SplitLayer(const LayerUUID& layerId, LayerIDs& splittedLayers
   {
     case WLayer::LAYER_TYPE_ENUM::LT_NONE:
       break;
-
+    case WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT | WLayer::LAYER_TYPE_ENUM::LT_OTHER:
+    {
+        WLayer* linesLayer = this->AddLayer(layer->getGroupId());
+        this->SetLayerType(linesLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_LINES);
+        WLayer* othersLayer = this->AddLayer(layer->getGroupId());
+        this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_TEXT);
+        this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_OTHER);
+        this->SplitLines(layerId, linesLayer->getID(), othersLayer->getID());
+        splittedLayers.clear();
+        splittedLayers.push_back(linesLayer->getID());
+        splittedLayers.push_back(othersLayer->getID());
+    }
     case WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT:
       {
       }
