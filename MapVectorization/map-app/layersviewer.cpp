@@ -127,6 +127,8 @@ void LayersViewer::on_SplitButton_clicked()
     for(int i=0;i<vec.size();i++)
     {
         m_layers->append(m_image->GetLayerById(vec.at(i)));
+        if(m_image->GetLayerById(vec.at(i))->getType()==WLayer::LAYER_TYPE_ENUM::LT_LINES)
+            m_image->GetLayerById(vec.at(i))->InicializeVectorContainer();
     }
     UpdateList();
 
