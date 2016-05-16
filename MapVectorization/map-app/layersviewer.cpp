@@ -85,7 +85,7 @@ void LayersViewer::on_listWidget_currentRowChanged(int currentRow)
         {
            m_ui->SplitButton->setEnabled(true);
         }
-        else m_ui->SplitButton->setEnabled(true);
+        else m_ui->SplitButton->setEnabled(false);
 
     }
 }
