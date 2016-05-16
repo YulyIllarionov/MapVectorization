@@ -123,7 +123,7 @@ void LayersViewer::on_SavePngButton_clicked()
 void LayersViewer::on_SplitButton_clicked()
 {
     LayerIDs vec;
-    m_image->SplitLayer(m_layers->at(m_ui->listWidget->currentRow)->getID(),vec);
+    m_image->SplitLayer(m_layers->at(m_ui->listWidget->currentRow())->getID(),vec);
     for(int i=0;i<vec.size();i++)
     {
         m_layers->append(m_image->GetLayerById(vec.at(i)));
