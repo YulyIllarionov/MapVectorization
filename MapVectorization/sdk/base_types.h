@@ -94,8 +94,7 @@ class WLine : public WVectorObject
 public:
   WLine() : m_width(0) {};
 
-	WLine(double width, const WPointsContainer& points)
-    : m_width(width)
+	WLine(const WPointsContainer& points)
 	{
 		m_points = points;
 	};
@@ -111,7 +110,6 @@ public:
 
 	// points
 	void Concat(const WLine& line);
-	void ConcatTornLine(const WLine& line, bool firstOrder, bool secondOrder);
 
     //находится внутри полигона 
   bool BelongsTo(const WPolygon& polygon);
@@ -309,11 +307,12 @@ public:
   w_range     getRange()     const { return m_color_range; }
   std::string getName()      const { return m_name; }
   GroupID     getGroupId()   const { return m_group_id; }
+
   void DrawCircle(SMapPoint point, uint radius, uchar color);
+  void InicializeVectorContainer();
 
   cv::Mat     m_data;
-
-  
+    
   WLineContainer      m_objects_line;
   WPolygonContainer   m_objects_polygon;
   WMapObjectContainer m_objects_map;
@@ -325,6 +324,8 @@ private:
   w_range     m_color_range;
   std::string m_name;
   GroupID     m_group_id;
+
+  SDKResult InicializeLinesContainer();
 };
 // ------------------------------------------------------------
 typedef std::list<WLayer>       LayersContainer;

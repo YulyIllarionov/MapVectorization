@@ -10,6 +10,7 @@
 
 #include  "util/utils.h"
 #include  "util/math_utils.h"
+#include  "graphics/skeletonization.h"
 
 #include <math.h>
 #include <algorithm>
@@ -91,6 +92,80 @@ w_color w_range::getHigh()
 void WLayer::DrawCircle(SMapPoint point, uint radius, uchar color)
 {
     circle(m_data, point.ToPoint(), radius, color, -1);
+}
+// ------------------------------------------------------------
+SDKResult WLayer::InicializeLinesContainer()
+{
+    if(m_type != LT_LINES)
+        return kSDKResult_Error;
+    Mat skeleton;
+    SDK_NAMESPACE::WSkeletonizer::Instance().Skeletonize(m_data, skeleton);
+    for (int y = 1; y < skeleton.rows - 1; y++)
+    {
+        for (int x = 1; x < skeleton.cols - 1; x++)
+        {
+            Point initial(x, y);
+            if (skeleton.at<uchar>(initial) > 0)
+            {
+                std::vector<Point> firstNeighbors = SDK_NAMESPACE::utils::getNeghboursClockwise(initial, skeleton);
+                if (firstNeighbors.size() > 2)
+                    continue;
+                else
+                {
+                    std::vector<WPointsContainer> lines(firstNeighbors.size());
+                    lines[0].push_back(initial);
+                    skeleton.at<uchar>(initial) = 0;
+                    for (int i = 0; i < firstNeighbors.size(); i++)
+                    {
+                        Point current(firstNeighbors[i]);
+                        std::vector<Point> neighbors;
+                        while(true)
+                        {
+                            lines[i].push_back(current);
+                            skeleton.at<uchar>(current) = 0;
+                            neighbors = SDK_NAMESPACE::utils::getNeghboursClockwise(current, skeleton);
+                            if (neighbors.size() != 1)
+                                break;
+                            current = neighbors[0];
+                        }
+                    }
+                    WLine line(lines[0]);
+                    for (int i = 1; i < lines.size(); i++)
+                    {
+                        line.Concat(lines[i]);
+                    }
+                    m_objects_line.Add(line);
+                }
+            }
+        }
+    }
+}
+// ------------------------------------------------------------
+void WLayer::InicializeVectorContainer()
+{
+    switch (this->m_type)
+    {
+    case WLayer::LAYER_TYPE_ENUM::LT_NONE:
+        break;
+        
+    case WLayer::LAYER_TYPE_ENUM::LT_LINES:
+    {
+    }
+    break;
+
+    case WLayer::LAYER_TYPE_ENUM::LT_TEXT:
+    {
+    }
+    break;
+    
+    case WLayer::LAYER_TYPE_ENUM::LT_OTHER:
+    {
+    }
+    break;
+
+    default:
+        break;
+    }
 }
 // ------------------------------------------------------------
 WRaster::WRaster(const std::string& imgPath)
@@ -396,7 +471,6 @@ std::vector<cv::Rect> WRaster::DetectLetters(const LayerUUID& layerId) const
   return boundRect;
 }
 // ------------------------------------------------------------
-
 // define objects inside polygon
 std::vector<int> WRaster::DefineObjectsInsidePolygon(
   const WObjectContainer<WVectorObject>& vectorObjects, 
@@ -406,7 +480,7 @@ std::vector<int> WRaster::DefineObjectsInsidePolygon(
 
 	return indexes;
 }
-
+// ------------------------------------------------------------
 // copy object from one layer to another
 void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, WPolygon mapPoints)
 {
@@ -521,7 +595,7 @@ void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const
       break;
     }
 }
-
+// ------------------------------------------------------------
 void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoints)
 {
     // delete raster
@@ -567,9 +641,7 @@ void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoint
       break;
     }
 }
-
-//Реализация функций для работы с объектами
-//Добавить точку
+// ------------------------------------------------------------
 bool WVectorObject::AddPointAt(/*const*/ Point& point, size_t idx)
 {
 	if (idx < m_points.size())
@@ -581,7 +653,7 @@ bool WVectorObject::AddPointAt(/*const*/ Point& point, size_t idx)
 	}
 	return false;
 }
-
+// ------------------------------------------------------------
 bool WVectorObject::RemovePoint(size_t idx)
 {
 	if (idx < m_points.size())
@@ -593,51 +665,48 @@ bool WVectorObject::RemovePoint(size_t idx)
 	}
 	return false;
 }
-
+// ------------------------------------------------------------
 WPolygon::WPolygon(std::vector<SMapPoint> & mapPoints)
 {
     for (int i = 0; i < mapPoints.size(); i++) {
         m_points.push_back(Point::Point_(mapPoints[i].GetX(), mapPoints[i].GetY()));
     }
 };
-
+// ------------------------------------------------------------
 bool WPolygon::Contains(/*const*/ Point& point) const
 {
     return (pointPolygonTest(m_points, point, false)>=0);
 }
-
+// ------------------------------------------------------------
 void WLine::Concat(const WLine& line)
 {
-  //std::reverse(line.m_points.begin(), line.m_points.end());
-	//m_points.insert(m_points.end(), line.m_points.begin(), line.m_points.end());
-  m_points.insert(m_points.end(), line.m_points.rbegin(), line.m_points.rend());
+    std::vector<int> distances;
+    distances.push_back(SDK_NAMESPACE::utils::squaredDistanceBetween(m_points.front(), line.m_points.front()));
+    distances.push_back(SDK_NAMESPACE::utils::squaredDistanceBetween(m_points.front(), line.m_points.back()));
+    distances.push_back(SDK_NAMESPACE::utils::squaredDistanceBetween(m_points.back(), line.m_points.front()));
+    distances.push_back(SDK_NAMESPACE::utils::squaredDistanceBetween(m_points.back(), line.m_points.back()));
+    std::vector<int>::iterator result = std::min_element(distances.begin(), distances.end());
+    if (result == distances.end())
+        return;
+    switch (*result)
+    {
+    case 0:
+        m_points.insert(m_points.begin(), line.m_points.rbegin(), line.m_points.rend());
+        break;
+    case 1:
+        m_points.insert(m_points.begin(), line.m_points.begin(), line.m_points.end());
+        break;
+    case 2:
+        m_points.insert(m_points.end(), line.m_points.rbegin(), line.m_points.rend());
+        break;
+    case 3:
+        m_points.insert(m_points.end(), line.m_points.begin(), line.m_points.end());
+        break;
+    default:
+        break;
+    }
 }
-
-void WLine::ConcatTornLine(const WLine& line, bool firstOrder, bool secondOrder)
-{
-	if (firstOrder && secondOrder)
-	{
-		m_points.insert(m_points.end(), line.m_points.begin(), line.m_points.end());
-	}
-	else if (firstOrder && !secondOrder)
-	{
-		//std::reverse(line.m_points.begin(), line.m_points.end());
-		//m_points.insert(m_points.end(), line.m_points.begin(), line.m_points.end());
-    m_points.insert(m_points.end(), line.m_points.rbegin(), line.m_points.rend());
-
-	}
-	else if (!firstOrder && secondOrder)
-	{
-		//std::reverse(line.m_points.begin(), line.m_points.end());
-		//m_points.insert(m_points.begin(), line.m_points.begin(), line.m_points.end());
-    m_points.insert(m_points.end(), line.m_points.rbegin(), line.m_points.rend());
-	}
-	else if (!firstOrder && !secondOrder)
-	{
-		m_points.insert(m_points.begin(), line.m_points.begin(), line.m_points.end());
-	}
-}
-
+// ------------------------------------------------------------
 bool WLine::BelongsTo(const WPolygon& polygon)
 {
   if (m_points.size() == 0)
@@ -649,7 +718,7 @@ bool WLine::BelongsTo(const WPolygon& polygon)
   }
   return true;
 }
-
+// ------------------------------------------------------------
 WPointsContainer WLine::SimplifyLine(const WPointsContainer& linevector, double EPSILON, int delta)
 {
 	int i = 0;
@@ -693,4 +762,6 @@ WPointsContainer WLine::SimplifyLine(const WPointsContainer& linevector, double 
 	}
 	return outpoints;
 }
+// ------------------------------------------------------------
+
   SDK_END_NAMESPACE

@@ -123,6 +123,42 @@ namespace utils {
         return !(first < second);
     }
     // ----------------------------------------------------
+    std::vector<cv::Point>& getNeghboursClockwise(cv::Point point, const cv::Mat& image)
+    {
+        std::vector<cv::Point> neighbors;
+        uchar color = image.at<uchar>(point);
+        point.y--;
+        if (image.at<uchar>(point) == color)
+                neighbors.push_back(point);
+        point.x++;
+        if (image.at<uchar>(point) == color)
+            neighbors.push_back(point);
+        point.y++;
+        if (image.at<uchar>(point) == color)
+            neighbors.push_back(point);
+        point.y++;
+        if (image.at<uchar>(point) == color)
+            neighbors.push_back(point);
+        point.x--;
+        if (image.at<uchar>(point) == color)
+            neighbors.push_back(point);
+        point.x--;
+        if (image.at<uchar>(point) == color)
+            neighbors.push_back(point);
+        point.y--;
+        if (image.at<uchar>(point) == color)
+            neighbors.push_back(point);
+        point.y--;
+        if (image.at<uchar>(point) == color)
+            neighbors.push_back(point);
+
+        return neighbors;
+    }
+    // ----------------------------------------------------
+    int squaredDistanceBetween(const cv::Point& a, const cv::Point& b)
+    {
+        return (a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y);
+    }
 
 }
 SDK_END_NAMESPACE
