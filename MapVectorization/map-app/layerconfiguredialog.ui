@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>223</width>
-    <height>402</height>
+    <width>253</width>
+    <height>494</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_5" stretch="2,1,3,1,1,1">
+  <layout class="QVBoxLayout" name="verticalLayout_5" stretch="2,1,3,1,1,1,1">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,10">
      <item>
@@ -143,6 +143,38 @@
          </widget>
         </item>
        </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>Пиксельное добавление</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QPushButton" name="PenButton">
+        <property name="text">
+         <string>Карандаш</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="EraseButton">
+        <property name="text">
+         <string>Ластик</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="RadiusSpinBox"/>
       </item>
      </layout>
     </widget>

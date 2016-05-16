@@ -4,5 +4,6 @@
         <file>resources/icons/pipette.ico</file>
         <file>resources/icons/remove.ico</file>
         <file>resources/icons/lasso.ico</file>
+        <file>resources/icons/eraser.ico</file>
     </qresource>
 </RCC>
