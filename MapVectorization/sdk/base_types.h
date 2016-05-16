@@ -201,11 +201,11 @@ public:
 	void Add(const T& object) { return m_objects.push_back(object); }
 	//Удалить объект из коллекции
 	void Remove(const T& object) { std::remove(m_objects.begin(), m_objects.end(), object); }
-  void RemoveById(int id) { m_objects.erase(m_listLineObjects.begin() + id); }
+    void RemoveById(int id) { m_objects.erase(m_listLineObjects.begin() + id); }
 	//Взять длину коллекции
 	int GetLength() const { return m_objects.size(); }
 	//Клонировать коллекцию
-  void Clone(WObjectContainer* newCollection) { newCollection = new WObjectContainer(*this); }
+    void Clone(WObjectContainer* newCollection) { newCollection = new WObjectContainer(*this); }
 
 private:
 	std::vector<T> m_objects; //Коллекция объектов
@@ -395,7 +395,7 @@ public:
 private:
   SDKResult SetLayerType (const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite) const;
   void Initialize(const std::string& imgPath);
-  SDKResult WRaster::SplitLines(const LayerUUID& layerId, const LayerUUID& linesLayerID, const LayerUUID& othersLayerID);
+  SDKResult SplitLines(const LayerUUID& layerId, const LayerUUID& linesLayerID, const LayerUUID& othersLayerID);
   // depricate copy and move operations
   WRaster(const WRaster& other)
     /*: m_raster{other.m_raster},
