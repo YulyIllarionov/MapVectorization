@@ -183,22 +183,22 @@ public:
 	WObjectContainer(void) {};
 	~WObjectContainer(void) {};
 
-	WObjectContainer(const WObjectContainer& container)
-	{
-    m_objects.clear();
-    m_objects.reserve(container->GetLength());
-		for (int i = 0; i < container->GetLength(); i++)
-		{
-			if (container->GetObjectByID(i).GetState())
-				m_objects.push_back(container->GetObjectByID(i));
-		}
-	}
+	//WObjectContainer(const WObjectContainer& container)
+	//{
+ //   m_objects.clear();
+ //   m_objects.reserve(container.GetLength());
+	//	for (int i = 0; i < container.GetLength(); i++)
+	//	{
+	//		if (container.GetObjectByID(i).GetState())
+	//			m_objects.push_back(container.GetObjectByID(i));
+	//	}
+	//}
 	//Взять объекты
 	const std::vector<T>& GetObjectList() { return m_objects; }
 	//Установить новый список объектов
 	void SetObjectList(const std::vector<T>& objects) { m_objects = objects; }
 	//Взять объет по идентификатору
-	T& GetObjectByID(int id) { return m_objects[id]; }
+	T& GetObjectByID(int id) const { return m_objects[id]; }
 	//Добавить объект в коллекцию
 	void Add(const T& object) { return m_objects.push_back(object); }
 	//Удалить объект из коллекции
@@ -313,6 +313,12 @@ public:
 
   cv::Mat     m_data;
 
+  
+  WLineContainer      m_objects_line;
+  WPolygonContainer   m_objects_polygon;
+  WMapObjectContainer m_objects_map;
+  WTextContainer      m_objects_text;
+
 private:
   LayerUUID   m_uuid;
   LAYER_TYPE  m_type;
@@ -415,11 +421,6 @@ private:
   LayersContainer   m_layers;
 public:
   cv::Mat           m_raster;
-
-  WLineContainer      m_objects_line;
-  WPolygonContainer   m_objects_polygon;
-  WMapObjectContainer m_objects_map;
-  WTextContainer      m_objects_text;
 
 private:
 

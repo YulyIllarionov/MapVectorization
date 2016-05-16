@@ -445,7 +445,7 @@ void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const
             
             // e.g.
             // get texts
-            std::vector<WText> texts = m_objects_text.GetObjectList();
+            std::vector<WText> texts = departureLayer->m_objects_text.GetObjectList();
             // iterate and find
             std::vector<WText>::const_iterator cit = texts.begin();
             for (; cit != texts.end(); cit++)
@@ -453,10 +453,10 @@ void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const
               // when found
               break;
             }
-            m_objects_text.Remove(*cit);
+            departureLayer->m_objects_text.Remove(*cit);
             // create new line object
             WLine line;
-            m_objects_line.Add(line);
+            arrivalLayer->m_objects_line.Add(line);
             // profit
           }
           break;
