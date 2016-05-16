@@ -76,10 +76,10 @@ class WPolygon : public WVectorObject
 {
 public:
 	WPolygon();
-    WPolygon(std::vector<SMapPoint> & mapPoints);
-    ~WPolygon() {};
+  WPolygon(std::vector<SMapPoint> & mapPoints);
+  ~WPolygon() {};
 
-	WPolygon& operator=(WPolygon& other);
+	//WPolygon& operator=(WPolygon& other);
 	
     //Проверка точки на принадлежность
   bool Contains(/*const*/ cv::Point& point) const;
@@ -99,7 +99,7 @@ public:
 	{
 		m_points = points;
 	};
-	~WLine();
+  ~WLine() {};
 
 	//WLine& operator=(WLine& other);
 	//void clearPoints();
@@ -141,9 +141,9 @@ public:
     : m_polygon(polygon), m_text(text), m_textline(textline), m_state(false)
 	{
 	}
-	~WText();
+  ~WText() {};
 
-	WText& operator=(WText& other);
+	//WText& operator=(WText& other);
   bool operator==(const WText& other) {
     return other.m_text == m_text;
 	}
@@ -170,8 +170,8 @@ private:
 class WMapObject : public WVectorObject
 {
 public:
-	WMapObject();
-	~WMapObject();
+  WMapObject() {};
+  ~WMapObject() {};
 private:
 };
 
