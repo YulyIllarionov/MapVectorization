@@ -152,13 +152,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IOperation.h" />
-    <ClInclude Include="RegionClassifierImpl.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="algorithms.cpp" />
-    <ClCompile Include="RegionClassifierImpl.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

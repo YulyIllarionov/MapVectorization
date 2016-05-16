@@ -6,7 +6,7 @@
 #include "stdafx.h"
 
 #include "opencv2/highgui/highgui.hpp"
-
+#include <stack>
 
 #include  "util/utils.h"
 #include  "util/math_utils.h"
@@ -300,8 +300,17 @@ SDKResult WRaster::SplitLayer(const LayerUUID& layerId, LayerIDs& splittedLayers
     case WLayer::LAYER_TYPE_ENUM::LT_NONE:
       break;
 
-    case WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT:
+    case WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT| WLayer::LAYER_TYPE_ENUM::LT_OTHER:
       {
+          WLayer* linesLayer = this->AddLayer(layer->getGroupId());
+          this->SetLayerType(linesLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_LINES);
+          WLayer* othersLayer = this->AddLayer(layer->getGroupId());
+          this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_TEXT);
+          this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_OTHER);
+          this->SplitLines(layerId, linesLayer->getID(), othersLayer->getID());
+          splittedLayers.clear();
+          splittedLayers.push_back(linesLayer->getID());
+          splittedLayers.push_back(othersLayer->getID());
       }
       break;
 
@@ -388,5 +397,100 @@ std::vector<cv::Rect> WRaster::DetectLetters(const LayerUUID& layerId) const
   return boundRect;
 }
 // ------------------------------------------------------------
+Wregion::Wregion(cv::Point point, cv::Mat& img)
+{
+    if (img.at<uchar>(point) == 0)
+        return;
 
+    std::stack <cv::Point> stack;
+
+    stack.emplace(point);
+
+    while (!stack.empty())
+    {
+        cv::Point currentPoint = stack.top();
+        stack.pop(); // Удалить точку из стека
+        points.push_back(currentPoint); //Добавить точку к результату
+
+        for (int k = currentPoint.x - 1; k <= currentPoint.x + 1; k++)
+        {
+            if (k == -1) // Следим за границами изображения
+                continue;
+            if (k == img.cols)
+                break;
+
+            for (int l = currentPoint.y - 1; l <= currentPoint.y + 1; l++)
+            {
+                if ((l == -1) || ((l == point.y) && (k == point.x)))
+                    continue;
+                if (l == img.rows)
+                    break;
+
+                if (img.at<uchar>(l, k) != 0)
+                    stack.emplace(k, l);
+            }
+        }
+        img.at<uchar>(currentPoint) = 0; // Закрасить на изображении
+    }
+}
+// ------------------------------------------------------------
+cv::Rect Wregion::boundingRectangle()
+{
+    return boundingRect(points);
+}
+// ------------------------------------------------------------
+int Wregion::Square()
+{
+    return (int)points.size();
+}
+// ------------------------------------------------------------
+bool Wregion::IsLine()
+{
+    float radius;
+    minEnclosingCircle(points, Point2f(), radius);    
+    double ratio = (double)this->Square() / radius / radius;
+    return (ratio < 0.07);
+}
+// ------------------------------------------------------------
+void Wregion::drawOn(Mat& img, uchar color)
+{
+    for (int i = 0; i < points.size(); i++)
+    {
+        //if ((points[i].x<img.cols)&& (points[i].y<img.rows))
+        img.at<uchar>(points[i]) = color;
+    }
+}
+// ------------------------------------------------------------
+SDKResult WRaster::SplitLines(const LayerUUID& layerId, const LayerUUID& linesLayerID, const LayerUUID& othersLayerID)
+{
+    WLayer* layer = GetLayerById(layerId);
+    if (layer == nullptr)
+        return kSDKResult_NullPointer;
+
+    WLayer* linesLayer = GetLayerById(linesLayerID);
+    linesLayer->m_data = Mat(layer->m_data.size(), layer->m_data.type(), 0);
+
+    WLayer* othersLayer = GetLayerById(othersLayerID);
+    othersLayer->m_data = Mat(layer->m_data.size(), layer->m_data.type(), 0);
+
+    Mat temp = layer->m_data.clone();
+    for (int y = 1; y < temp.rows - 1; y++)
+    {
+        for (int x = 1; x < temp.cols - 1; x++)
+        {
+            if (temp.at<uchar>(y, x)>0)
+            {
+                Wregion region(Point(x, y), temp);
+                if (region.Square() > 4)
+                {
+                    if (region.IsLine())
+                        region.drawOn(linesLayer->m_data, 1);
+                    else
+                        region.drawOn(othersLayer->m_data, 1);
+                }
+            }
+        }
+    }
+
+}
   SDK_END_NAMESPACE

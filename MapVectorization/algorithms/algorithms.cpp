@@ -8,7 +8,6 @@
 #include "opencv/cv.h"
 #include "opencv/highgui.h"
 
-#include "RegionClassifierImpl.h"
 
 //---------------------------Не для проекта-----------------------
 void saveImage(const std::string &filename, cv::Mat *img) {
@@ -144,46 +143,46 @@ int _tmain(int argc, _TCHAR* argv[])
 	//**
 	//Поиск линий
 	//**
-	RegionClassifierImpl classifier(img);
-	output_data objects = classifier.GetOutputData();
-	//saveImage("output1.jpg", &img);
-
-	cv::Mat img1(img.size(), CV_8UC3);
-	img1.setTo(cv::Scalar(0, 0, 0));
-
-	uchar step = 0;
-	//cv::Vec3b color;
-	//color[0] = 90 + 10 * (++step); color[1] = 180 + 10 * step; color[2] = 10 * step; // "Рандомный" цвет
-	//img1.at <cv::Vec3b>(37, 466) = color;
-	
-	cv::Vec3b color(255, 255, 255);
-		
-	for (auto i : objects.regions)
-	{	
-		for (auto j : i)
-		{
-			img1.at <cv::Vec3b>(j) = color;
-		}
-	}
-
-	cv::Vec3b color_tr(255, 0, 0); // Рисуем мусор
-	for (auto i : objects.trash)
-	{
-		for (auto j : i)
-		{
-			img1.at <cv::Vec3b>(j) = color_tr;
-		}
-	}
-	 
-	cv::Vec3b color_ln(0, 255, 0); // Линии
-	for (auto i : objects.lines)
-	{
-		for (auto j : i)
-		{
-			img1.at <cv::Vec3b>(j) = color_ln;
-		}
-	}
-
-	saveImage("count3.jpg", &img1);
-	return 0;
+	//RegionClassifierImpl classifier(img);
+	//output_data objects = classifier.GetOutputData();
+	////saveImage("output1.jpg", &img);
+    //
+	//cv::Mat img1(img.size(), CV_8UC3);
+	//img1.setTo(cv::Scalar(0, 0, 0));
+    //
+	//uchar step = 0;
+	////cv::Vec3b color;
+	////color[0] = 90 + 10 * (++step); color[1] = 180 + 10 * step; color[2] = 10 * step; // "Рандомный" цвет
+	////img1.at <cv::Vec3b>(37, 466) = color;
+	//
+	//cv::Vec3b color(255, 255, 255);
+	//	
+	//for (auto i : objects.regions)
+	//{	
+	//	for (auto j : i)
+	//	{
+	//		img1.at <cv::Vec3b>(j) = color;
+	//	}
+	//}
+    //
+	//cv::Vec3b color_tr(255, 0, 0); // Рисуем мусор
+	//for (auto i : objects.trash)
+	//{
+	//	for (auto j : i)
+	//	{
+	//		img1.at <cv::Vec3b>(j) = color_tr;
+	//	}
+	//}
+	// 
+	//cv::Vec3b color_ln(0, 255, 0); // Линии
+	//for (auto i : objects.lines)
+	//{
+	//	for (auto j : i)
+	//	{
+	//		img1.at <cv::Vec3b>(j) = color_ln;
+	//	}
+	//}
+    //
+	//saveImage("count3.jpg", &img1);
+	//return 0;
 }

@@ -149,16 +149,13 @@ public:
   // get layers count
   size_t    GetLayersCount  () { return m_layers.size(); }
   // get related layers
-SDKResult WRaster::GetLayersByGroupId(const GroupID& groupId, LayerIDs& relatedLayers) const;
+  SDKResult WRaster::GetLayersByGroupId(const GroupID& groupId, LayerIDs& relatedLayers) const;
   //}
  
-public:
-
-
 private:
   SDKResult SetLayerType (const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite) const;
   void Initialize(const std::string& imgPath);
-
+  SDKResult WRaster::SplitLines(const LayerUUID& layerId, const LayerUUID& linesLayerID, const LayerUUID& othersLayerID);
   // depricate copy and move operations
   WRaster(const WRaster& other)
     /*: m_raster{other.m_raster},
@@ -191,7 +188,17 @@ private:
   std::wstring                      m_image_path;
 };
 // ------------------------------------------------------------
-
+class Wregion
+{
+public:
+    Wregion(cv::Point point, cv::Mat& img);
+    cv::Rect boundingRectangle();
+    int Square();
+    bool IsLine();
+    void drawOn(cv::Mat& img, uchar color);
+private:
+    std::vector<cv::Point> points;
+};
 
 SDK_END_NAMESPACE
 

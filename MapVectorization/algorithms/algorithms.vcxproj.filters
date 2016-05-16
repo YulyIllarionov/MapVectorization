@@ -30,18 +30,12 @@
     <ClInclude Include="IOperation.h">
       <Filter>Source Files\Classes</Filter>
     </ClInclude>
-    <ClInclude Include="RegionClassifierImpl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="algorithms.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RegionClassifierImpl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
