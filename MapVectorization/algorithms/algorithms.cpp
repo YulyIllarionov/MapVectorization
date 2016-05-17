@@ -7,8 +7,8 @@
 #include "opencv2/opencv.hpp" 
 #include "opencv/cv.h"
 #include "opencv/highgui.h"
-
-
+#include <cmath>
+using namespace cv;
 //---------------------------Не для проекта-----------------------
 void saveImage(const std::string &filename, cv::Mat *img) {
 	std::string output("C:/projects/MapVectorization/MapVectorization/sample/output/");
@@ -81,35 +81,130 @@ cv::Mat makeElementOfPyramid(cv::Mat &img, int n)
 //	}
 //
 //}
-cv::Mat rotateImage(cv::Mat image) 
+cv::Mat rotateImage(std::vector<cv::Point> vec_points,cv::Mat img, float angle) 
 {
-	 cv::Mat thr,dst;
-	 threshold(image,thr,200,255,cv::THRESH_BINARY_INV);
-	 imshow("thr",thr);
+	int x1 = vec_points[0].x;
+	int y1 = vec_points[0].y;
+	int width = vec_points[1].x-vec_points[0].x;
+	int height = vec_points[2].y - vec_points[0].y;
 
-	  std::vector<cv::Point> points;
-	  cv::Mat_<uchar>::iterator it = thr.begin<uchar>();
-	  cv::Mat_<uchar>::iterator end = thr.end<uchar>();
-	  for (; it != end; ++it)
+	//cv::Mat image = cv::Mat(img, cv::Rect(x1,y1, width, height)); 
+	cv::Mat image = img;
+	cv::Mat thr,dst;
+	threshold(image,thr,200,255,cv::THRESH_BINARY_INV);
+	imshow("thr",thr);
+
+	std::vector<cv::Point> points;
+	cv::Mat_<uchar>::iterator it = thr.begin<uchar>();
+	cv::Mat_<uchar>::iterator end = thr.end<uchar>();
+	for (; it != end; ++it)
+	{
 		if (*it)
-		  points.push_back(it.pos());
-
-	  cv::RotatedRect box = cv::minAreaRect(cv::Mat(points));
-	  cv::Mat rot_mat = cv::getRotationMatrix2D(box.center, box.angle, 1);
-
-	  //cv::Mat rotated(src.size(),src.type(),Scalar(255,255,255));
-	  cv::Mat rotated;
-	  cv::warpAffine(image, rotated, rot_mat, image.size(), cv::INTER_CUBIC);
-	  imshow("rotated",rotated);
+		{
+			points.push_back(it.pos());
+		}
+	}
+	cv::RotatedRect box = cv::minAreaRect(cv::Mat(points));
+	cv::Size box_size = box.size;
+	if (box.angle < -45.)
+	{
+		std::swap(box_size.width, box_size.height);
+	}
+	cv::Mat rot_mat = cv::getRotationMatrix2D(box.center,angle, 1);
 	  
-	  return rotated;
+	std::cout<<box.angle;
+	cv::Mat rotated;
+	cv::warpAffine(image, rotated, rot_mat, image.size(), cv::INTER_CUBIC);
+	  
+	cv::Mat cropped;
+	cv::getRectSubPix(rotated, box_size, box.center, cropped);
+
+	imshow("rotated",cropped);
+	cv::waitKey(27);
+	  
+	return cropped;
 }
 
+float countAngle(std::vector<Vec4i> lines) 
+{
+	float angle = 0;
+	for (size_t i = 0; i < lines.size(); i++)
+        {
+        	Vec4i l = lines[i];
+			Point p1, p2;
+			p1=Point(l[0], l[1]);
+			p2=Point(l[2], l[3]);
+			angle += atan2(p1.y - p2.y, p1.x - p2.x);
+        }
+	angle = angle/lines.size();
+	angle = (angle*180)/CV_PI;
+	if (angle < -45.)
+	{
+		angle += 180.;
+	} 
+	else if (angle > 45.) 
+	{
+		angle-=180;
+	}
+	return angle; 
+}
 int _tmain(int argc, _TCHAR* argv[])
 {
-	std::string imgPath("C:/projects/MapVectorization/MapVectorization/sample/map/black/cu71Black.png");
+	std::vector<cv::Point> data;
+	data.push_back(cv::Point(0,0));
+	data.push_back(cv::Point(200,0));
+	data.push_back(cv::Point(0,179));
+	data.push_back(cv::Point(200,179));
 
-	cv::Mat img = cv::imread(imgPath, CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat src=cv::imread("E:/Downloads/text22.png",0);
+	rotateImage(data,src, -65);
+
+    namedWindow("1", CV_WINDOW_KEEPRATIO);
+
+    Mat text = imread("E:/Downloads/text22.png", CV_LOAD_IMAGE_COLOR);
+    Mat textGray;
+    Mat current;
+    cvtColor(text, textGray, CV_BGR2GRAY);
+    //GaussianBlur(gray, gray, Size(9, 9), 2, 2);
+    //blur(gray, gray, Size(3, 3));
+    int threshold = 40;
+    int minLineLength = 40;
+    int maxLineGap = 10;
+
+    cvCreateTrackbar("threshold: ", "1", &threshold, 500);
+    cvCreateTrackbar("minLineLength: ", "1", &minLineLength, 200);
+    cvCreateTrackbar("maxLineGap: ", "1", &maxLineGap, 100);
+
+    int key;
+
+    while (true)
+    {
+        current = text.clone();
+        std::vector<Vec4i> lines;
+        //Ищем линии
+        HoughLinesP(textGray, lines, 1, CV_PI / 180, threshold, minLineLength, maxLineGap);
+		float angle=0;
+        for (size_t i = 0; i < lines.size(); i++)
+        {
+        	Vec4i l = lines[i];
+			Point p1, p2;
+			p1=Point(l[0], l[1]);
+			p2=Point(l[2], l[3]);
+        	line(current, p1, p2, Scalar(0, 0, 255), 1, CV_AA);
+        }
+		angle = countAngle(lines);
+		std::cout<<angle<<" ";
+        imshow("1", current);
+
+        key = waitKey(100);
+        if (key == 27)
+            break;
+    }
+
+    return 0;
+	//std::string imgPath("C:/projects/MapVectorization/MapVectorization/sample/map/black/cu71Black.png");
+
+//	cv::Mat img = cv::imread(imgPath, CV_LOAD_IMAGE_GRAYSCALE);
 	//cv::threshold(img, img, 0, 255, CV_THRESH_BINARY);
 	
 
