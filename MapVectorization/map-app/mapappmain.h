@@ -56,6 +56,8 @@ private slots:
 
     void on_actionRegimentBlackColor_triggered();
 
+    void on_actionUpdatePixmap_triggered();
+
 private:
     Ui::mapAppMainClass       m_ui;
     int                       m_idCounter;  // Если ведется работа с несколькими проектами

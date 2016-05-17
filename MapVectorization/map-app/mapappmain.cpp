@@ -85,3 +85,8 @@ void mapAppMain::on_actionRegimentBlackColor_triggered()
     viewer->setWindowFlags(Qt::WindowStaysOnTopHint);
     viewer->show();
 }
+
+void mapAppMain::on_actionUpdatePixmap_triggered()
+{
+    static_cast<ImageViewer *>(m_tabs->currentWidget())->UpdatePixmap();
+}

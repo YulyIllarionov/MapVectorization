@@ -62,6 +62,7 @@ public:
     QCheckBox *checkBox_3;
     QCheckBox *checkBox_4;
     QDialogButtonBox *buttonBox;
+    QButtonGroup *buttonGroup;
 
     void setupUi(QWidget *LayerConfigureDialog)
     {
@@ -75,6 +76,9 @@ public:
         verticalLayout = new QVBoxLayout();
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         Pipette = new QPushButton(LayerConfigureDialog);
+        buttonGroup = new QButtonGroup(LayerConfigureDialog);
+        buttonGroup->setObjectName(QStringLiteral("buttonGroup"));
+        buttonGroup->addButton(Pipette);
         Pipette->setObjectName(QStringLiteral("Pipette"));
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
@@ -169,12 +173,14 @@ public:
         horizontalLayout_2 = new QHBoxLayout(groupBox_3);
         horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
         PenButton = new QPushButton(groupBox_3);
+        buttonGroup->addButton(PenButton);
         PenButton->setObjectName(QStringLiteral("PenButton"));
         PenButton->setCheckable(true);
 
         horizontalLayout_2->addWidget(PenButton);
 
         EraseButton = new QPushButton(groupBox_3);
+        buttonGroup->addButton(EraseButton);
         EraseButton->setObjectName(QStringLiteral("EraseButton"));
         EraseButton->setCheckable(true);
 
@@ -182,6 +188,8 @@ public:
 
         RadiusSpinBox = new QSpinBox(groupBox_3);
         RadiusSpinBox->setObjectName(QStringLiteral("RadiusSpinBox"));
+        RadiusSpinBox->setMinimum(1);
+        RadiusSpinBox->setValue(1);
 
         horizontalLayout_2->addWidget(RadiusSpinBox);
 

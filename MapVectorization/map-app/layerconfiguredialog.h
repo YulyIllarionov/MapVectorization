@@ -49,7 +49,6 @@ private slots:
 signals:
     void Accept();
     void Reject();
-
 private:
     Ui::LayerConfigureDialog*   m_ui;
     ImageViewer*              m_widget;
