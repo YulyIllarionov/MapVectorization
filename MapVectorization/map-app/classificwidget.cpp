@@ -60,14 +60,17 @@ void ClassificWidget::on_listWidget_currentRowChanged(int currentRow)
     utils::SetTransparent(m_image->m_raster, cv::Mat(m_image->m_raster.size(), CV_8UC1, 1), 50);
     for(int i=0; i<m_layers.size();i++)
     {
-        // Здесь нужно просуммировать слои
         if(i!=currentRow)    
         utils::SetTransparent(m_image->m_raster, m_layers.at(i)->m_data, 150,0,1,0);
     }
     utils::SetTransparent(m_image->m_raster, m_layers.at(currentRow)->m_data, 255, 0, 1, 0);
     m_widget->UpdatePixmap();
-    QObject::connect(m_widget->GetPixItem(), SIGNAL(sendCoordAndType(int, int, int)), this, SLOT(GetCoordAndType(int, int, int)));
 
+    WObjectContainer &cont=m_layers.at(currentRow)->m_objects;
+    for(int i=0;i<cont.size();i++)
+    {
+        m_ui->listWidget_2->addItem("№"+QString::number(i));
+    }
 }
 
 void ClassificWidget::GetCoordAndType(int x, int y, int type)
@@ -105,4 +108,47 @@ void ClassificWidget::GetCoordAndType(int x, int y, int type)
         }
 
     }
+}
+
+void ClassificWidget::on_listWidget_2_currentRowChanged(int currentRow)
+{
+    m_textPolygons.clear();
+    for(int i=0;i<m_polygonForText.size();i++)
+    {
+        delete m_polygonForText.at(i);
+    }
+    m_polygonForText.clear();
+    for(int j=0;j<m_rectForLines.size();j++)
+    {
+        for(int i=0;i<m_rectForLines.at(j).size();i++)
+        {
+            delete m_rectForLines.at(j).at(i);
+        }
+    }
+
+    m_rectForLines.clear();
+
+    WObjectContainer &cont=m_layers.at(m_ui->listWidget->currentRow())->m_objects;
+    WVectorObject &vobj=cont.at(currentRow);
+    WLayer::LAYER_TYPE type=m_layers.at(m_ui->listWidget->currentRow())->getType();
+    
+    
+    QVector<QPointF> tempPoints;
+    for (int i = 0;i<vobj.Length();i++)
+    {
+        tempPoints.append(QPointF(vobj.GetPoint(i).GetX(), vobj.GetPoint(i).GetY()));
+    }
+
+    switch(type)
+    {
+        case WLayer::LT_TEXT:
+            m_polygonForText.append(m_widget->AddTextSelection(QPolygonF(tempPoints)));
+            break;
+        case WLayer::LT_LINES:
+            QList<QGraphicsRectItem *> lst;
+            m_widget->AddLineSelection(tempPoints,lst);
+            m_rectForLines.append(lst);
+        break;
+    }
+
 }

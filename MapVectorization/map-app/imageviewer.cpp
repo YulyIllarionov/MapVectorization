@@ -55,6 +55,26 @@ QGraphicsPolygonItem* ImageViewer::AddSelection(QPolygonF polygon)
     return scene()->addPolygon(polygon,pen,brush);
 }
 
+QGraphicsPolygonItem *ImageViewer::AddTextSelection(QPolygonF polygon)
+{
+    QPen pen(Qt::SolidLine);
+    QBrush brush(QColor(75,255,184,200));
+    return scene()->addPolygon(polygon,pen,brush);
+}
+
+void ImageViewer::AddLineSelection(QVector<QPointF> &vec, QList<QGraphicsRectItem *> &items)
+{
+    QPen pen(Qt::SolidLine);
+    QBrush brush(QColor(255,18,18,200));
+    for(int i=0;i<vec.size();i++)
+    {
+        QPointF tempPoint=vec.at(i);
+        QRectF rect(tempPoint.x()-1,tempPoint.y()-1,3,3);
+        items.append(scene()->addRect(rect,pen,brush));
+
+    }
+}
+
 
 MyPixmapItem* ImageViewer::GetPixItem() const
 {
