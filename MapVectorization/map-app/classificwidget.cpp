@@ -112,6 +112,23 @@ void ClassificWidget::GetCoordAndType(int x, int y, int type)
 
 void ClassificWidget::on_listWidget_2_currentRowChanged(int currentRow)
 {
+    m_textPolygons.clear();
+    for(int i=0;i<m_polygonForText.size();i++)
+    {
+        delete m_polygonForText.at(i);
+    }
+    m_polygonForText.clear();
+    for(int j=0;j<m_rectForLines.size();j++)
+    {
+        for(int i=0;i<m_rectForLines.at(j).size();i++)
+        {
+            delete m_rectForLines.at(j).at(i);
+        }
+        m_rectForLines.at(j).clear();
+    }
+
+    m_rectForLines.clear();
+
     WObjectContainer &cont=m_layers.at(m_ui->listWidget->currentRow())->m_objects;
     WVectorObject &vobj=cont.at(currentRow);
     WLayer::LAYER_TYPE type=m_layers.at(m_ui->listWidget->currentRow())->getType();
