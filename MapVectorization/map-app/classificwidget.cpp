@@ -124,7 +124,6 @@ void ClassificWidget::on_listWidget_2_currentRowChanged(int currentRow)
         {
             delete m_rectForLines.at(j).at(i);
         }
-        m_rectForLines.at(j).clear();
     }
 
     m_rectForLines.clear();
