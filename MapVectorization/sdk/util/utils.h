@@ -14,6 +14,7 @@
 #include "opencv2/opencv.hpp" 
 #include "opencv/cv.h"
 #include "opencv/highgui.h"
+#include "../base_types.h"
 
 SDK_BEGIN_NAMESPACE
    
@@ -30,6 +31,7 @@ namespace utils
   inline bool operator >= (cv::Vec3b& first, cv::Vec3b& second);
   std::vector<cv::Point>& getNeghboursClockwise(cv::Point point, const cv::Mat& image);
   int squaredDistanceBetween(const cv::Point& a, const cv::Point& b);
+  WObjectContainer FindLinesOnMat(const cv::Mat& img);
 }
 
 SDK_END_NAMESPACE

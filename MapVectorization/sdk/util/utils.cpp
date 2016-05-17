@@ -17,6 +17,7 @@ extern "C"
 #include <iostream>
 
 #include "utils.h"
+#include "../graphics/skeletonization.h"
 
 SDK_BEGIN_NAMESPACE
 
@@ -158,6 +159,53 @@ namespace utils {
     int squaredDistanceBetween(const cv::Point& a, const cv::Point& b)
     {
         return (a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y);
+    }
+    // ----------------------------------------------------
+    WObjectContainer FindLinesOnMat(const cv::Mat & img)
+    {
+        WObjectContainer lines;
+        cv::Mat skeleton;
+        SDK_NAMESPACE::WSkeletonizer::Instance().Skeletonize(img, skeleton);
+        for (int y = 1; y < skeleton.rows - 1; y++)
+        {
+            for (int x = 1; x < skeleton.cols - 1; x++)
+            {
+                cv::Point initial(x, y);
+                if (skeleton.at<uchar>(initial) > 0)
+                {
+                    std::vector<cv::Point> firstNeighbors = SDK_NAMESPACE::utils::getNeghboursClockwise(initial, skeleton);
+                    if (firstNeighbors.size() > 2)
+                        continue;
+                    else
+                    {
+                        std::vector<WPointsContainer> lines(firstNeighbors.size());
+                        lines[0].push_back(initial);
+                        skeleton.at<uchar>(initial) = 0;
+                        for (int i = 0; i < firstNeighbors.size(); i++)
+                        {
+                            cv::Point current(firstNeighbors[i]);
+                            std::vector<cv::Point> neighbors;
+                            while (true)
+                            {
+                                lines[i].push_back(current);
+                                skeleton.at<uchar>(current) = 0;
+                                neighbors = SDK_NAMESPACE::utils::getNeghboursClockwise(current, skeleton);
+                                if (neighbors.size() != 1)
+                                    break;
+                                current = neighbors[0];
+                            }
+                        }
+                        WLine line(lines[0]);
+                        for (int i = 1; i < lines.size(); i++)
+                        {
+                            line.Concat(lines[i]);
+                        }
+                        lines.push_back(reinterpret_cast<WVectorObject>(line));
+                    }
+                }
+            }
+        }
+        return lines;
     }
 
 }
