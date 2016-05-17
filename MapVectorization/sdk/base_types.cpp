@@ -99,7 +99,7 @@ SDKResult WLayer::InicializeLinesContainer()
 {
     if(m_type != LT_LINES)
         return kSDKResult_Error;
-    WObjectContainer lines = FindLinesOnMat()
+    //WObjectContainer lines = SDKNAMESPACE::FindLinesOnMat()
     
 }
 // ------------------------------------------------------------

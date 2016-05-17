@@ -163,7 +163,7 @@ namespace utils {
     // ----------------------------------------------------
     WObjectContainer FindLinesOnMat(const cv::Mat & img)
     {
-        WObjectContainer lines;
+        WObjectContainer linesContainer;
         cv::Mat skeleton;
         SDK_NAMESPACE::WSkeletonizer::Instance().Skeletonize(img, skeleton);
         for (int y = 1; y < skeleton.rows - 1; y++)
@@ -200,12 +200,12 @@ namespace utils {
                         {
                             line.Concat(lines[i]);
                         }
-                        lines.push_back(reinterpret_cast<WVectorObject>(line));
+                        linesContainer.push_back(line);
                     }
                 }
             }
         }
-        return lines;
+        return linesContainer;
     }
 
 }
