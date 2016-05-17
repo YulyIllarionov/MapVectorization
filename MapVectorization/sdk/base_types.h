@@ -352,6 +352,7 @@ private:
   SDKResult SetLayerType (const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite) const;
   void Initialize(const std::string& imgPath);
   SDKResult SplitLines(const LayerUUID& layerId, const LayerUUID& linesLayerID, const LayerUUID& othersLayerID);
+  SDKResult SplitText(const LayerUUID& layerId, const LayerUUID& textLayerID, const LayerUUID& othersLayerID);
   
   // depricate copy and move operations
   WRaster(const WRaster& other)

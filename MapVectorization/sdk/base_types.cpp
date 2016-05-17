@@ -362,10 +362,27 @@ SDKResult WRaster::SplitLayer(const LayerUUID& layerId, LayerIDs& splittedLayers
         break;
     }
     case WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT:
-      {
-      }
-      break;
-
+    {
+        break;
+    }
+    case WLayer::LAYER_TYPE_ENUM::LT_TEXT | WLayer::LAYER_TYPE_ENUM::LT_OTHER:
+    {
+        WLayer* textLayer = this->AddLayer(layer->getGroupId());
+        this->SetLayerType(textLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_TEXT);
+        this->SetLayerName(textLayer->getID(), std::string("Text from ") + layer->getName());
+        
+        WLayer* othersLayer = this->AddLayer(layer->getGroupId());
+        this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_OTHER);
+        this->SetLayerName(othersLayer->getID(), std::string("Other from ") + layer->getName());
+        
+        this->SplitText(layerId, textLayer->getID(), othersLayer->getID());
+        
+        textLayer->InicializeVectorContainer();
+        splittedLayers.clear();
+        splittedLayers.push_back(textLayer->getID());
+        splittedLayers.push_back(othersLayer->getID());
+        break;
+    }
     default:
       {   
         WLayer* l1 = AddLayer();
@@ -807,5 +824,12 @@ SDKResult WRaster::SplitLines(const LayerUUID& layerId, const LayerUUID& linesLa
     }
 
 }
+// ------------------------------------------------------------
+SDKResult SplitText(const LayerUUID& layerId, const LayerUUID& textLayerID, const LayerUUID& othersLayerID)
+{
+  SDKResult result = kSDKResult_Succeeded;
+
+  return result;
+} 
 // ------------------------------------------------------------
   SDK_END_NAMESPACE
