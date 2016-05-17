@@ -52,23 +52,20 @@ SDK_BEGIN_NAMESPACE
 class WVectorObject
 {
 public:
-	//virtual void clearPoints();
-	//virtual void setColor(WColor color);
-	virtual void Add(/*const*/ cv::Point& point) { m_points.push_back(point); };
-  //Добавить точку в по указанному индексу
-	virtual bool AddPointAt(/*const*/ cv::Point& point, size_t idx);
-	//Удалить точку
-	virtual bool RemovePoint(size_t idx);
-	//Взять точку по индексу
-	virtual cv::Point GetPoint(size_t idx) { return m_points.size() > idx ? m_points[idx] : cv::Point::Point_(); };
-    // get points
-  const WPointsContainer& GetPoints() const { return m_points; };
+	//virtual void Add(/*const*/ cv::Point& point) { m_points.push_back(point); };
+  ////Добавить точку в по указанному индексу
+	//virtual bool AddPointAt(/*const*/ cv::Point& point, size_t idx);
+	////Удалить точку
+	//virtual bool RemovePoint(size_t idx);
+	////Взять точку по индексу
+	//virtual cv::Point GetPoint(size_t idx) { return m_points.size() > idx ? m_points[idx] : cv::Point::Point_(); };
+  // // get points
+  //const WPointsContainer& GetPoints() const { return m_points; };
   // get length
 	virtual size_t Length() const { return m_points.size(); };
-    virtual double DistanceTo(cv::Point mapPoint);
-private:
+  virtual double DistanceTo(cv::Point mapPoint) const;
 
-protected:
+//protected:
   WPointsContainer  m_points;
 };
 
@@ -82,8 +79,9 @@ public:
 
 	//WPolygon& operator=(WPolygon& other);
 	
-    //Проверка точки на принадлежность
-  bool Contains(/*const*/ cv::Point& point) const;
+  //Проверка точки на принадлежность
+  bool Contains(const WVectorObject& object) const;
+  //virtual double DistanceTo(cv::Point mapPoint) const;
 
 private:
 	
@@ -109,12 +107,8 @@ public:
 	double GetWidth() { return m_width; };
 	void   SetColor(WColor color) { m_color = color; };
 
-	// points
 	void Concat(const WLine& line);
-
-    //находится внутри полигона 
-    bool BelongsTo(const WPolygon& polygon);
-
+  //virtual double DistanceTo(cv::Point mapPoint) const;
 	//Упростить линию
 	WPointsContainer SimplifyLine(const WPointsContainer& vectorline, double EPSILON, int delta);
 
@@ -126,7 +120,7 @@ private:
 
 
 //Объект текст
-class WText : public WVectorObject
+class WText : public WPolygon
 {
 public:
 	WText();
@@ -159,6 +153,8 @@ public:
 	void SetState(bool state) { m_state = state; }
 	bool GetState() const { return m_state; }
 
+  //virtual double DistanceTo(cv::Point mapPoint) const;
+
 private:
 	WPolygon    m_polygon;  //Границы текста на карте
 	WLine       m_textline; // Линия, обозначающая направление текста внутри полигона
@@ -171,52 +167,12 @@ class WMapObject : public WVectorObject
 public:
   WMapObject() {};
   ~WMapObject() {};
+  
+  //virtual double DistanceTo(cv::Point mapPoint) const;
 private:
 };
 
-//Класс коллекции объектов
-template<class T> class WObjectContainer
-{
-public:
-	//Конструктор
-	WObjectContainer(void) {};
-	~WObjectContainer(void) {};
-
-	//WObjectContainer(const WObjectContainer& container)
-	//{
- //   m_objects.clear();
- //   m_objects.reserve(container.GetLength());
-	//	for (int i = 0; i < container.GetLength(); i++)
-	//	{
-	//		if (container.GetObjectByID(i).GetState())
-	//			m_objects.push_back(container.GetObjectByID(i));
-	//	}
-	//}
-	//Взять объекты
-	const std::vector<T>& GetObjectList() { return m_objects; }
-	//Установить новый список объектов
-	void SetObjectList(const std::vector<T>& objects) { m_objects = objects; }
-	//Взять объет по идентификатору
-	T& GetObjectByID(int id) const { return m_objects[id]; }
-	//Добавить объект в коллекцию
-	void Add(const T& object) { return m_objects.push_back(object); }
-	//Удалить объект из коллекции
-	void Remove(const T& object) { std::remove(m_objects.begin(), m_objects.end(), object); }
-    void RemoveById(int id) { m_objects.erase(m_objects.begin() + id); }
-	//Взять длину коллекции
-	int GetLength() const { return m_objects.size(); }
-	//Клонировать коллекцию
-    void Clone(WObjectContainer* newCollection) { newCollection = new WObjectContainer(*this); }
-
-private:
-	std::vector<T> m_objects; //Коллекция объектов
-};
-
-//Класс коллекции объектов
-typedef WObjectContainer<WLine>       WLineContainer;
-typedef WObjectContainer<WPolygon>    WPolygonContainer;
-typedef WObjectContainer<WMapObject>  WMapObjectContainer;
-typedef WObjectContainer<WText>       WTextContainer;
+typedef std::vector<WVectorObject> WObjectContainer;
 
 //  Enumerator
 class IEnumItem {
@@ -314,10 +270,7 @@ public:
 
   cv::Mat     m_data;
     
-  WLineContainer      m_objects_line;
-  WPolygonContainer   m_objects_polygon;
-  WMapObjectContainer m_objects_map;
-  WTextContainer      m_objects_text;
+  WObjectContainer  m_objects;
 
 private:
   LayerUUID   m_uuid;
