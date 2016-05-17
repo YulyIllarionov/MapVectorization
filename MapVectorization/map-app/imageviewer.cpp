@@ -2,11 +2,15 @@
 
 #include "imageviewer.h"
 
-ImageViewer::ImageViewer(QImage image, QWidget *parent) : QGraphicsView(parent)
+ImageViewer::ImageViewer(QImage image, QWidget *parent) : QGraphicsView(parent), img(1, 1, QImage::Format_ARGB32)
 {
     m_image = image;
     m_pixItem = NULL;
     setScene(&m_scene);
+    m_pixItem = new MyPixmapItem();
+    m_scene.addItem(m_pixItem);
+    img.fill(QColor(qRgba(255, 255, 255, 255)));
+    m_pixItem->setPixmap(QPixmap::fromImage(m_image));
 }
 
 void ImageViewer::ZoomIn()
@@ -31,14 +35,44 @@ void ImageViewer::SetImage(const QImage &image)
 
 void ImageViewer::UpdatePixmap()
 {
-    delete m_pixItem;
-    m_pixItem = new MyPixmapItem();
+    //delete m_pixItem;
+    //m_pixItem = new MyPixmapItem();
+    //m_scene.removeItem(m_pixItem);
+   
+    m_pixItem->setPixmap(QPixmap::fromImage(img));
     m_pixItem->setPixmap(QPixmap::fromImage(m_image));
-    m_scene.addItem(m_pixItem);
+    //m_scene.addItem(m_pixItem);
 }
 QImage& ImageViewer::GetImage()
 {
     return m_image;
+}
+
+QGraphicsPolygonItem* ImageViewer::AddSelection(QPolygonF polygon)
+{
+    QPen pen(Qt::DashLine);
+    QBrush brush(QColor(17,107,209,100));
+    return scene()->addPolygon(polygon,pen,brush);
+}
+
+QGraphicsPolygonItem *ImageViewer::AddTextSelection(QPolygonF polygon)
+{
+    QPen pen(Qt::SolidLine);
+    QBrush brush(QColor(75,255,184,200));
+    return scene()->addPolygon(polygon,pen,brush);
+}
+
+void ImageViewer::AddLineSelection(QVector<QPointF> &vec, QList<QGraphicsRectItem *> &items)
+{
+    QPen pen(Qt::SolidLine);
+    QBrush brush(QColor(255,18,18,200));
+    for(int i=0;i<vec.size();i++)
+    {
+        QPointF tempPoint=vec.at(i);
+        QRectF rect(tempPoint.x()-1,tempPoint.y()-1,3,3);
+        items.append(scene()->addRect(rect,pen,brush));
+
+    }
 }
 
 
@@ -48,7 +82,8 @@ MyPixmapItem* ImageViewer::GetPixItem() const
 }
 void ImageViewer::DeletePixmap()
 {
-    delete m_pixItem;
-    m_pixItem = NULL;
+    //delete m_pixItem;
+    //m_pixItem = NULL;
+    m_pixItem->setPixmap(QPixmap::fromImage(img));
 }
 

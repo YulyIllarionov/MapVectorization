@@ -17,6 +17,7 @@ extern "C"
 #include <iostream>
 
 #include "utils.h"
+#include "../graphics/skeletonization.h"
 
 SDK_BEGIN_NAMESPACE
 
@@ -59,11 +60,22 @@ namespace utils {
         return kernel;
     }
     // ----------------------------------------------------
-    void SetTransparent(cv::Mat& img, cv::Mat& mask, uchar aTrue, uchar aFalse)
+    void SetTransparent(cv::Mat& img, cv::Mat& mask, uchar alphaTrue, uchar alphaFalse, bool needTrue, bool needFalse)
     {
         for (int y = 0; y < img.rows; y++)
             for (int x = 0; x < img.cols; x++)
-                img.at<cv::Vec4b>(y, x)[3] = (mask.at<uchar>(y, x) > 0) ? aTrue : aFalse;
+                if (mask.at<uchar>(y, x) > 0)
+                {
+                    if (needTrue)
+                        img.at<cv::Vec4b>(y, x)[3] = alphaTrue;
+                    
+                }
+                else
+                {
+                    if (needFalse)
+                        img.at<cv::Vec4b>(y, x)[3] = alphaFalse;
+
+                }                    
     } 
     // ----------------------------------------------------
     std::string genUUID()
@@ -111,6 +123,89 @@ namespace utils {
         return !(first < second);
     }
     // ----------------------------------------------------
+    std::vector<cv::Point>& getNeghboursClockwise(cv::Point point, const cv::Mat& image)
+    {
+        std::vector<cv::Point> neighbors;
+        uchar color = image.at<uchar>(point);
+        point.y--;
+        if (image.at<uchar>(point) == color)
+                neighbors.push_back(point);
+        point.x++;
+        if (image.at<uchar>(point) == color)
+            neighbors.push_back(point);
+        point.y++;
+        if (image.at<uchar>(point) == color)
+            neighbors.push_back(point);
+        point.y++;
+        if (image.at<uchar>(point) == color)
+            neighbors.push_back(point);
+        point.x--;
+        if (image.at<uchar>(point) == color)
+            neighbors.push_back(point);
+        point.x--;
+        if (image.at<uchar>(point) == color)
+            neighbors.push_back(point);
+        point.y--;
+        if (image.at<uchar>(point) == color)
+            neighbors.push_back(point);
+        point.y--;
+        if (image.at<uchar>(point) == color)
+            neighbors.push_back(point);
+
+        return neighbors;
+    }
+    // ----------------------------------------------------
+    int squaredDistanceBetween(const cv::Point& a, const cv::Point& b)
+    {
+        return (a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y);
+    }
+    // ----------------------------------------------------
+    WObjectContainer FindLinesOnMat(const cv::Mat & img)
+    {
+        WObjectContainer linesContainer;
+        cv::Mat skeleton;
+        SDK_NAMESPACE::WSkeletonizer::Instance().Skeletonize(img, skeleton);
+        for (int y = 1; y < skeleton.rows - 1; y++)
+        {
+            for (int x = 1; x < skeleton.cols - 1; x++)
+            {
+                cv::Point initial(x, y);
+                if (skeleton.at<uchar>(initial) > 0)
+                {
+                    std::vector<cv::Point> firstNeighbors = SDK_NAMESPACE::utils::getNeghboursClockwise(initial, skeleton);
+                    if (firstNeighbors.size() > 2)
+                        continue;
+                    else
+                    {
+                        std::vector<WPointsContainer> lines(firstNeighbors.size());
+                        lines[0].push_back(initial);
+                        skeleton.at<uchar>(initial) = 0;
+                        for (int i = 0; i < firstNeighbors.size(); i++)
+                        {
+                            cv::Point current(firstNeighbors[i]);
+                            std::vector<cv::Point> neighbors;
+                            while (true)
+                            {
+                                lines[i].push_back(current);
+                                skeleton.at<uchar>(current) = 0;
+                                neighbors = SDK_NAMESPACE::utils::getNeghboursClockwise(current, skeleton);
+                                if (neighbors.size() != 1)
+                                    break;
+                                current = neighbors[0];
+                            }
+                        }
+                        WLine line(lines[0]);
+                        for (int i = 1; i < lines.size(); i++)
+                        {
+                            line.Concat(lines[i]);
+                        }
+                        linesContainer.push_back(line);
+                    }
+                }
+            }
+        }
+        return linesContainer;
+    }
 
 }
 SDK_END_NAMESPACE

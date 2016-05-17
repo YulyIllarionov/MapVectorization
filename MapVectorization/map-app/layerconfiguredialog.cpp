@@ -13,6 +13,7 @@ LayerConfigureDialog::LayerConfigureDialog(WRaster* image, ImageViewer* widget,W
     m_tempLayer = tempLayer;
     QObject::connect(m_widget->GetPixItem(), SIGNAL(sendCoord(int, int)), this, SLOT(GetCoord(int, int)));
     m_ui->SapleFrame->installEventFilter(this);
+    m_state=nothing;
 }
 
 LayerConfigureDialog::~LayerConfigureDialog()
@@ -58,7 +59,7 @@ bool LayerConfigureDialog::eventFilter(QObject *obj, QEvent *event)
 
 void LayerConfigureDialog::GetCoord(int x, int y)
 {
-    if(m_ui->Pipette->isChecked())
+    if(m_state ==pipette)
     {
         QColor rgb = m_widget->GetImage().pixel(x,y);
         m_r = rgb.red();
@@ -71,6 +72,18 @@ void LayerConfigureDialog::GetCoord(int x, int y)
         //activateWindow();
         on_AddColor_clicked();
     }
+    if(m_state ==pen)
+    {
+        m_tempLayer->DrawCircle(SMapPoint(x,y),m_ui->RadiusSpinBox->value()-1,255);
+        UpdatesMask();
+    }
+    if(m_state ==eraser)
+    {
+        m_tempLayer->DrawCircle(SMapPoint(x,y),m_ui->RadiusSpinBox->value()-1,0);
+        UpdatesMask();
+    }
+
+
 }
 
 void LayerConfigureDialog::UpdateSamples()
@@ -94,18 +107,18 @@ void LayerConfigureDialog::on_AddColor_clicked()
 
 void LayerConfigureDialog::UpdatesMask()
 {
-    w_color wc2 = m_tempLayer->getRange().getLow();
-    w_color wc3= m_tempLayer->getRange().getHigh();
+    //w_color wc2 = m_tempLayer->getRange().getLow();
+    //w_color wc3= m_tempLayer->getRange().getHigh();
     utils::SetTransparent(m_image->m_raster, m_tempLayer->m_data, 50);
     m_widget->UpdatePixmap();
-    QObject::connect(m_widget->GetPixItem(), SIGNAL(sendCoord(int, int)), this, SLOT(GetCoord(int, int)));
+    //QObject::connect(m_widget->GetPixItem(), SIGNAL(sendCoord(int, int)), this, SLOT(GetCoord(int, int)));
 }
 
 void LayerConfigureDialog::on_buttonBox_accepted()
 {
-    QCheckBox * mas[4] = {m_ui->checkBox,m_ui->checkBox_2,m_ui->checkBox_3,m_ui->checkBox_4};
+    QCheckBox * mas[5] = {m_ui->checkBox,m_ui->checkBox_2,m_ui->checkBox_3,m_ui->checkBox_5,m_ui->checkBox_4};
     int tempType = 0;
-    for (int i = 0;i < 4;i++)
+    for (int i = 0;i < 5;i++)
     {
         if (mas[i]->isChecked()) 
             tempType += 1 << i;
@@ -125,3 +138,22 @@ void LayerConfigureDialog::on_buttonBox_rejected()
     emit Reject();
     this->close();
 }
+
+void LayerConfigureDialog::on_PenButton_toggled(bool checked)
+{
+    if(checked) m_state=pen;
+    else m_state =nothing;
+}
+
+void LayerConfigureDialog::on_Pipette_toggled(bool checked)
+{
+    if(checked) m_state =pipette;
+    else m_state =nothing;
+}
+
+void LayerConfigureDialog::on_EraseButton_toggled(bool checked)
+{
+    if (checked) m_state = eraser;
+    else m_state = nothing;
+}
+

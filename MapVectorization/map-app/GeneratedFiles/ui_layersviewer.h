@@ -30,12 +30,14 @@ public:
     QHBoxLayout *horizontalLayout;
     QPushButton *Add;
     QPushButton *Remove;
+    QPushButton *SplitButton;
+    QPushButton *SavePngButton;
 
     void setupUi(QWidget *LayersViewer)
     {
         if (LayersViewer->objectName().isEmpty())
             LayersViewer->setObjectName(QStringLiteral("LayersViewer"));
-        LayersViewer->resize(198, 165);
+        LayersViewer->resize(244, 201);
         verticalLayout = new QVBoxLayout(LayersViewer);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         listWidget = new QListWidget(LayersViewer);
@@ -61,6 +63,17 @@ public:
 
         horizontalLayout->addWidget(Remove);
 
+        SplitButton = new QPushButton(LayersViewer);
+        SplitButton->setObjectName(QStringLiteral("SplitButton"));
+        SplitButton->setEnabled(false);
+
+        horizontalLayout->addWidget(SplitButton);
+
+        SavePngButton = new QPushButton(LayersViewer);
+        SavePngButton->setObjectName(QStringLiteral("SavePngButton"));
+
+        horizontalLayout->addWidget(SavePngButton);
+
 
         verticalLayout->addLayout(horizontalLayout);
 
@@ -75,6 +88,8 @@ public:
         LayersViewer->setWindowTitle(QApplication::translate("LayersViewer", "Form", 0));
         Add->setText(QString());
         Remove->setText(QString());
+        SplitButton->setText(QApplication::translate("LayersViewer", "Split", 0));
+        SavePngButton->setText(QApplication::translate("LayersViewer", "Save as PNG", 0));
     } // retranslateUi
 
 };

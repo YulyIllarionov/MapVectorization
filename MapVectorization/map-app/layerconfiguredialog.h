@@ -40,10 +40,15 @@ private slots:
 
     void on_buttonBox_rejected();
 
+    void on_PenButton_toggled(bool checked);
+
+    void on_Pipette_toggled(bool checked);
+
+    void on_EraseButton_toggled(bool checked);
+
 signals:
     void Accept();
     void Reject();
-
 private:
     Ui::LayerConfigureDialog*   m_ui;
     ImageViewer*              m_widget;
@@ -51,6 +56,12 @@ private:
     WLayer *m_tempLayer;
 
     int   m_r, m_g, m_b;
+    enum States
+    {
+        nothing,pipette,pen,eraser
+    };
+
+    States m_state;
 };
 
 #endif // LAYERCONFIGUREDIALOG_H

@@ -45,6 +45,7 @@
     <addaction name="LayersEditor"/>
     <addaction name="SharpenAction"/>
     <addaction name="menu_4"/>
+    <addaction name="actionRegimentBlackColor"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -53,6 +54,7 @@
     <addaction name="ZoomIn"/>
     <addaction name="ZoomOut"/>
     <addaction name="FitImage"/>
+    <addaction name="actionUpdatePixmap"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -111,6 +113,16 @@
   <action name="actionMeanshift">
    <property name="text">
     <string>Meanshift</string>
+   </property>
+  </action>
+  <action name="actionRegimentBlackColor">
+   <property name="text">
+    <string>Классификация черного цвета</string>
+   </property>
+  </action>
+  <action name="actionUpdatePixmap">
+   <property name="text">
+    <string>UpdatePixmap</string>
    </property>
   </action>
  </widget>

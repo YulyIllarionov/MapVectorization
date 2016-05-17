@@ -77,10 +77,16 @@ void LayersViewer::UpdateList()
 }
 void LayersViewer::on_listWidget_currentRowChanged(int currentRow)
 {
-    if (m_layers->size() > 0)
+    if (m_layers->size() > 0 &&currentRow>-1)
     {
         utils::SetTransparent(m_image->m_raster, m_layers->at(currentRow)->m_data, 50);
         m_widget->UpdatePixmap();
+        if(m_layers->at(currentRow)->getType()==(WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT| WLayer::LAYER_TYPE_ENUM::LT_OTHER))
+        {
+           m_ui->SplitButton->setEnabled(true);
+        }
+        else m_ui->SplitButton->setEnabled(false);
+
     }
 }
 
@@ -94,4 +100,36 @@ void LayersViewer::on_Remove_clicked()
     m_image->RemoveLayer(m_layers->at(m_ui->listWidget->currentRow())->getID());
     m_layers->removeAt(m_ui->listWidget->currentRow());
     UpdateList();
+}
+
+void LayersViewer::on_SavePngButton_clicked()
+{
+    int index;
+
+    if((index=m_ui->listWidget->currentRow())>-1)
+    {
+        QString str = QFileDialog::getSaveFileName(0, "Save layer", QString(m_layers->at(index)->getName().c_str()) + ".png", "Image Files (*.png *.jpg *.bmp) ;; *.*");
+        if (!str.isEmpty())
+        {
+            cv::Mat toSave;
+            cv::normalize(m_layers->at(index)->m_data, toSave, 0, 255, cv::NORM_MINMAX, CV_8UC1);
+            //cv::imshow("1", toSave);
+            //cv::waitKey(0);
+            cv::imwrite(str.toStdString(), toSave);
+        }
+    }
+}
+
+void LayersViewer::on_SplitButton_clicked()
+{
+    LayerIDs vec;
+    m_image->SplitLayer(m_layers->at(m_ui->listWidget->currentRow())->getID(),vec);
+    for(int i=0;i<vec.size();i++)
+    {
+        m_layers->append(m_image->GetLayerById(vec.at(i)));
+        if(m_image->GetLayerById(vec.at(i))->getType()==WLayer::LAYER_TYPE_ENUM::LT_LINES)
+            m_image->GetLayerById(vec.at(i))->InicializeVectorContainer();
+    }
+    UpdateList();
+
 }
