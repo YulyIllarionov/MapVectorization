@@ -340,7 +340,8 @@ public:
 
   // define objects inside polygon
   std::vector<int> DefineObjectsForPolygon(const LayerUUID& layerId, WPolygon mapPoints);
-	
+  std::vector<int> DefineObjectsNearPoint(const LayerUUID& layerId, SMapPoint point);
+
   // copy object from one layer to another
   void CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, WPolygon mapPoints);
   // удаление объектов со слоя 

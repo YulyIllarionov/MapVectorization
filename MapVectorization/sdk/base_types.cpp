@@ -99,7 +99,7 @@ SDKResult WLayer::InicializeLinesContainer()
 {
     if(m_type != LT_LINES)
         return kSDKResult_Error;
-    //WObjectContainer lines = SDKNAMESPACE::FindLinesOnMat()
+    WObjectContainer lines = SDK_NAMESPACE::utils::FindLinesOnMat(m_data);
     
 }
 // ------------------------------------------------------------
@@ -444,6 +444,30 @@ std::vector<cv::Rect> WRaster::DetectLetters(const LayerUUID& layerId) const
   return boundRect;
 }
 // ------------------------------------------------------------
+std::vector<int> WRaster::DefineObjectsNearPoint(const LayerUUID& layerId, SMapPoint point)
+{
+    Point pointCV(point.GetX(), point.GetY());
+    std::vector<int> ids;
+    WLayer* layer = GetLayerById(layerId);
+    if (!layer->IsSingleType())
+        return ids;
+
+    double distance = DBL_MAX;
+    int index;
+
+    for (size_t i = 0; i < layer->m_objects.size(); i++)
+    {
+        double currentDistance = layer->m_objects[i].DistanceTo(pointCV);
+        if (currentDistance < distance)
+        {
+            distance = currentDistance;
+            index = i;
+        }
+    }
+    ids.push_back(index);
+    return ids;
+}
+// ------------------------------------------------------------
 // define objects inside polygon
 std::vector<int> WRaster::DefineObjectsForPolygon(const LayerUUID& layerId, WPolygon mapPoints)
 {
@@ -673,11 +697,6 @@ void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoint
     }
 }
 // ------------------------------------------------------------
-double WVectorObject::DistanceTo(cv::Point mapPoint) const
-{
-    return -pointPolygonTest(m_points, mapPoint, true);
-}
-// ------------------------------------------------------------
 WPolygon::WPolygon(std::vector<SMapPoint> & mapPoints)
 {
     for (int i = 0; i < mapPoints.size(); i++) {
@@ -689,6 +708,18 @@ bool WPolygon::Contains(const WVectorObject& object) const
 {
   return false;
   //return (pointPolygonTest(m_points, object.point, false)>=0);
+}
+// ------------------------------------------------------------
+double WVectorObject::DistanceTo(cv::Point mapPoint) const
+{
+    int squaredDistance = INT_MAX;
+    for (size_t i = 0; i < m_points.size(); i++)
+    {
+        int currentDistance = SDK_NAMESPACE::utils::squaredDistanceBetween(mapPoint, m_points[i]);
+        if (currentDistance < squaredDistance)
+            squaredDistance = currentDistance;
+    }
+    return std::sqrt((double)squaredDistance);
 }
 // ------------------------------------------------------------
 void WLine::Concat(const WLine& line)

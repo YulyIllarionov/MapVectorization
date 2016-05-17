@@ -75,8 +75,7 @@ namespace utils {
                     if (needFalse)
                         img.at<cv::Vec4b>(y, x)[3] = alphaFalse;
 
-                }
-                    
+                }                    
     } 
     // ----------------------------------------------------
     std::string genUUID()
