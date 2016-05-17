@@ -339,9 +339,8 @@ public:
   SDKResult GetLayersByGroupId(const GroupID& groupId, LayerIDs& relatedLayers) const;
 
   // define objects inside polygon
-  std::vector<int> DefineObjectsForPolygon(const LayerUUID& layerId, WPolygon mapPoints);
-  std::vector<int> DefineObjectsNearPoint(const LayerUUID& layerId, SMapPoint point);
-
+  std::vector<int> DefineObjectsInsidePolygon(const LayerUUID& layerId, const WPolygon& mapPoints);
+	
   // copy object from one layer to another
   void CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, WPolygon mapPoints);
   // удаление объектов со слоя 

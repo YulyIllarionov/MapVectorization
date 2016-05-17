@@ -348,13 +348,16 @@ SDKResult WRaster::SplitLayer(const LayerUUID& layerId, LayerIDs& splittedLayers
     {
         WLayer* linesLayer = this->AddLayer(layer->getGroupId());
         this->SetLayerType(linesLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_LINES);
+        this->SetLayerName(linesLayer->getID(), std::string("Lines from ") + layer->getName());
         WLayer* othersLayer = this->AddLayer(layer->getGroupId());
         this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_TEXT);
         this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_OTHER);
+        this->SetLayerName(othersLayer->getID(), std::string("Text from ")+layer->getName());
         this->SplitLines(layerId, linesLayer->getID(), othersLayer->getID());
         splittedLayers.clear();
         splittedLayers.push_back(linesLayer->getID());
         splittedLayers.push_back(othersLayer->getID());
+        break;
     }
     case WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT:
       {
@@ -469,83 +472,22 @@ std::vector<int> WRaster::DefineObjectsNearPoint(const LayerUUID& layerId, SMapP
 }
 // ------------------------------------------------------------
 // define objects inside polygon
-std::vector<int> WRaster::DefineObjectsForPolygon(const LayerUUID& layerId, WPolygon mapPoints)
+std::vector<int> WRaster::DefineObjectsInsidePolygon(const LayerUUID& layerId, const WPolygon& mapPoints)
 {
     std::vector<int> ids;
-
     WLayer* layer = GetLayerById(layerId);
-    if (!layer->IsSingleType())
-        return ids;
-    if (mapPoints.Length() == 0)
+    if (!layer->IsSingleType() || mapPoints.Length() == 0)
         return ids;
     
-    WLayer::LAYER_TYPE layerType = layer->getType();
-
-    if (mapPoints.Length() == 1)
+    int idx = 0;
+    WObjectContainer::const_iterator cit = layer->m_objects.begin();
+    for (; cit != layer->m_objects.end(); ++cit, ++idx)
     {
-        Point point = mapPoints.m_points[0];  // .GetPoint(0);
-        switch (layerType)
-        {
-            // from Text layer
-        case WLayer::LT_TEXT:
-        {
-            //std::vector<WText> texts = layer->m_objects_text.GetObjectList();
-            //double minDistance = DBL_MAX;
-            //int minIndex = 0;
-            //for (int i = 0; i < texts.size(); i++)
-            //{
-            //    double currentDistance = texts[i].DistanceTo(point);
-            //    if (currentDistance < minDistance)
-            //    {
-            //        minDistance = currentDistance;
-            //        minIndex = i;
-            //    }
-            //}
-            //ids.push_back(minIndex);
-        }
-        break;
-        // from Lines layer
-        case WLayer::LT_LINES:
-        {
-            //std::vector<WLine> lines = layer->m_objects_line.GetObjectList();
-            //double minDistance = DBL_MAX;
-            //int minIndex = 0;
-            //for (int i = 0; i < lines.size(); i++)
-            //{
-            //    double currentDistance = lines[i].DistanceTo(point);
-            //    if (currentDistance < minDistance)
-            //    {
-            //        minDistance = currentDistance;
-            //        minIndex = i;
-            //    }
-            //}
-            //ids.push_back(minIndex);
-        }
-        break;
-        // from Other layer
-        default:
-            break;
-        }
+        if (mapPoints.Contains(*cit))
+          ids.push_back(idx);
     }
-    else
-    {
-        switch (layerType)
-        {
-        // from Lines layer
-        case WLayer::LT_LINES:
-        {
-            //std::vector<WLine> lines = layer->m_objects_line.GetObjectList();
-            //for (int i = 0; i < lines.size(); i++)
-            //    if (lines[i].BelongsTo(mapPoints))
-            //        ids.push_back(i);
-        }
-        break;
-        // from Other layer
-        default:
-            break;
-        }
-    }
-	return ids;
+    
+	  return ids;
 }
 // ------------------------------------------------------------
 // copy object from one layer to another
@@ -669,7 +611,7 @@ void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoint
     if (!layer->IsSingleType())
       return;
 
-    std::vector<int> ids = DefineObjectsForPolygon(layerId, mapPoints);
+    std::vector<int> ids = DefineObjectsInsidePolygon(layerId, mapPoints);
     WLayer::LAYER_TYPE layerType = layer->getType();
 
     switch (layerType)
@@ -706,8 +648,16 @@ WPolygon::WPolygon(std::vector<SMapPoint> & mapPoints)
 // ------------------------------------------------------------
 bool WPolygon::Contains(const WVectorObject& object) const
 {
-  return false;
-  //return (pointPolygonTest(m_points, object.point, false)>=0);
+  bool result = false;
+  WPointsContainer::const_iterator cit = object.m_points.begin();
+  for (; cit != object.m_points.end(); cit++)
+  {
+    if (pointPolygonTest(m_points, *cit, false) >= 0)
+      result = true;
+    else
+      return false;
+  }
+  return result;
 }
 // ------------------------------------------------------------
 double WVectorObject::DistanceTo(cv::Point mapPoint) const

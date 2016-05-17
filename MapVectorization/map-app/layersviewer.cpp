@@ -77,7 +77,7 @@ void LayersViewer::UpdateList()
 }
 void LayersViewer::on_listWidget_currentRowChanged(int currentRow)
 {
-    if (m_layers->size() > 0)
+    if (m_layers->size() > 0 &&currentRow>-1)
     {
         utils::SetTransparent(m_image->m_raster, m_layers->at(currentRow)->m_data, 50);
         m_widget->UpdatePixmap();
@@ -130,6 +130,6 @@ void LayersViewer::on_SplitButton_clicked()
         if(m_image->GetLayerById(vec.at(i))->getType()==WLayer::LAYER_TYPE_ENUM::LT_LINES)
             m_image->GetLayerById(vec.at(i))->InicializeVectorContainer();
     }
-    //UpdateList();
+    UpdateList();
 
 }
