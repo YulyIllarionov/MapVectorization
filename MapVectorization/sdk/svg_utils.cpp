@@ -10,10 +10,9 @@ SVGUtils::~SVGUtils(void)
 {
 }
 
-void SVGUtils::WriteLineToSVG(SDK_NAMESPACE::WLineVector<SDK_NAMESPACE::WLine> wvector, string filename)
+void SVGUtils::WriteLineToSVG(SDK_NAMESPACE::WObjectContainer wvector, string filename)
 {
 	std::ofstream fout;
-	std::vector<SDK_NAMESPACE::WLine> m_listLines = wvector.GetObjectList();
 	fout.open(filename);
 	
 	if (fout.fail())
@@ -25,18 +24,17 @@ void SVGUtils::WriteLineToSVG(SDK_NAMESPACE::WLineVector<SDK_NAMESPACE::WLine> w
 	fout << "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">" << endl;
 	fout << "<svg version = \"1.1\"" << endl; 
 	
-	for (int i = 0; i<m_listLines.size(); i++)
+	for (int i = 0; i<wvector.size(); i++)
 	{
-		WriteLine(m_listLines[i].getPoints(), fout);
+		WriteLine(reinterpret_cast<SDK_NAMESPACE::WLine>(wvector[i]), fout);
 	}
 	fout.close();
 
 }
 
-void SVGUtils::WriteTextToSVG(SDK_NAMESPACE::WTextVector<SDK_NAMESPACE::WText> wvector, string filename)
+void SVGUtils::WriteTextToSVG(SDK_NAMESPACE::WObjectContainer& wvector, string filename)
 {
 	std::ofstream fout;
-	std::vector<SDK_NAMESPACE::WText> m_listLines = wvector.GetObjectList();
 	fout.open(filename);
 
 	if (fout.fail())
@@ -48,20 +46,20 @@ void SVGUtils::WriteTextToSVG(SDK_NAMESPACE::WTextVector<SDK_NAMESPACE::WText> w
 	fout << "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">" << endl;
 	fout << "<svg version = \"1.1\"" << endl;
 
-	for (int i = 0; i<m_listLines.size(); i++)
+	for (int i = 0; i<wvector.size(); i++)
 	{
-		WriteText(m_listLines[i], fout);
+		WriteText((SDK_NAMESPACE::WText)wvector[i], fout);
 	}
 	fout.close();
 
 }
 
-void SVGUtils::WriteLine (std::vector<Point> points, std::ofstream& fout)
+void SVGUtils::WriteLine (SDK_NAMESPACE::WLine& line, std::ofstream& fout)
 {
 	fout << "<line>";
-	for (int i = 0; i<points.size(); i++)
+	for (int i = 0; i<line.Length(); i++)
 	{
-		fout << "<x=\"" << points[i].x << "\" y=\"" << points[i].y << "\"/>" << endl;
+		fout << "<x=\"" << line.GetPoint(i).GetX() << "\" y=\"" << line.GetPoint(i).GetY() << "\"/>" << endl;
 	}
 	fout << "</line>";
 }
@@ -70,17 +68,17 @@ void SVGUtils::WriteText(SDK_NAMESPACE::WText& text,std::ofstream& fout)
 {
 	fout << "<text>";
 	fout << "\" lengthAdjust=\"spacing\">" << text.GetText() << endl;
-	WritePolygon(text.getPolygon().getPoints(), fout);
+	WritePolygon(text.GetPolygon(), fout);
 	fout << "</text>";
 
 }
 
-void SVGUtils::WritePolygon(std::vector<Point> points, std::ofstream& fout)
+void SVGUtils::WritePolygon(SDK_NAMESPACE::WPolygon& polygon, std::ofstream& fout)
 {
 	fout << "<polygon>";
-	for (int i = 0; i<points.size(); i++)
+	for (int i = 0; i<polygon.Length(); i++)
 	{
-		fout << "<x=\"" << points[i].x << "\" y=\"" << points[i].y << "\"/>" << endl;
+		fout << "<x=\"" << polygon.GetPoint(i).GetX() << "\" y=\"" << polygon.GetPoint(i).GetY() << "\"/>" << endl;
 	}
 	fout << "</polygon>";
 }

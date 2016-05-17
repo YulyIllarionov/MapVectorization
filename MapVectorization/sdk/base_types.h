@@ -20,6 +20,8 @@
 
 //using namespace cv;
 //
+SDK_BEGIN_NAMESPACE
+
 typedef std::vector<cv::Point>            WPointsContainer;
 typedef unsigned char                     WColor; 
 
@@ -46,7 +48,6 @@ public:
     }
 };
 
-SDK_BEGIN_NAMESPACE
 
 
 //Общий интерфейс всех объектов
