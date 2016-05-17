@@ -100,7 +100,7 @@ SDKResult WLayer::InicializeLinesContainer()
     if(m_type != LT_LINES)
         return kSDKResult_Error;
     WObjectContainer lines = SDK_NAMESPACE::utils::FindLinesOnMat(m_data);
-    
+    m_objects.insert(m_objects.end(), lines.begin(), lines.end());
 }
 // ------------------------------------------------------------
 void WLayer::InicializeVectorContainer()
@@ -112,6 +112,7 @@ void WLayer::InicializeVectorContainer()
         
     case WLayer::LAYER_TYPE_ENUM::LT_LINES:
     {
+        InicializeLinesContainer();
     }
     break;
 
@@ -354,32 +355,13 @@ SDKResult WRaster::SplitLayer(const LayerUUID& layerId, LayerIDs& splittedLayers
         this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_OTHER);
         this->SetLayerName(othersLayer->getID(), std::string("Text from ")+layer->getName());
         this->SplitLines(layerId, linesLayer->getID(), othersLayer->getID());
+        linesLayer->InicializeVectorContainer();
         splittedLayers.clear();
         splittedLayers.push_back(linesLayer->getID());
         splittedLayers.push_back(othersLayer->getID());
         break;
     }
     case WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT:
-      {
-      }
-      break;
-
-    case WLayer::LAYER_TYPE_ENUM::LT_LINES:
-      {
-      }
-      break;
-
-    case WLayer::LAYER_TYPE_ENUM::LT_TEXT:
-      {
-      }
-      break;
-
-    case WLayer::LAYER_TYPE_ENUM::LT_AREAS:
-      {
-      }
-      break;
-
-    case WLayer::LAYER_TYPE_ENUM::LT_OTHER:
       {
       }
       break;
