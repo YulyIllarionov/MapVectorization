@@ -97,7 +97,7 @@ public:
 	{
 		m_points = points;
 	};
-  ~WLine() {};
+   ~WLine() {};
 
 	//WLine& operator=(WLine& other);
 	//void clearPoints();

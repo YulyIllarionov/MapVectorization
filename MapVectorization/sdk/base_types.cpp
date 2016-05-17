@@ -243,7 +243,7 @@ void WRaster::SegmentationMeanshift()
 WLayer* WRaster::AddLayer(const GroupID& groupId)
 {
   WLayer layer;
-  layer.m_data = Mat(m_raster.size(), CV_8UC1);
+  layer.m_data = Mat(m_raster.size(), CV_8UC1, Scalar(0));
   layer.m_uuid = utils::genUUID();
   layer.m_group_id = groupId.empty() ? utils::genUUID() : groupId;
   m_layers.push_back(layer);
@@ -874,10 +874,10 @@ SDKResult WRaster::SplitLines(const LayerUUID& layerId, const LayerUUID& linesLa
         return kSDKResult_NullPointer;
 
     WLayer* linesLayer = GetLayerById(linesLayerID);
-    linesLayer->m_data = Mat(layer->m_data.size(), layer->m_data.type(), 0);
+    //linesLayer->m_data = Mat(layer->m_data.size(), layer->m_data.type(), 0);
 
     WLayer* othersLayer = GetLayerById(othersLayerID);
-    othersLayer->m_data = Mat(layer->m_data.size(), layer->m_data.type(), 0);
+    //othersLayer->m_data = Mat(layer->m_data.size(), layer->m_data.type(), 0);
 
     Mat temp = layer->m_data.clone();
     for (int y = 1; y < temp.rows - 1; y++)
