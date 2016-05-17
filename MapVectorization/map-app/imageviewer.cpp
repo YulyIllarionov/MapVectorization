@@ -39,7 +39,7 @@ void ImageViewer::UpdatePixmap()
     //m_pixItem = new MyPixmapItem();
     //m_scene.removeItem(m_pixItem);
    
-    //m_pixItem->setPixmap(QPixmap::fromImage(img));
+    m_pixItem->setPixmap(QPixmap::fromImage(img));
     m_pixItem->setPixmap(QPixmap::fromImage(m_image));
     //m_scene.addItem(m_pixItem);
 }

@@ -116,9 +116,9 @@ void LayerConfigureDialog::UpdatesMask()
 
 void LayerConfigureDialog::on_buttonBox_accepted()
 {
-    QCheckBox * mas[4] = {m_ui->checkBox,m_ui->checkBox_2,m_ui->checkBox_3,m_ui->checkBox_4};
+    QCheckBox * mas[5] = {m_ui->checkBox,m_ui->checkBox_2,m_ui->checkBox_3,m_ui->checkBox_5,m_ui->checkBox_4};
     int tempType = 0;
-    for (int i = 0;i < 4;i++)
+    for (int i = 0;i < 5;i++)
     {
         if (mas[i]->isChecked()) 
             tempType += 1 << i;

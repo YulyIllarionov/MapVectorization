@@ -81,7 +81,7 @@ void LayersViewer::on_listWidget_currentRowChanged(int currentRow)
     {
         utils::SetTransparent(m_image->m_raster, m_layers->at(currentRow)->m_data, 50);
         m_widget->UpdatePixmap();
-        if(m_layers->at(currentRow)->getType()==WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT| WLayer::LAYER_TYPE_ENUM::LT_OTHER)
+        if(m_layers->at(currentRow)->getType()==(WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT| WLayer::LAYER_TYPE_ENUM::LT_OTHER))
         {
            m_ui->SplitButton->setEnabled(true);
         }

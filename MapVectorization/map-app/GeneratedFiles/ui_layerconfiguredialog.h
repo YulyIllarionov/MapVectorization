@@ -60,6 +60,7 @@ public:
     QCheckBox *checkBox;
     QCheckBox *checkBox_2;
     QCheckBox *checkBox_3;
+    QCheckBox *checkBox_5;
     QCheckBox *checkBox_4;
     QDialogButtonBox *buttonBox;
     QButtonGroup *buttonGroup;
@@ -235,6 +236,11 @@ public:
 
         verticalLayout_4->addWidget(checkBox_3);
 
+        checkBox_5 = new QCheckBox(groupBox_2);
+        checkBox_5->setObjectName(QStringLiteral("checkBox_5"));
+
+        verticalLayout_4->addWidget(checkBox_5);
+
         checkBox_4 = new QCheckBox(groupBox_2);
         checkBox_4->setObjectName(QStringLiteral("checkBox_4"));
 
@@ -279,6 +285,7 @@ public:
         checkBox->setText(QApplication::translate("LayerConfigureDialog", "\320\242\320\265\320\272\321\201\321\202", 0));
         checkBox_2->setText(QApplication::translate("LayerConfigureDialog", "\320\233\320\270\320\275\320\270\320\270", 0));
         checkBox_3->setText(QApplication::translate("LayerConfigureDialog", "\320\236\320\261\320\273\320\260\321\201\321\202\320\270", 0));
+        checkBox_5->setText(QApplication::translate("LayerConfigureDialog", "\320\241\320\270\320\274\320\262\320\276\320\273\321\213", 0));
         checkBox_4->setText(QApplication::translate("LayerConfigureDialog", "\320\224\321\200\321\203\320\263\320\276\320\265", 0));
     } // retranslateUi
 
