@@ -26,13 +26,19 @@ private slots:
     void on_listWidget_currentRowChanged(int currentRow);
     void GetCoordAndType(int x, int y, int type);
 
+    void on_listWidget_2_currentRowChanged(int currentRow);
+
 private:
-    Ui::ClassificWidget *     m_ui;
-    ImageViewer*              m_widget;
-    SDK_NAMESPACE::WRaster*   m_image;
-    QList<WLayer*>            m_layers;
-    QGraphicsPolygonItem*     m_polygon;
-    QVector<QPointF>          m_selectPoints;
+    Ui::ClassificWidget *                   m_ui;
+    ImageViewer*                            m_widget;
+    SDK_NAMESPACE::WRaster*                 m_image;
+    QList<WLayer*>                          m_layers;
+    QGraphicsPolygonItem*                   m_polygon;
+    QVector<QPointF>                        m_selectPoints;
+    QList<QPolygonF>                        m_textPolygons;
+    QList<QGraphicsPolygonItem*>            m_polygonForText;
+    QList< QList<QGraphicsRectItem*> >      m_rectForLines;
+
 };
 
 #endif // CLASSIFICWIDGET_H

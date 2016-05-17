@@ -65,6 +65,8 @@ public:
 	virtual size_t Length() const { return m_points.size(); };
   virtual double DistanceTo(cv::Point mapPoint) const;
 
+  SMapPoint GetPoint(int i) { return SMapPoint(m_points.at(i).x, m_points.at(i).y); };
+
 //protected:
   WPointsContainer  m_points;
 };
