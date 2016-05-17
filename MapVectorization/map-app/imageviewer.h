@@ -28,6 +28,7 @@ private:
      QGraphicsScene     m_scene;
      MyPixmapItem*      m_pixItem;
      QImage             m_image;
+     QImage             img;
 };
 
 #endif // IMAGEVIEWER_H

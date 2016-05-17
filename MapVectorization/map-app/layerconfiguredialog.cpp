@@ -99,7 +99,7 @@ void LayerConfigureDialog::UpdatesMask()
     w_color wc3= m_tempLayer->getRange().getHigh();
     utils::SetTransparent(m_image->m_raster, m_tempLayer->m_data, 50);
     m_widget->UpdatePixmap();
-    QObject::connect(m_widget->GetPixItem(), SIGNAL(sendCoord(int, int)), this, SLOT(GetCoord(int, int)));
+    //QObject::connect(m_widget->GetPixItem(), SIGNAL(sendCoord(int, int)), this, SLOT(GetCoord(int, int)));
 }
 
 void LayerConfigureDialog::on_buttonBox_accepted()

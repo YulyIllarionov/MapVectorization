@@ -54,6 +54,7 @@
     <addaction name="ZoomIn"/>
     <addaction name="ZoomOut"/>
     <addaction name="FitImage"/>
+    <addaction name="actionUpdatePixmap"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -117,6 +118,11 @@
   <action name="actionRegimentBlackColor">
    <property name="text">
     <string>Классификация черного цвета</string>
+   </property>
+  </action>
+  <action name="actionUpdatePixmap">
+   <property name="text">
+    <string>UpdatePixmap</string>
    </property>
   </action>
  </widget>
