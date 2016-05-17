@@ -350,6 +350,7 @@ private:
   SDKResult SetLayerType (const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite) const;
   void Initialize(const std::string& imgPath);
   SDKResult SplitLines(const LayerUUID& layerId, const LayerUUID& linesLayerID, const LayerUUID& othersLayerID);
+  
   // depricate copy and move operations
   WRaster(const WRaster& other)
     /*: m_raster{other.m_raster},
@@ -378,7 +379,7 @@ public:
   cv::Mat           m_raster;
 
 private:
-
+    
   std::wstring                      m_image_path;
 };
 // ------------------------------------------------------------

@@ -99,47 +99,8 @@ SDKResult WLayer::InicializeLinesContainer()
 {
     if(m_type != LT_LINES)
         return kSDKResult_Error;
-    Mat skeleton;
-    SDK_NAMESPACE::WSkeletonizer::Instance().Skeletonize(m_data, skeleton);
-    for (int y = 1; y < skeleton.rows - 1; y++)
-    {
-        for (int x = 1; x < skeleton.cols - 1; x++)
-        {
-            Point initial(x, y);
-            if (skeleton.at<uchar>(initial) > 0)
-            {
-                std::vector<Point> firstNeighbors = SDK_NAMESPACE::utils::getNeghboursClockwise(initial, skeleton);
-                if (firstNeighbors.size() > 2)
-                    continue;
-                else
-                {
-                    std::vector<WPointsContainer> lines(firstNeighbors.size());
-                    lines[0].push_back(initial);
-                    skeleton.at<uchar>(initial) = 0;
-                    for (int i = 0; i < firstNeighbors.size(); i++)
-                    {
-                        Point current(firstNeighbors[i]);
-                        std::vector<Point> neighbors;
-                        while(true)
-                        {
-                            lines[i].push_back(current);
-                            skeleton.at<uchar>(current) = 0;
-                            neighbors = SDK_NAMESPACE::utils::getNeghboursClockwise(current, skeleton);
-                            if (neighbors.size() != 1)
-                                break;
-                            current = neighbors[0];
-                        }
-                    }
-                    WLine line(lines[0]);
-                    for (int i = 1; i < lines.size(); i++)
-                    {
-                        line.Concat(lines[i]);
-                    }
-                    //m_objects_line.Add(line);
-                }
-            }
-        }
-    }
+    //WObjectContainer lines = SDKNAMESPACE::FindLinesOnMat()
+    
 }
 // ------------------------------------------------------------
 void WLayer::InicializeVectorContainer()
@@ -461,19 +422,19 @@ std::vector<cv::Rect> WRaster::DetectLetters(const LayerUUID& layerId) const
     return boundRect;
 
 	cv::Mat img = layer->m_data;
-  cv::Mat img_sobel, img_threshold, element;
-  cv::Sobel(img, img_sobel, CV_8U, 1, 0, 3, 1, 0, cv::BORDER_DEFAULT);
-  cv::threshold(img_sobel, img_threshold, 0, 255, CV_THRESH_OTSU+CV_THRESH_BINARY);
-  
-  element = getStructuringElement(cv::MORPH_RECT, cv::Size(17, 3) );
-  cv::morphologyEx(img_threshold, img_threshold, CV_MOP_CLOSE, element);
-  
-  std::vector< std::vector< cv::Point> > contours;
-  cv::findContours(img_threshold, contours, 0, 1); 
-  
-  std::vector<std::vector<cv::Point> > contours_poly(contours.size());
-  for( int i = 0; i < contours.size(); i++ )
-  {
+    cv::Mat img_sobel, img_threshold, element;
+    cv::Sobel(img, img_sobel, CV_8U, 1, 0, 3, 1, 0, cv::BORDER_DEFAULT);
+    cv::threshold(img_sobel, img_threshold, 0, 255, CV_THRESH_OTSU+CV_THRESH_BINARY);
+    
+    element = getStructuringElement(cv::MORPH_RECT, cv::Size(17, 3) );
+    cv::morphologyEx(img_threshold, img_threshold, CV_MOP_CLOSE, element);
+    
+    std::vector< std::vector< cv::Point> > contours;
+    cv::findContours(img_threshold, contours, 0, 1); 
+    
+    std::vector<std::vector<cv::Point> > contours_poly(contours.size());
+    for( int i = 0; i < contours.size(); i++ )
+    {
     if (contours[i].size()>100)
     { 
       cv::approxPolyDP(cv::Mat(contours[i]), contours_poly[i], 3, true);
