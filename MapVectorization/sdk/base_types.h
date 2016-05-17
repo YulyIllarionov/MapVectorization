@@ -82,6 +82,7 @@ public:
 	//WPolygon& operator=(WPolygon& other);
 	
   //Проверка точки на принадлежность
+  bool Contains(cv::Point& object) const;
   bool Contains(const WVectorObject& object) const;
   //virtual double DistanceTo(cv::Point mapPoint) const;
 

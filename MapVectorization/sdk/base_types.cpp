@@ -100,7 +100,7 @@ SDKResult WLayer::InicializeLinesContainer()
     if(m_type != LT_LINES)
         return kSDKResult_Error;
     WObjectContainer lines = SDK_NAMESPACE::utils::FindLinesOnMat(m_data);
-    
+    m_objects.insert(m_objects.end(), lines.begin(), lines.end());
 }
 // ------------------------------------------------------------
 void WLayer::InicializeVectorContainer()
@@ -112,6 +112,7 @@ void WLayer::InicializeVectorContainer()
         
     case WLayer::LAYER_TYPE_ENUM::LT_LINES:
     {
+        InicializeLinesContainer();
     }
     break;
 
@@ -354,32 +355,13 @@ SDKResult WRaster::SplitLayer(const LayerUUID& layerId, LayerIDs& splittedLayers
         this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_OTHER);
         this->SetLayerName(othersLayer->getID(), std::string("Text from ")+layer->getName());
         this->SplitLines(layerId, linesLayer->getID(), othersLayer->getID());
+        linesLayer->InicializeVectorContainer();
         splittedLayers.clear();
         splittedLayers.push_back(linesLayer->getID());
         splittedLayers.push_back(othersLayer->getID());
         break;
     }
     case WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT:
-      {
-      }
-      break;
-
-    case WLayer::LAYER_TYPE_ENUM::LT_LINES:
-      {
-      }
-      break;
-
-    case WLayer::LAYER_TYPE_ENUM::LT_TEXT:
-      {
-      }
-      break;
-
-    case WLayer::LAYER_TYPE_ENUM::LT_AREAS:
-      {
-      }
-      break;
-
-    case WLayer::LAYER_TYPE_ENUM::LT_OTHER:
       {
       }
       break;
@@ -601,8 +583,8 @@ void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoint
             for (int x = roi.x; x < roi.x + roi.width; x++)
             {
                 Point current(x, y);
-                //if (mapPoints.Contains(current))
-                //    layer->m_data.at<uchar>(current) = 0;
+                if (mapPoints.Contains(current))
+                    layer->m_data.at<uchar>(current) = 0;
             }
         }
     }
@@ -613,30 +595,9 @@ void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoint
 
     std::vector<int> ids = DefineObjectsInsidePolygon(layerId, mapPoints);
     WLayer::LAYER_TYPE layerType = layer->getType();
-
-    switch (layerType)
-    {
-      // from Text layer
-      case WLayer::LT_TEXT:
-      {
-          //for (int i = 0; i < ids.size(); i++)
-          //    layer->m_objects_text.RemoveById(i);
-      }
-      break;
-      // from Lines layer
-      case WLayer::LT_LINES:
-      {
-          //for (int i = 0; i < ids.size(); i++)
-          //    layer->m_objects_line.RemoveById(i);
-      }
-      break;
-      // from Other layer
-      case WLayer::LT_OTHER:
-      {
-        
-      }
-      break;
-    }
+    
+    for (int i = 0; i < ids.size(); i++)
+      layer->m_objects.erase(layer->m_objects.begin() + ids[i]);
 }
 // ------------------------------------------------------------
 WPolygon::WPolygon(std::vector<SMapPoint> & mapPoints)
@@ -658,6 +619,11 @@ bool WPolygon::Contains(const WVectorObject& object) const
       return false;
   }
   return result;
+}
+// ------------------------------------------------------------
+bool WPolygon::Contains(cv::Point& point) const
+{
+  return pointPolygonTest(m_points, point, false) >= 0;
 }
 // ------------------------------------------------------------
 double WVectorObject::DistanceTo(cv::Point mapPoint) const
