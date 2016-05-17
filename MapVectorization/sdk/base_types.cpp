@@ -387,13 +387,16 @@ SDKResult WRaster::SplitLayer(const LayerUUID& layerId, LayerIDs& splittedLayers
     {
         WLayer* linesLayer = this->AddLayer(layer->getGroupId());
         this->SetLayerType(linesLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_LINES);
+        this->SetLayerName(linesLayer->getID(), std::string("Lines from ") + layer->getName());
         WLayer* othersLayer = this->AddLayer(layer->getGroupId());
         this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_TEXT);
         this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_OTHER);
+        this->SetLayerName(othersLayer->getID(), std::string("Text from ")+layer->getName());
         this->SplitLines(layerId, linesLayer->getID(), othersLayer->getID());
         splittedLayers.clear();
         splittedLayers.push_back(linesLayer->getID());
         splittedLayers.push_back(othersLayer->getID());
+        break;
     }
     case WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT:
       {
