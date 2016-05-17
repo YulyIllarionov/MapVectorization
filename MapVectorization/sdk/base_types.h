@@ -61,10 +61,11 @@ public:
 	virtual bool RemovePoint(size_t idx);
 	//Взять точку по индексу
 	virtual cv::Point GetPoint(size_t idx) { return m_points.size() > idx ? m_points[idx] : cv::Point::Point_(); };
-  // get points
+    // get points
   const WPointsContainer& GetPoints() const { return m_points; };
   // get length
 	virtual size_t Length() const { return m_points.size(); };
+    virtual double DistanceTo(cv::Point mapPoint);
 private:
 
 protected:
@@ -112,7 +113,7 @@ public:
 	void Concat(const WLine& line);
 
     //находится внутри полигона 
-  bool BelongsTo(const WPolygon& polygon);
+    bool BelongsTo(const WPolygon& polygon);
 
 	//Упростить линию
 	WPointsContainer SimplifyLine(const WPointsContainer& vectorline, double EPSILON, int delta);
@@ -125,7 +126,7 @@ private:
 
 
 //Объект текст
-class WText //: public WVectorObject
+class WText : public WVectorObject
 {
 public:
 	WText();
@@ -201,7 +202,7 @@ public:
 	void Add(const T& object) { return m_objects.push_back(object); }
 	//Удалить объект из коллекции
 	void Remove(const T& object) { std::remove(m_objects.begin(), m_objects.end(), object); }
-    void RemoveById(int id) { m_objects.erase(m_listLineObjects.begin() + id); }
+    void RemoveById(int id) { m_objects.erase(m_objects.begin() + id); }
 	//Взять длину коллекции
 	int GetLength() const { return m_objects.size(); }
 	//Клонировать коллекцию
@@ -385,7 +386,7 @@ public:
   SDKResult GetLayersByGroupId(const GroupID& groupId, LayerIDs& relatedLayers) const;
 
   // define objects inside polygon
-  std::vector<int> DefineObjectsInsidePolygon(const WObjectContainer<WVectorObject>& vectorObjects, std::vector<SMapPoint> & mapPoints);
+  std::vector<int> DefineObjectsForPolygon(const LayerUUID& layerId, WPolygon mapPoints);
 	
   // copy object from one layer to another
   void CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, WPolygon mapPoints);

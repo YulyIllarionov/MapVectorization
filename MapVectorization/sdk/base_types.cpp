@@ -484,13 +484,83 @@ std::vector<cv::Rect> WRaster::DetectLetters(const LayerUUID& layerId) const
 }
 // ------------------------------------------------------------
 // define objects inside polygon
-std::vector<int> WRaster::DefineObjectsInsidePolygon(
-  const WObjectContainer<WVectorObject>& vectorObjects, 
-  std::vector<SMapPoint>& mapPoints)
+std::vector<int> WRaster::DefineObjectsForPolygon(const LayerUUID& layerId, WPolygon mapPoints)
 {
-	std::vector<int> indexes;//Коллекция индексов внутри коллекции
+    std::vector<int> ids;
 
-	return indexes;
+    WLayer* layer = GetLayerById(layerId);
+    if (!layer->IsSingleType())
+        return ids;
+    if (mapPoints.Length() == 0)
+        return ids;
+    
+    WLayer::LAYER_TYPE layerType = layer->getType();
+
+    if (mapPoints.Length() == 1)
+    {
+        Point point = mapPoints.GetPoint(0);
+        switch (layerType)
+        {
+            // from Text layer
+        case WLayer::LT_TEXT:
+        {
+            std::vector<WText> texts = layer->m_objects_text.GetObjectList();
+            double minDistance = DBL_MAX;
+            int minIndex = 0;
+            for (int i = 0; i < texts.size(); i++)
+            {
+                double currentDistance = texts[i].DistanceTo(point);
+                if (currentDistance < minDistance)
+                {
+                    minDistance = currentDistance;
+                    minIndex = i;
+                }
+            }
+            ids.push_back(minIndex);
+        }
+        break;
+        // from Lines layer
+        case WLayer::LT_LINES:
+        {
+            std::vector<WLine> lines = layer->m_objects_line.GetObjectList();
+            double minDistance = DBL_MAX;
+            int minIndex = 0;
+            for (int i = 0; i < lines.size(); i++)
+            {
+                double currentDistance = lines[i].DistanceTo(point);
+                if (currentDistance < minDistance)
+                {
+                    minDistance = currentDistance;
+                    minIndex = i;
+                }
+            }
+            ids.push_back(minIndex);
+        }
+        break;
+        // from Other layer
+        default:
+            break;
+        }
+    }
+    else
+    {
+        switch (layerType)
+        {
+        // from Lines layer
+        case WLayer::LT_LINES:
+        {
+            std::vector<WLine> lines = layer->m_objects_line.GetObjectList();
+            for (int i = 0; i < lines.size(); i++)
+                if (lines[i].BelongsTo(mapPoints))
+                    ids.push_back(i);
+        }
+        break;
+        // from Other layer
+        default:
+            break;
+        }
+    }
+	return ids;
 }
 // ------------------------------------------------------------
 // copy object from one layer to another
@@ -611,24 +681,26 @@ void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const
 void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoints)
 {
     // delete raster
-    Rect roi = boundingRect(mapPoints.GetPoints());
     WLayer* layer = GetLayerById(layerId);
-    for (int y = roi.y; y < roi.y + roi.height; y++)
+    if (mapPoints.Length() > 1)
     {
-        for (int x = roi.x; x < roi.x + roi.width; x++)
+        Rect roi = boundingRect(mapPoints.GetPoints());
+        for (int y = roi.y; y < roi.y + roi.height; y++)
         {
-            Point current(x, y);
-            if (mapPoints.Contains(current))
-                layer->m_data.at<uchar>(current) = 0;
+            for (int x = roi.x; x < roi.x + roi.width; x++)
+            {
+                Point current(x, y);
+                if (mapPoints.Contains(current))
+                    layer->m_data.at<uchar>(current) = 0;
+            }
         }
     }
 
-    
-    // delete vector objects
-    
+    // delete vector objects    
     if (!layer->IsSingleType())
       return;
 
+    std::vector<int> ids = DefineObjectsForPolygon(layerId, mapPoints);
     WLayer::LAYER_TYPE layerType = layer->getType();
 
     switch (layerType)
@@ -636,13 +708,15 @@ void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoint
       // from Text layer
       case WLayer::LT_TEXT:
       {
-        
+          for (int i = 0; i < ids.size(); i++)
+              layer->m_objects_text.RemoveById(i);
       }
       break;
       // from Lines layer
       case WLayer::LT_LINES:
       {
-        
+          for (int i = 0; i < ids.size(); i++)
+              layer->m_objects_line.RemoveById(i);
       }
       break;
       // from Other layer
@@ -676,6 +750,11 @@ bool WVectorObject::RemovePoint(size_t idx)
 		return true;
 	}
 	return false;
+}
+// ------------------------------------------------------------
+double WVectorObject::DistanceTo(cv::Point mapPoint)
+{
+    return -pointPolygonTest(m_points, mapPoint, true);
 }
 // ------------------------------------------------------------
 WPolygon::WPolygon(std::vector<SMapPoint> & mapPoints)
