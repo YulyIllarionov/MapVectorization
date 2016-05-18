@@ -112,7 +112,6 @@ cv::Mat rotateImage(std::vector<cv::Point> vec_points,cv::Mat img, float angle)
 	}
 	cv::Mat rot_mat = cv::getRotationMatrix2D(box.center,angle, 1);
 	  
-	std::cout<<box.angle;
 	cv::Mat rotated;
 	cv::warpAffine(image, rotated, rot_mat, image.size(), cv::INTER_CUBIC);
 	  
@@ -120,49 +119,15 @@ cv::Mat rotateImage(std::vector<cv::Point> vec_points,cv::Mat img, float angle)
 	cv::getRectSubPix(rotated, box_size, box.center, cropped);
 
 	imshow("rotated",cropped);
-	cv::waitKey(27);
+	cv::waitKey(0);
 	  
 	return cropped;
 }
 
-float countAngle(std::vector<Vec4i> lines) 
+float countAngle(String image_name) 
 {
-	float angle = 0;
-	for (size_t i = 0; i < lines.size(); i++)
-        {
-        	Vec4i l = lines[i];
-			Point p1, p2;
-			p1=Point(l[0], l[1]);
-			p2=Point(l[2], l[3]);
-			angle += atan2(p1.y - p2.y, p1.x - p2.x);
-        }
-	angle = angle/lines.size();
-	angle = (angle*180)/CV_PI;
-	if (angle < -45.)
-	{
-		angle += 180.;
-	} 
-	else if (angle > 45.) 
-	{
-		angle-=180;
-	}
-	return angle; 
-}
-int _tmain(int argc, _TCHAR* argv[])
-{
-	std::vector<cv::Point> data;
-	data.push_back(cv::Point(0,0));
-	data.push_back(cv::Point(200,0));
-	data.push_back(cv::Point(0,179));
-	data.push_back(cv::Point(200,179));
-
-	cv::Mat src=cv::imread("E:/Downloads/text22.png",0);
-	rotateImage(data,src, -65);
-
-    namedWindow("1", CV_WINDOW_KEEPRATIO);
-
-    Mat text = imread("E:/Downloads/text22.png", CV_LOAD_IMAGE_COLOR);
-    Mat textGray;
+	Mat text = imread(image_name, CV_LOAD_IMAGE_COLOR);
+	Mat textGray;
     Mat current;
     cvtColor(text, textGray, CV_BGR2GRAY);
     //GaussianBlur(gray, gray, Size(9, 9), 2, 2);
@@ -175,32 +140,44 @@ int _tmain(int argc, _TCHAR* argv[])
     cvCreateTrackbar("minLineLength: ", "1", &minLineLength, 200);
     cvCreateTrackbar("maxLineGap: ", "1", &maxLineGap, 100);
 
-    int key;
-
-    while (true)
+	current = text.clone();
+    std::vector<Vec4i> lines;
+    //»щем линии
+    HoughLinesP(textGray, lines, 1, CV_PI / 180, 40, 0, 50);
+	float angle=0;
+    
+	for (size_t i = 0; i < lines.size(); i++)
     {
-        current = text.clone();
-        std::vector<Vec4i> lines;
-        //»щем линии
-        HoughLinesP(textGray, lines, 1, CV_PI / 180, threshold, minLineLength, maxLineGap);
-		float angle=0;
-        for (size_t i = 0; i < lines.size(); i++)
-        {
-        	Vec4i l = lines[i];
-			Point p1, p2;
-			p1=Point(l[0], l[1]);
-			p2=Point(l[2], l[3]);
-        	line(current, p1, p2, Scalar(0, 0, 255), 1, CV_AA);
-        }
-		angle = countAngle(lines);
-		std::cout<<angle<<" ";
-        imshow("1", current);
-
-        key = waitKey(100);
-        if (key == 27)
-            break;
+    	Vec4i l = lines[i];
+		Point p1, p2;
+		p1=Point(l[0], l[1]);
+		p2=Point(l[2], l[3]);
+		angle += atan2(p1.y - p2.y, p1.x - p2.x);
     }
-
+	angle = angle/lines.size();
+	angle = (angle*180.)/CV_PI;
+	if (angle < 0.)
+	{
+		angle += 180.;
+	} 
+	else if (angle > 0.) 
+	{
+		angle-=180;
+	}
+	std::cout<<angle<<std::endl;
+	return angle; 
+}
+int _tmain(int argc, _TCHAR* argv[])
+{
+	std::vector<cv::Point> data;
+	data.push_back(cv::Point(0,0));
+	data.push_back(cv::Point(200,0));
+	data.push_back(cv::Point(0,179));
+	data.push_back(cv::Point(200,179));
+	String img_name = "E:/Downloads/text22.png";
+	cv::Mat src=cv::imread(img_name,0);
+	rotateImage (data,src, countAngle(img_name));
+	
     return 0;
 	//std::string imgPath("C:/projects/MapVectorization/MapVectorization/sample/map/black/cu71Black.png");
 
