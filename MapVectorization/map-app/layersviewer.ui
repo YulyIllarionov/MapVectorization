@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>244</width>
-    <height>201</height>
+    <width>338</width>
+    <height>217</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,22 +22,14 @@
      <item>
       <widget class="QPushButton" name="Add">
        <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="mapappmain.qrc">
-         <normaloff>:/mapAppMain/resources/icons/add.ico</normaloff>:/mapAppMain/resources/icons/add.ico</iconset>
+        <string>Доб.</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="Remove">
        <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="mapappmain.qrc">
-         <normaloff>:/mapAppMain/resources/icons/remove.ico</normaloff>:/mapAppMain/resources/icons/remove.ico</iconset>
+        <string>Удал.</string>
        </property>
       </widget>
      </item>
@@ -62,8 +54,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="mapappmain.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

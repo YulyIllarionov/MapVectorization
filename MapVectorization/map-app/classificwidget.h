@@ -30,6 +30,11 @@ private slots:
     void on_listWidget_2_currentRowChanged(int currentRow);
 
     void on_catLinesButton_clicked();
+
+    void on_lasso_clicked();
+
+    void on_lassoMove_clicked();
+
 private:
     void clearCollectionList();
 private:
@@ -42,6 +47,10 @@ private:
     QList<QPolygonF>                        m_textPolygons;
     QList<QGraphicsPolygonItem*>            m_polygonForText;
     QList< QList<QGraphicsRectItem*> >      m_rectForLines;
+    enum States
+    {
+        nothing=0,lasso_delete,lasso_move
+    } m_states;
 
 };
 

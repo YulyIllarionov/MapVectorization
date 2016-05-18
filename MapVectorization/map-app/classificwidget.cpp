@@ -21,6 +21,7 @@ ClassificWidget::ClassificWidget(WRaster *image, ImageViewer *widget,QList<WLaye
     if(!m_layers.isEmpty()) m_ui->listWidget->setCurrentRow(0);
     QObject::connect(m_widget->GetPixItem(), SIGNAL(sendCoordAndType(int,int,int)), this, SLOT(GetCoordAndType(int,int,int)));
     UpdateList();
+    m_states=nothing;
 }
 void ClassificWidget::closeEvent(QCloseEvent *event)
 {
@@ -91,6 +92,7 @@ bool ClassificWidget::event(QEvent *event)
 
 void ClassificWidget::on_listWidget_currentRowChanged(int currentRow)
 {
+    m_ui->listWidget_2->clear();
     utils::SetTransparent(m_image->m_raster, cv::Mat(m_image->m_raster.size(), CV_8UC1, 1), 50);
     for(int i=0; i<m_layers.size();i++)
     {
@@ -110,7 +112,7 @@ void ClassificWidget::on_listWidget_currentRowChanged(int currentRow)
 
 void ClassificWidget::GetCoordAndType(int x, int y, int type)
 {
-    if(m_ui->lasso->isChecked())
+    if(!m_states)
     {
         if(type==2)
         {
@@ -138,9 +140,16 @@ void ClassificWidget::GetCoordAndType(int x, int y, int type)
                 QPointF pf= m_selectPoints.at(i);
                 vec.push_back(SMapPoint((int)pf.x(), (int)pf.y()));
             }
+
+            if(m_states==lasso_delete)
             m_image->DeleteOblectsFromLayer(m_layers.at(m_ui->listWidget->currentRow())->getID(), WPolygon(vec));
+
+            if(m_states==lasso_move)
+            m_image->CopyObjectsToAnotherLayer(m_layers.at(m_ui->listWidget->currentRow())->getID(),m_layers.at(m_ui->comboBox->currentIndex())->getID(),WPolygon(vec));
+
+            m_ui->listWidget_2->clear();
             m_selectPoints.clear();
-            UpdateCollectionList();
+            //UpdateCollectionList();
         }
 
     }
@@ -169,7 +178,7 @@ void ClassificWidget::on_catLinesButton_clicked()
             else
             {
                 WLine* vobj2 = dynamic_cast<WLine*>(&cont.at(i));
-                vobj->Concat(*vobj2);
+                //vobj->Concat(*vobj2);
             }
         }
     }
@@ -191,4 +200,30 @@ void ClassificWidget::clearCollectionList()
             }
         }
         m_rectForLines.clear();
+}
+
+void ClassificWidget::on_lasso_clicked()
+{
+    if(m_ui->lasso->isChecked())
+    {
+        m_states=nothing;
+        m_ui->lasso->setChecked(false);
+    }
+    else
+    {
+        m_states=lasso_delete;
+    }
+}
+
+void ClassificWidget::on_lassoMove_clicked()
+{
+    if(m_ui->lassoMove->isChecked())
+    {
+        m_states=nothing;
+        m_ui->lassoMove->setChecked(false);
+    }
+    else
+    {
+        m_states=lasso_move;
+    }
 }

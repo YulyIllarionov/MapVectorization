@@ -37,7 +37,7 @@ public:
     {
         if (LayersViewer->objectName().isEmpty())
             LayersViewer->setObjectName(QStringLiteral("LayersViewer"));
-        LayersViewer->resize(244, 201);
+        LayersViewer->resize(338, 217);
         verticalLayout = new QVBoxLayout(LayersViewer);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         listWidget = new QListWidget(LayersViewer);
@@ -49,17 +49,11 @@ public:
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         Add = new QPushButton(LayersViewer);
         Add->setObjectName(QStringLiteral("Add"));
-        QIcon icon;
-        icon.addFile(QStringLiteral(":/mapAppMain/resources/icons/add.ico"), QSize(), QIcon::Normal, QIcon::Off);
-        Add->setIcon(icon);
 
         horizontalLayout->addWidget(Add);
 
         Remove = new QPushButton(LayersViewer);
         Remove->setObjectName(QStringLiteral("Remove"));
-        QIcon icon1;
-        icon1.addFile(QStringLiteral(":/mapAppMain/resources/icons/remove.ico"), QSize(), QIcon::Normal, QIcon::Off);
-        Remove->setIcon(icon1);
 
         horizontalLayout->addWidget(Remove);
 
@@ -86,8 +80,8 @@ public:
     void retranslateUi(QWidget *LayersViewer)
     {
         LayersViewer->setWindowTitle(QApplication::translate("LayersViewer", "Form", 0));
-        Add->setText(QString());
-        Remove->setText(QString());
+        Add->setText(QApplication::translate("LayersViewer", "\320\224\320\276\320\261.", 0));
+        Remove->setText(QApplication::translate("LayersViewer", "\320\243\320\264\320\260\320\273.", 0));
         SplitButton->setText(QApplication::translate("LayersViewer", "Split", 0));
         SavePngButton->setText(QApplication::translate("LayersViewer", "Save as PNG", 0));
     } // retranslateUi
