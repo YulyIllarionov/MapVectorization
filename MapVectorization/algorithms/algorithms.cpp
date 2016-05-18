@@ -7,6 +7,7 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 
+<<<<<<< HEAD
 #include <iostream>
 
 using namespace std;
@@ -20,6 +21,19 @@ bool   isRepetitive(const string& s);
 bool   sort_by_lenght(const string &a, const string &b);
 //Draw ER's in an image via floodFill
 void   er_draw(vector<Mat> &channels, vector<vector<ERStat> > &regions, vector<Vec2i> group, Mat& segmentation);
+=======
+#include "opencv2/opencv.hpp" 
+#include "opencv/cv.h"
+#include "opencv/highgui.h"
+#include <cmath>
+using namespace cv;
+//---------------------------Не для проекта-----------------------
+void saveImage(const std::string &filename, cv::Mat *img) {
+	std::string output("C:/projects/MapVectorization/MapVectorization/sample/output/");
+	output += filename;
+	cv::imwrite(output, *img);
+}
+>>>>>>> a6b462f23a97ba8af749d0e157ff7318e186ad77
 
 //Perform text detection and recognition and evaluate results using edit distance
 int main(int argc, char* argv[])
@@ -329,6 +343,7 @@ bool   sort_by_lenght(const string &a, const string &b){return (a.size()>b.size(
 //	  
 //	  return rotated;
 //}
+<<<<<<< HEAD
 
 //int _tmain(int argc, _TCHAR* argv[])
 //{
@@ -337,6 +352,109 @@ bool   sort_by_lenght(const string &a, const string &b){return (a.size()>b.size(
 //	cv::Mat img = cv::imread(imgPath, CV_LOAD_IMAGE_GRAYSCALE);
 
 
+=======
+cv::Mat rotateImage(std::vector<cv::Point> vec_points,cv::Mat img, float angle) 
+{
+	int x1 = vec_points[0].x;
+	int y1 = vec_points[0].y;
+	int width = vec_points[1].x-vec_points[0].x;
+	int height = vec_points[2].y - vec_points[0].y;
+
+	//cv::Mat image = cv::Mat(img, cv::Rect(x1,y1, width, height)); 
+	cv::Mat image = img;
+	cv::Mat thr,dst;
+	threshold(image,thr,200,255,cv::THRESH_BINARY_INV);
+	imshow("thr",thr);
+
+	std::vector<cv::Point> points;
+	cv::Mat_<uchar>::iterator it = thr.begin<uchar>();
+	cv::Mat_<uchar>::iterator end = thr.end<uchar>();
+	for (; it != end; ++it)
+	{
+		if (*it)
+		{
+			points.push_back(it.pos());
+		}
+	}
+	cv::RotatedRect box = cv::minAreaRect(cv::Mat(points));
+	cv::Size box_size = box.size;
+	if (box.angle < -45.)
+	{
+		std::swap(box_size.width, box_size.height);
+	}
+	cv::Mat rot_mat = cv::getRotationMatrix2D(box.center,angle, 1);
+	  
+	cv::Mat rotated;
+	cv::warpAffine(image, rotated, rot_mat, image.size(), cv::INTER_CUBIC);
+	  
+	cv::Mat cropped;
+	cv::getRectSubPix(rotated, box_size, box.center, cropped);
+
+	imshow("rotated",cropped);
+	cv::waitKey(0);
+	  
+	return cropped;
+}
+
+float countAngle(String image_name) 
+{
+	Mat text = imread(image_name, CV_LOAD_IMAGE_COLOR);
+	Mat textGray;
+    Mat current;
+    cvtColor(text, textGray, CV_BGR2GRAY);
+    //GaussianBlur(gray, gray, Size(9, 9), 2, 2);
+    //blur(gray, gray, Size(3, 3));
+    int threshold = 40;
+    int minLineLength = 40;
+    int maxLineGap = 10;
+
+    cvCreateTrackbar("threshold: ", "1", &threshold, 500);
+    cvCreateTrackbar("minLineLength: ", "1", &minLineLength, 200);
+    cvCreateTrackbar("maxLineGap: ", "1", &maxLineGap, 100);
+
+	current = text.clone();
+    std::vector<Vec4i> lines;
+    //Ищем линии
+    HoughLinesP(textGray, lines, 1, CV_PI / 180, 40, 0, 50);
+	float angle=0;
+    
+	for (size_t i = 0; i < lines.size(); i++)
+    {
+    	Vec4i l = lines[i];
+		Point p1, p2;
+		p1=Point(l[0], l[1]);
+		p2=Point(l[2], l[3]);
+		angle += atan2(p1.y - p2.y, p1.x - p2.x);
+    }
+	angle = angle/lines.size();
+	angle = (angle*180.)/CV_PI;
+	if (angle < 0.)
+	{
+		angle += 180.;
+	} 
+	else if (angle > 0.) 
+	{
+		angle-=180;
+	}
+	std::cout<<angle<<std::endl;
+	return angle; 
+}
+int _tmain(int argc, _TCHAR* argv[])
+{
+	std::vector<cv::Point> data;
+	data.push_back(cv::Point(0,0));
+	data.push_back(cv::Point(200,0));
+	data.push_back(cv::Point(0,179));
+	data.push_back(cv::Point(200,179));
+	String img_name = "E:/Downloads/text22.png";
+	cv::Mat src=cv::imread(img_name,0);
+	rotateImage (data,src, countAngle(img_name));
+	
+    return 0;
+	//std::string imgPath("C:/projects/MapVectorization/MapVectorization/sample/map/black/cu71Black.png");
+
+//	cv::Mat img = cv::imread(imgPath, CV_LOAD_IMAGE_GRAYSCALE);
+>>>>>>> a6b462f23a97ba8af749d0e157ff7318e186ad77
 	//cv::threshold(img, img, 0, 255, CV_THRESH_BINARY);
 	
 
