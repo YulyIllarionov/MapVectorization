@@ -20,7 +20,7 @@
 
 SDK_BEGIN_NAMESPACE
 
-#define WCOLOR_WHITE 255
+#define WCOLOR_WHITE 0
 
 
 class WSkeletonizer

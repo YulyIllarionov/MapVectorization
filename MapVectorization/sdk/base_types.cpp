@@ -99,6 +99,8 @@ SDKResult WLayer::InicializeLinesContainer()
 {
     if(m_type != LT_LINES)
         return kSDKResult_Error;
+    //cv::imshow("window", this->m_data);
+    //cv::waitKey(0);
     WObjectContainer lines = SDK_NAMESPACE::utils::FindLinesOnMat(m_data);
     m_objects.insert(m_objects.end(), lines.begin(), lines.end());
 }
@@ -112,7 +114,7 @@ void WLayer::InicializeVectorContainer()
         
     case WLayer::LAYER_TYPE_ENUM::LT_LINES:
     {
-        InicializeLinesContainer();
+        this->InicializeLinesContainer();
     }
     break;
 
@@ -780,7 +782,7 @@ bool Wregion::IsLine()
     float radius;
     minEnclosingCircle(points, Point2f(), radius);
     double ratio = (double)this->Square() / radius / radius;
-    return (ratio < 0.07);
+    return (ratio < 3.0);
 }
 // ------------------------------------------------------------
 void Wregion::drawOn(Mat& img, uchar color)
@@ -815,9 +817,9 @@ SDKResult WRaster::SplitLines(const LayerUUID& layerId, const LayerUUID& linesLa
                 if (region.Square() > 4)
                 {
                     if (region.IsLine())
-                        region.drawOn(linesLayer->m_data, 1);
+                        region.drawOn(linesLayer->m_data, 255);
                     else
-                        region.drawOn(othersLayer->m_data, 1);
+                        region.drawOn(othersLayer->m_data, 255);
                 }
             }
         }
@@ -825,7 +827,7 @@ SDKResult WRaster::SplitLines(const LayerUUID& layerId, const LayerUUID& linesLa
 
 }
 // ------------------------------------------------------------
-SDKResult SplitText(const LayerUUID& layerId, const LayerUUID& textLayerID, const LayerUUID& othersLayerID)
+SDKResult WRaster::SplitText(const LayerUUID& layerId, const LayerUUID& textLayerID, const LayerUUID& othersLayerID)
 {
   SDKResult result = kSDKResult_Succeeded;
 

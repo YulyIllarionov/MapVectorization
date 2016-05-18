@@ -123,7 +123,7 @@ namespace utils {
         return !(first < second);
     }
     // ----------------------------------------------------
-    std::vector<cv::Point>& getNeghboursClockwise(cv::Point point, const cv::Mat& image)
+    std::vector<cv::Point> getNeghboursClockwise(cv::Point point, const cv::Mat& image)
     {
         std::vector<cv::Point> neighbors;
         uchar color = image.at<uchar>(point);
@@ -165,6 +165,7 @@ namespace utils {
         WObjectContainer linesContainer;
         cv::Mat skeleton;
         SDK_NAMESPACE::WSkeletonizer::Instance().Skeletonize(img, skeleton);
+        cv::imwrite("skeleton.png", skeleton);
         for (int y = 1; y < skeleton.rows - 1; y++)
         {
             for (int x = 1; x < skeleton.cols - 1; x++)
@@ -187,8 +188,8 @@ namespace utils {
                             while (true)
                             {
                                 lines[i].push_back(current);
-                                skeleton.at<uchar>(current) = 0;
                                 neighbors = SDK_NAMESPACE::utils::getNeghboursClockwise(current, skeleton);
+                                skeleton.at<uchar>(current) = 0;
                                 if (neighbors.size() != 1)
                                     break;
                                 current = neighbors[0];
