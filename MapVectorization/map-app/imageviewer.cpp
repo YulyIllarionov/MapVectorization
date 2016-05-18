@@ -69,7 +69,7 @@ void ImageViewer::AddLineSelection(QVector<QPointF> &vec, QList<QGraphicsRectIte
     for(int i=0;i<vec.size();i++)
     {
         QPointF tempPoint=vec.at(i);
-        QRectF rect(tempPoint.x()-1,tempPoint.y()-1,3,3);
+        QRectF rect(tempPoint.x()-3,tempPoint.y()-3,7,7);
         items.append(scene()->addRect(rect,pen,brush));
 
     }

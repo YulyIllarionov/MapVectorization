@@ -19,6 +19,7 @@ public:
     ~ClassificWidget();
 public slots:
     void UpdateList();
+    void UpdateCollectionList();
 protected:
     bool event(QEvent *event);
     void closeEvent(QCloseEvent *event);
@@ -28,6 +29,9 @@ private slots:
 
     void on_listWidget_2_currentRowChanged(int currentRow);
 
+    void on_catLinesButton_clicked();
+private:
+    void clearCollectionList();
 private:
     Ui::ClassificWidget *                   m_ui;
     ImageViewer*                            m_widget;

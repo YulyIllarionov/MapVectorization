@@ -26,6 +26,7 @@ void ClassificWidget::closeEvent(QCloseEvent *event)
 {
         utils::SetTransparent(m_image->m_raster, cv::Mat(m_image->m_raster.size(), CV_8UC1, 1), 255);
         m_widget->UpdatePixmap();
+        clearCollectionList();
 }
 
 ClassificWidget::~ClassificWidget()
@@ -43,6 +44,39 @@ void ClassificWidget::UpdateList()
         WLayer* tlay=m_layers.at(i);
         m_ui->listWidget->addItem(QString(tlay->getName().c_str()));
         m_ui->comboBox->addItem(QString(tlay->getName().c_str()));
+    }
+
+
+}
+
+void ClassificWidget::UpdateCollectionList()
+{
+    clearCollectionList();
+    WObjectContainer &cont=m_layers.at(m_ui->listWidget->currentRow())->m_objects;
+    WLayer::LAYER_TYPE type=m_layers.at(m_ui->listWidget->currentRow())->getType();
+
+    for(int i=0;i<cont.size();i++)
+    {
+        if(m_ui->listWidget_2->item(i)->isSelected()|| m_ui->listWidget_2->currentRow()==i)
+        {
+            WVectorObject &vobj=cont.at(i);
+            QVector<QPointF> tempPoints;
+            for (int j = 0;j<vobj.Length();j++)
+            {
+                tempPoints.append(QPointF(vobj.GetPoint(j).GetX(), vobj.GetPoint(j).GetY()));
+            }
+            switch(type)
+            {
+                case WLayer::LT_TEXT:
+                    m_polygonForText.append(m_widget->AddTextSelection(QPolygonF(tempPoints)));
+                    break;
+                case WLayer::LT_LINES:
+                    QList<QGraphicsRectItem *> lst;
+                    m_widget->AddLineSelection(tempPoints,lst);
+                    m_rectForLines.append(lst);
+                break;
+            }
+        }
     }
 }
 
@@ -69,7 +103,7 @@ void ClassificWidget::on_listWidget_currentRowChanged(int currentRow)
     WObjectContainer &cont=m_layers.at(currentRow)->m_objects;
     for(int i=0;i<cont.size();i++)
     {
-        m_ui->listWidget_2->addItem("¹"+QString::number(i));
+        m_ui->listWidget_2->addItem("#"+QString::number(i));
     }
 }
 
@@ -104,7 +138,8 @@ void ClassificWidget::GetCoordAndType(int x, int y, int type)
                 vec.push_back(SMapPoint((int)pf.x(), (int)pf.y()));
             }
             m_image->DeleteOblectsFromLayer(m_layers.at(m_ui->listWidget->currentRow())->getID(), WPolygon(vec));
-            on_listWidget_currentRowChanged(m_ui->listWidget->currentRow());
+            m_selectPoints.clear();
+            UpdateCollectionList();
         }
 
     }
@@ -112,43 +147,48 @@ void ClassificWidget::GetCoordAndType(int x, int y, int type)
 
 void ClassificWidget::on_listWidget_2_currentRowChanged(int currentRow)
 {
-    m_textPolygons.clear();
-    for(int i=0;i<m_polygonForText.size();i++)
+   UpdateCollectionList();
+
+}
+
+void ClassificWidget::on_catLinesButton_clicked()
+{
+    WObjectContainer &cont=m_layers.at(m_ui->listWidget->currentRow())->m_objects;
+    WVectorObject &vobj= cont.at(0);;
+    bool isFirst=true;
+    for(int i=0;i<cont.size();i++)
     {
-        delete m_polygonForText.at(i);
-    }
-    m_polygonForText.clear();
-    for(int j=0;j<m_rectForLines.size();j++)
-    {
-        for(int i=0;i<m_rectForLines.at(j).size();i++)
+        if(m_ui->listWidget_2->item(i)->isSelected())
         {
-            delete m_rectForLines.at(j).at(i);
+            if(isFirst)
+            {
+                vobj=cont.at(i);
+                isFirst=false;
+            }
+            else
+            {
+                WVectorObject &vobj2=cont.at(i);
+                //static_cast<WLine>(vobj).Concat(static_cast<WLine>(vobj2));
+
+            }
         }
     }
+}
 
-    m_rectForLines.clear();
-
-    WObjectContainer &cont=m_layers.at(m_ui->listWidget->currentRow())->m_objects;
-    WVectorObject &vobj=cont.at(currentRow);
-    WLayer::LAYER_TYPE type=m_layers.at(m_ui->listWidget->currentRow())->getType();
-    
-    
-    QVector<QPointF> tempPoints;
-    for (int i = 0;i<vobj.Length();i++)
-    {
-        tempPoints.append(QPointF(vobj.GetPoint(i).GetX(), vobj.GetPoint(i).GetY()));
-    }
-
-    switch(type)
-    {
-        case WLayer::LT_TEXT:
-            m_polygonForText.append(m_widget->AddTextSelection(QPolygonF(tempPoints)));
-            break;
-        case WLayer::LT_LINES:
-            QList<QGraphicsRectItem *> lst;
-            m_widget->AddLineSelection(tempPoints,lst);
-            m_rectForLines.append(lst);
-        break;
-    }
-
+void ClassificWidget::clearCollectionList()
+{
+    m_textPolygons.clear();
+        for(int i=0;i<m_polygonForText.size();i++)
+        {
+            delete m_polygonForText.at(i);
+        }
+        m_polygonForText.clear();
+        for(int j=0;j<m_rectForLines.size();j++)
+        {
+            for(int i=0;i<m_rectForLines.at(j).size();i++)
+            {
+                delete m_rectForLines.at(j).at(i);
+            }
+        }
+        m_rectForLines.clear();
 }
