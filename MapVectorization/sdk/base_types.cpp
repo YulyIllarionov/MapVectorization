@@ -531,7 +531,7 @@ void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const
    {
        switch (arrivalType)
        {
-           //to Line layer
+           // from Text layerto Lines layer
        case WLayer::LT_LINES:
        {
            for (size_t i = 0; i < ids.size(); i++)
@@ -575,6 +575,21 @@ void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const
        case WLayer::LT_TEXT:
        {
            // from Lines layer to Text layer
+           if (mapPoints.Length() == 1)
+               return;
+           for (int y = roi.y; y < roi.y + roi.height; y++)
+           {
+               for (int x = roi.x; x < roi.x + roi.width; x++)
+               {
+                   Point current(x, y);
+                   if (mapPoints.Contains(current))
+                   {
+                       arrivalLayer->m_data.at<uchar>(current) = departureLayer->m_data.at<uchar>(current);
+                   }
+               }
+           }
+           //TODO
+           //arrivalLayer->m_objects.push_back(WText(mapPoints)); 
        }
        break;
        case WLayer::LT_OTHER:
