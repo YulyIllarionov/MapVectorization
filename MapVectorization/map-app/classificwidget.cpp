@@ -112,7 +112,7 @@ void ClassificWidget::on_listWidget_currentRowChanged(int currentRow)
 
 void ClassificWidget::GetCoordAndType(int x, int y, int type)
 {
-    if(!m_states)
+    if(m_states!=nothing)
     {
         if(type==2)
         {
@@ -157,7 +157,7 @@ void ClassificWidget::GetCoordAndType(int x, int y, int type)
 
 void ClassificWidget::on_listWidget_2_currentRowChanged(int currentRow)
 {
-   UpdateCollectionList();
+   if(currentRow>-1) UpdateCollectionList();
 
 }
 
@@ -204,26 +204,28 @@ void ClassificWidget::clearCollectionList()
 
 void ClassificWidget::on_lasso_clicked()
 {
-    if(m_ui->lasso->isChecked())
+    m_states = lasso_delete;
+    /*if(m_ui->lasso->isChecked())
     {
         m_states=nothing;
         m_ui->lasso->setChecked(false);
     }
     else
     {
-        m_states=lasso_delete;
-    }
+        
+    }*/
 }
 
 void ClassificWidget::on_lassoMove_clicked()
 {
-    if(m_ui->lassoMove->isChecked())
+    m_states = lasso_move;
+    /*if(m_ui->lassoMove->isChecked())
     {
         m_states=nothing;
         m_ui->lassoMove->setChecked(false);
     }
     else
     {
-        m_states=lasso_move;
-    }
+        
+    }*/
 }
