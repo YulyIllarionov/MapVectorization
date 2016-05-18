@@ -634,8 +634,14 @@ void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoint
     std::vector<int> ids = DefineObjectsInsidePolygon(layerId, mapPoints);
     WLayer::LAYER_TYPE layerType = layer->getType();
     
-    for (int i = 0; i < ids.size(); i++)
-      layer->m_objects.erase(layer->m_objects.begin() + ids[i]);
+    WObjectContainer new_objects;
+    new_objects.reserve(layer->m_objects.size() - ids.size());
+    for (int idx = 0; idx < layer->m_objects.size(); idx++)
+    {
+      if (ids.end() == std::find(ids.begin(), ids.end(), idx))
+        new_objects.push_back(layer->m_objects[idx]);
+    }
+    layer->m_objects = new_objects;
 }
 // ------------------------------------------------------------
 WPolygon::WPolygon(std::vector<SMapPoint> & mapPoints)
