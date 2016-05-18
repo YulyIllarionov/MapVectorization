@@ -60,6 +60,9 @@
     <ClInclude Include="graphics\skeletonization.h">
       <Filter>Header Files\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="svg_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -79,6 +82,9 @@
     </ClCompile>
     <ClCompile Include="graphics\skeletonization.cpp">
       <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="svg_utils.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

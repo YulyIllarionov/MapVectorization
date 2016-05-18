@@ -10,7 +10,7 @@ SVGUtils::~SVGUtils(void)
 {
 }
 
-void SVGUtils::WriteLineToSVG(SDK_NAMESPACE::WObjectContainer wvector, string filename)
+void SVGUtils::WriteLineToSVG(SDK_NAMESPACE::WObjectContainer& wvector, string filename)
 {
 	std::ofstream fout;
 	fout.open(filename);
@@ -26,7 +26,7 @@ void SVGUtils::WriteLineToSVG(SDK_NAMESPACE::WObjectContainer wvector, string fi
 	
 	for (int i = 0; i<wvector.size(); i++)
 	{
-		WriteLine(reinterpret_cast<SDK_NAMESPACE::WLine>(wvector[i]), fout);
+		WriteLine(dynamic_cast<SDK_NAMESPACE::WLine&>(wvector[i]), fout);
 	}
 	fout.close();
 
@@ -48,7 +48,7 @@ void SVGUtils::WriteTextToSVG(SDK_NAMESPACE::WObjectContainer& wvector, string f
 
 	for (int i = 0; i<wvector.size(); i++)
 	{
-		WriteText((SDK_NAMESPACE::WText)wvector[i], fout);
+		WriteText(dynamic_cast<SDK_NAMESPACE::WText&>(wvector[i]), fout);
 	}
 	fout.close();
 
