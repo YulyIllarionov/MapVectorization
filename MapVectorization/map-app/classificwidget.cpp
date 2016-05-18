@@ -154,7 +154,7 @@ void ClassificWidget::on_listWidget_2_currentRowChanged(int currentRow)
 void ClassificWidget::on_catLinesButton_clicked()
 {
     WObjectContainer &cont=m_layers.at(m_ui->listWidget->currentRow())->m_objects;
-    WVectorObject &vobj= cont.at(0);;
+    WLine* vobj= dynamic_cast<WLine*>(&cont.at(0));
     bool isFirst=true;
     for(int i=0;i<cont.size();i++)
     {
@@ -162,14 +162,13 @@ void ClassificWidget::on_catLinesButton_clicked()
         {
             if(isFirst)
             {
-                vobj=cont.at(i);
+                vobj = dynamic_cast<WLine*>(&cont.at(i));
                 isFirst=false;
             }
             else
             {
-                WVectorObject &vobj2=cont.at(i);
-                //static_cast<WLine>(vobj).Concat(static_cast<WLine>(vobj2));
-
+                WLine* vobj2 = dynamic_cast<WLine*>(&cont.at(i));
+                vobj->Concat(*vobj2);
             }
         }
     }
