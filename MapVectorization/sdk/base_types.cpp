@@ -498,16 +498,15 @@ void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const
     Rect roi = boundingRect(mapPoints.m_points); // GetPoints());
     WLayer* departureLayer = GetLayerById(arrivalLayerId);
     WLayer* arrivalLayer = GetLayerById(departureLayerId);
-    for (int y = roi.y; y < roi.y + roi.height; y++)
-    {
-        for (int x = roi.x; x < roi.x + roi.width; x++)
-        {
-            //Point current(x, y);
-            //if (mapPoints.Contains(current))
-            //    arrivalLayer->m_data.at<uchar>(current) =
-            //        departureLayer->m_data.at<uchar>(current);
-        }
-    }
+    //for (int y = roi.y; y < roi.y + roi.height; y++)
+    //{
+    //    for (int x = roi.x; x < roi.x + roi.width; x++)
+    //    {
+    //        Point current(x, y);
+    //        if (mapPoints.Contains(current))
+    //            arrivalLayer->m_data.at<uchar>(current) = departureLayer->m_data.at<uchar>(current);
+    //    }
+    //}
 
     // copy vector objects
     if (!departureLayer->IsSingleType() || !arrivalLayer->IsSingleType())
@@ -516,78 +515,83 @@ void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const
     WLayer::LAYER_TYPE departureType = departureLayer->getType();
     WLayer::LAYER_TYPE arrivalType   = arrivalLayer->getType();
 
-    switch (departureType)
-    {
-      // from Text layer
-      case WLayer::LT_TEXT:
-      {
-        switch (arrivalType)
-        {
-        case WLayer::LT_LINES:
-          {
-            // from Text layer to Lines layer
-          }
-          break;
-        case WLayer::LT_AREAS:
-          {
-            // from Text layer to Areas layer
-          }
-          break;
-        case WLayer::LT_OTHER:
-          {
-            // from Text layer to Other layer
-          }
-          break;
-        }
-      }
-      break;
-      // from Lines layer
-      case WLayer::LT_LINES:
-      {
-        switch (arrivalType)
-        {
-        case WLayer::LT_TEXT:
-          {
-            // from Lines layer to Text layer
-          }
-          break;
-        case WLayer::LT_AREAS:
-          {
-            // from Lines layer to Areas layer
-          }
-          break;
-        case WLayer::LT_OTHER:
-          {
-            // from Lines layer to Other layer
-          }
-          break;
-        }
-      }
-      break;
-      // from Other layer
-      case WLayer::LT_OTHER:
-      {
-        switch (arrivalType)
-        {
-        case WLayer::LT_LINES:
-          {
-            // from Other layer to Lines layer
-          }
-          break;
-        case WLayer::LT_AREAS:
-          {
-            // from Other layer to Areas layer
-          }
-          break;
-        case WLayer::LT_TEXT:
-          {
-            // from Other layer to Text layer
-          }
-          break;
-        }
-      }
-      break;
-    }
+    std::vector<int> ids;
+    if (mapPoints.Length() == 1)
+        ids = DefineObjectsNearPoint(departureLayerId, SMapPoint(mapPoints.m_points[0]));
+    else
+        ids = DefineObjectsInsidePolygon(departureLayerId, mapPoints);
+    
+    if (ids.empty())
+        return;
+
+   switch (departureType)
+   {
+       // from Text layer
+   case WLayer::LT_TEXT:
+   {
+       switch (arrivalType)
+       {
+           //to Line layer
+       case WLayer::LT_LINES:
+       {
+           for (size_t i = 0; i < ids.size(); i++)
+           {
+               Mat linesImg(roi.size(), CV_8UC1, Scalar(0));
+               for (int y = roi.y; y < roi.y + roi.height; y++)
+               {
+                   for (int x = roi.x; x < roi.x + roi.width; x++)
+                   {
+                       Point current(x, y);
+                       if (mapPoints.Contains(current))
+                       {
+                           arrivalLayer->m_data.at<uchar>(current) = departureLayer->m_data.at<uchar>(current);
+                           linesImg.at<uchar>(y - roi.y, x - roi.x) = departureLayer->m_data.at<uchar>(current);
+                           //departureLayer->m_data.at<uchar>(current) = 0;
+                       }
+                   }
+               }
+               WObjectContainer lines = SDK_NAMESPACE::utils::FindLinesOnMat(linesImg);
+               for (size_t m = 0; m < lines.size(); m++)
+                   for (size_t n = 0; n < lines[m].Length(); n++)
+                       lines[m].m_points[n] += roi.tl();
+               arrivalLayer->m_objects.insert(arrivalLayer->m_objects.begin(), lines.begin(), lines.end());
+           }
+       }
+       break;
+       case WLayer::LT_OTHER:
+       {
+           // from Text layer to Other layer
+       }
+       break;
+       default:
+           break;
+       }
+   }
+   // from Lines layer
+   case WLayer::LT_LINES:
+   {
+       switch (arrivalType)
+       {
+       case WLayer::LT_TEXT:
+       {
+           // from Lines layer to Text layer
+       }
+       break;
+       case WLayer::LT_OTHER:
+       {
+           // from Lines layer to Other layer
+       }
+       break;
+       default:
+           break;
+       }
+   }
+   break;
+   default:
+       break;
+   }
+   DeleteOblectsFromLayer(departureLayerId, mapPoints);
+    
 }
 // ------------------------------------------------------------
 void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoints)

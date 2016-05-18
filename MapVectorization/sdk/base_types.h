@@ -33,6 +33,11 @@ public:
         this->x = x;
         this->y = y;
     }
+    SMapPoint(cv::Point point)
+    {
+        this->x = point.x;
+        this->y = point.y;
+    }
 	int GetX() {
 		return x;
 	}
