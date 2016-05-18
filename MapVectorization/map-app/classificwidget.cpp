@@ -100,6 +100,7 @@ void ClassificWidget::on_listWidget_currentRowChanged(int currentRow)
     utils::SetTransparent(m_image->m_raster, m_layers.at(currentRow)->m_data, 255, 0, 1, 0);
     m_widget->UpdatePixmap();
 
+    clearCollectionList();
     WObjectContainer &cont=m_layers.at(currentRow)->m_objects;
     for(int i=0;i<cont.size();i++)
     {
@@ -154,7 +155,7 @@ void ClassificWidget::on_listWidget_2_currentRowChanged(int currentRow)
 void ClassificWidget::on_catLinesButton_clicked()
 {
     WObjectContainer &cont=m_layers.at(m_ui->listWidget->currentRow())->m_objects;
-    WLine* vobj= dynamic_cast<WLine*>(&cont.at(0));
+    WLine* vobj;
     bool isFirst=true;
     for(int i=0;i<cont.size();i++)
     {
