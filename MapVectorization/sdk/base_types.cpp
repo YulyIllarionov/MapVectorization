@@ -103,6 +103,8 @@ SDKResult WLayer::InicializeLinesContainer()
     //cv::waitKey(0);
     WObjectContainer lines = SDK_NAMESPACE::utils::FindLinesOnMat(m_data);
     m_objects.insert(m_objects.end(), lines.begin(), lines.end());
+
+    return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
 void WLayer::InicializeVectorContainer()
@@ -232,7 +234,7 @@ SDKResult WRaster::RemoveLayer(const LayerUUID& layerId)
   return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
-SDKResult WRaster::AddColorToLayer(const LayerUUID& layerId, const w_color& color) const
+SDKResult WRaster::AddColorToLayer(const LayerUUID& layerId, const w_color& color)
 {
   WLayer* layer = GetLayerById(layerId);
   if (layer == nullptr)
@@ -253,17 +255,17 @@ SDKResult WRaster::AddColorToLayer(const LayerUUID& layerId, const w_color& colo
   return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
-SDKResult WRaster::AddLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE type) const
+SDKResult WRaster::AddLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE type)
 {
   return SetLayerType(layerId, type, false);
 }
 // ------------------------------------------------------------
-SDKResult WRaster::SetLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE type) const
+SDKResult WRaster::SetLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE type)
 {
   return SetLayerType(layerId, type, true);
 }
 // ------------------------------------------------------------
-SDKResult WRaster::RemoveLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE type) const
+SDKResult WRaster::RemoveLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE type)
 {
   WLayer* layer = GetLayerById(layerId);
   if (layer == nullptr)
@@ -274,7 +276,7 @@ SDKResult WRaster::RemoveLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE 
   return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
-SDKResult WRaster::SetLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite) const
+SDKResult WRaster::SetLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite)
 {
   WLayer* layer = GetLayerById(layerId);
   if (layer == nullptr)
@@ -288,7 +290,7 @@ SDKResult WRaster::SetLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE typ
   return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
-SDKResult WRaster::SetLayerName(const LayerUUID& layerId, const std::string& name) const
+SDKResult WRaster::SetLayerName(const LayerUUID& layerId, const std::string& name)
 {
   WLayer* layer = GetLayerById(layerId);
   if (layer == nullptr)
@@ -298,22 +300,22 @@ SDKResult WRaster::SetLayerName(const LayerUUID& layerId, const std::string& nam
   return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
-WLayer* WRaster::GetLayerById(const LayerUUID& layerId) const
+WLayer* WRaster::GetLayerById(const LayerUUID& layerId)
 {
-  for (LayersContainer::const_iterator cit = m_layers.begin(); cit != m_layers.end(); ++cit)
+  for (LayersContainer::iterator cit = m_layers.begin(); cit != m_layers.end(); ++cit)
   {
     if (cit->m_uuid == layerId)
-      return const_cast<WLayer*>(&(*cit));    
+      return &(*cit);    
   }
   return nullptr;
 }
 // ------------------------------------------------------------
-WLayer* WRaster::GetLayerByName(const std::string& name) const
+WLayer* WRaster::GetLayerByName(const std::string& name)
 {
-  for (LayersContainer::const_iterator cit = m_layers.begin(); cit != m_layers.end(); ++cit)
+  for (LayersContainer::iterator cit = m_layers.begin(); cit != m_layers.end(); ++cit)
   {
     if (cit->m_name == name)
-      return const_cast<WLayer*>(&(*cit));  
+      return &(*cit);  
   }
   return nullptr;
 }
@@ -417,7 +419,7 @@ SDKResult WRaster::GetLayersByGroupId(const GroupID& groupId, LayerIDs& relatedL
   return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
-std::vector<cv::Rect> WRaster::DetectLetters(const LayerUUID& layerId) const
+std::vector<cv::Rect> WRaster::DetectLetters(const LayerUUID& layerId)
 {
 	std::vector<cv::Rect> boundRect;
 
@@ -853,6 +855,7 @@ SDKResult WRaster::SplitLines(const LayerUUID& layerId, const LayerUUID& linesLa
         }
     }
 
+    return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
 SDKResult WRaster::SplitText(const LayerUUID& layerId, const LayerUUID& textLayerID, const LayerUUID& othersLayerID)

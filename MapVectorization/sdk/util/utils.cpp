@@ -25,8 +25,6 @@ namespace utils {
     // ----------------------------------------------------
     std::string WSTR2STR(const std::wstring& wide)
     {
-        //const wchar_t *orig = const_cast<wchar_t>(wide.c_str());
-
         // Convert the wchar_t string to a char* string. Record 
         //.the length of the original string and add 1 to it to
         //.account for the terminating null character.

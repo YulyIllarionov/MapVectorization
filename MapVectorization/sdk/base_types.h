@@ -319,7 +319,7 @@ public:
   SDKResult IncreaseSharpness(double k) const;
   void SegmentationBilateral();
   void SegmentationMeanshift();
-  std::vector<cv::Rect> DetectLetters(const LayerUUID& layerId) const;
+  std::vector<cv::Rect> DetectLetters(const LayerUUID& layerId);
 
   //{ layer
   // create and add new layer
@@ -327,16 +327,16 @@ public:
   // create and add new layer
   SDKResult RemoveLayer     (const LayerUUID& layerId);
   // add layer color
-  SDKResult AddColorToLayer (const LayerUUID& layerId, const w_color& color) const;
+  SDKResult AddColorToLayer (const LayerUUID& layerId, const w_color& color);
   // add, set, remove layer type
-  SDKResult AddLayerType    (const LayerUUID& layerId, WLayer::LAYER_TYPE type) const;
-  SDKResult SetLayerType    (const LayerUUID& layerId, WLayer::LAYER_TYPE type) const;
-  SDKResult RemoveLayerType (const LayerUUID& layerId, WLayer::LAYER_TYPE type) const;
+  SDKResult AddLayerType    (const LayerUUID& layerId, WLayer::LAYER_TYPE type);
+  SDKResult SetLayerType    (const LayerUUID& layerId, WLayer::LAYER_TYPE type);
+  SDKResult RemoveLayerType (const LayerUUID& layerId, WLayer::LAYER_TYPE type);
   // set layer name
-  SDKResult SetLayerName    (const LayerUUID& layerId, const std::string& name) const;
+  SDKResult SetLayerName    (const LayerUUID& layerId, const std::string& name);
   // return layer's ref
-  WLayer*   GetLayerById    (const LayerUUID& layerId) const;
-  WLayer*   GetLayerByName  (const std::string& name) const;
+  WLayer*   GetLayerById    (const LayerUUID& layerId);
+  WLayer*   GetLayerByName  (const std::string& name);
   // get layers idxs by type
   SDKResult GetLayersByType (WLayer::LAYER_TYPE type, LayerIDs& layerIds) const;
   // split layer by function
@@ -356,7 +356,7 @@ public:
   void DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoints);
  
 private:
-  SDKResult SetLayerType (const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite) const;
+  SDKResult SetLayerType (const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite);
   void Initialize(const std::string& imgPath);
   SDKResult SplitLines(const LayerUUID& layerId, const LayerUUID& linesLayerID, const LayerUUID& othersLayerID);
   SDKResult SplitText(const LayerUUID& layerId, const LayerUUID& textLayerID, const LayerUUID& othersLayerID);
