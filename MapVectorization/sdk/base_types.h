@@ -38,12 +38,12 @@ public:
         this->x = point.x;
         this->y = point.y;
     }
-	int GetX() {
-		return x;
-	}
-	int GetY() {
-		return y;
-	}
+	  int GetX() {
+		  return x;
+	  }
+	  int GetY() {
+		  return y;
+	  }
 
     cv::Point ToPoint() {
         return cv::Point(x, y);
@@ -68,7 +68,7 @@ public:
   //const WPointsContainer& GetPoints() const { return m_points; };
   // get length
 	virtual size_t Length() const { return m_points.size(); };
-  virtual double DistanceTo(cv::Point mapPoint) const;
+  virtual double DistanceTo(const cv::Point& mapPoint) const;
 
   SMapPoint GetPoint(int i) { return SMapPoint(m_points.at(i).x, m_points.at(i).y); };
 
@@ -87,7 +87,7 @@ public:
 	//WPolygon& operator=(WPolygon& other);
 	
   //Проверка точки на принадлежность
-  bool Contains(cv::Point& object) const;
+  bool Contains(const cv::Point& object) const;
   bool Contains(const WVectorObject& object) const;
   //virtual double DistanceTo(cv::Point mapPoint) const;
 
@@ -296,8 +296,8 @@ struct w_color
 {
   //friend w_range;
   w_color(uchar r, uchar g, uchar b);
-  w_color(cv::Vec3b color);
-  w_color(cv::Vec4b color);
+  w_color(const cv::Vec3b& color);
+  w_color(const cv::Vec4b& color);
 
   cv::Vec3b toVec3b() const;
   friend inline bool operator <= (const w_color &first, const cv::Vec3b &second);
@@ -396,7 +396,7 @@ private:
 class Wregion
 {
 public:
-    Wregion(cv::Point point, cv::Mat& img);
+    Wregion(const cv::Point& point, cv::Mat& img);
     cv::Rect boundingRectangle();
     int Square();
     bool IsLine();

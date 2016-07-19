@@ -45,6 +45,8 @@ namespace utils {
         // Put a copy of the converted string into nstring
         wcstombs_s(&convertedChars, nstring, newsize, wide.c_str(), _TRUNCATE);
 
+        delete[] nstring;
+
         return std::string(nstring);
     }
     // ----------------------------------------------------

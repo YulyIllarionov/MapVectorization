@@ -30,14 +30,14 @@ w_color::w_color(uchar r, uchar g, uchar b)
   this->b = b;
 }
 // ------------------------------------------------------------
-w_color::w_color(cv::Vec3b color)
+w_color::w_color(const cv::Vec3b& color)
 {
   this->r = color[2];
   this->g = color[1];
   this->b = color[0];
 }
 // ------------------------------------------------------------
-w_color::w_color(cv::Vec4b color)
+w_color::w_color(const cv::Vec4b& color)
 {
   this->r = color[2];
   this->g = color[1];
@@ -361,6 +361,9 @@ SDKResult WRaster::SplitLayer(const LayerUUID& layerId, LayerIDs& splittedLayers
         splittedLayers.clear();
         splittedLayers.push_back(linesLayer->getID());
         splittedLayers.push_back(othersLayer->getID());
+
+        linesLayer = nullptr;
+        othersLayer = nullptr;
         break;
     }
     //case WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT:
@@ -665,12 +668,12 @@ bool WPolygon::Contains(const WVectorObject& object) const
   return result;
 }
 // ------------------------------------------------------------
-bool WPolygon::Contains(cv::Point& point) const
+bool WPolygon::Contains(const cv::Point& point) const
 {
   return pointPolygonTest(m_points, point, false) >= 0;
 }
 // ------------------------------------------------------------
-double WVectorObject::DistanceTo(cv::Point mapPoint) const
+double WVectorObject::DistanceTo(const cv::Point& mapPoint) const
 {
     int squaredDistance = INT_MAX;
     for (size_t i = 0; i < m_points.size(); i++)
@@ -755,7 +758,7 @@ WPointsContainer WLine::SimplifyLine(const WPointsContainer& linevector, double 
 	return outpoints;
 }
 // ------------------------------------------------------------
-Wregion::Wregion(cv::Point point, cv::Mat& img)
+Wregion::Wregion(const cv::Point& point, cv::Mat& img)
 {
     if (img.at<uchar>(point) == 0)
         return;
