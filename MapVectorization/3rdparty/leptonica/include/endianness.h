@@ -1,0 +1,2 @@
+#define L_LITTLE_ENDIAN
+
