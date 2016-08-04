@@ -155,6 +155,14 @@ namespace utils {
         return neighbors;
     }
     // ----------------------------------------------------
+    bool isEdgePoint(cv::Point point, const cv::Mat& image)
+    {
+        if ((point.x == 0) || (point.x == (image.cols - 1)) ||
+            (point.y == 0) || (point.y == (image.rows - 1)))
+            return true;
+        return false;
+    }
+    // ----------------------------------------------------
     int squaredDistanceBetween(const cv::Point& a, const cv::Point& b)
     {
         return (a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y);
@@ -176,7 +184,7 @@ namespace utils {
                     std::vector<cv::Point> firstNeighbors = SDK_NAMESPACE::utils::getNeghboursClockwise(initial, skeleton);
                     if (firstNeighbors.size() > 2)
                         continue;
-                    else
+                    else if (firstNeighbors.size() != 0)
                     {
                         std::vector<WPointsContainer> lines(firstNeighbors.size());
                         lines[0].push_back(initial);

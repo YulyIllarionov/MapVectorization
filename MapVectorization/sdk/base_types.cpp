@@ -765,37 +765,35 @@ Wregion::Wregion(const cv::Point& point, cv::Mat& img)
     if (img.at<uchar>(point) == 0)
         return; // <- Исправить
 
-    std::stack <cv::Point> stack;
 	cv::Point currentPoint;
+    std::stack <cv::Point> stack;
 
-    stack.emplace(point);
+    stack.push(point);
 
     while (!stack.empty())
     {
         currentPoint = stack.top();
         stack.pop(); // Удалить точку из стека
+        if (SDK_NAMESPACE::utils::isEdgePoint(currentPoint, img))
+            continue;
         points.push_back(currentPoint); //Добавить точку к результату
 
-        for (int k = currentPoint.x - 1; k <= currentPoint.x + 1; k++)
-        {
-            if (k == -1) // Следим за границами изображения
-                continue;
-            if (k == img.cols)
-                break;
+        img.at<uchar>(currentPoint) = 0; // Закрасить на изображении
 
+        for (int k = currentPoint.x - 1; k <= currentPoint.x + 1; k++)
+        {    
             for (int l = currentPoint.y - 1; l <= currentPoint.y + 1; l++)
             {
-                if ((l == -1) || ((l == point.y) && (k == point.x)))
-                    continue;
-                if (l == img.rows)
-                    break;
-
-                if (img.at<uchar>(l, k) != 0)
-                    stack.emplace(k, l);
+                //if ((l == point.y) && (k == point.x))
+                  //  continue;
+        
+                if (img.at<uchar>(l, k) != 0) 
+                {
+                    stack.push(Point(k, l));
+                    img.at<uchar>(l, k) = 0; // Закрасить на изображении
+                }
             }
         }
-        img.at<uchar>(currentPoint) = 0; // Закрасить на изображении
-		//stack.
     }
 }
 // ------------------------------------------------------------
@@ -814,7 +812,7 @@ bool Wregion::IsLine()
     float radius;
     minEnclosingCircle(points, Point2f(), radius);
     double ratio = (double)this->Square() / radius / radius;
-    return (ratio < 3.0);
+    return (ratio < 1.6);
 }
 // ------------------------------------------------------------
 void Wregion::drawOn(Mat& img, uchar color)
