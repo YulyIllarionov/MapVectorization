@@ -353,7 +353,7 @@ public:
   // copy object from one layer to another
   void CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, WPolygon mapPoints);
   // удаление объектов со слоя 
-  void DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoints);
+  void DeleteOblectsFromLayer(const LayerUUID& layerId, const WPolygon& mapPoints);
  
 private:
   SDKResult SetLayerType (const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite);

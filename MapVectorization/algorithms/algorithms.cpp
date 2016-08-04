@@ -3,113 +3,146 @@
 
 #include "stdafx.h"
 #include <iostream>
-
-#include "opencv2/opencv.hpp" 
-#include "opencv/cv.h"
-#include "opencv/highgui.h"
-
-
-//---------------------------Не для проекта-----------------------
-void saveImage(const std::string &filename, cv::Mat *img) {
-	std::string output("C:/projects/MapVectorization/MapVectorization/sample/output/");
-	output += filename;
-	cv::imwrite(output, *img);
-}
-
-//---------------------------Для проекта -------------------------
-std::vector<cv::Rect> detectLetters(cv::Mat &img, unsigned char elementId)
-{
-	std::vector<cv::Rect> boundRect;
-	cv::Mat img_reversed, img_sobel, img_threshold, element, img_gray;
-
-	cv::threshold(img, img_reversed, 0, 255, CV_THRESH_BINARY_INV);
-	//cvtColor(img_reversed, img_reversed, CV_BGR2GRAY);
-	//saveImage("rever1.jpg", &img_reversed);
-
-	//saveImage("rever1.jpg", &img_reversed);
-	cv::Sobel(img_reversed, img_sobel, CV_8U, 1, 0, 3, 1, 0, cv::BORDER_DEFAULT);
-	//saveImage("obel1.jpg", &img_sobel);
-	//cv::threshold(img_sobel, img_threshold, 0, 255, CV_THRESH_OTSU + CV_THRESH_BINARY);
-	element = getStructuringElement(cv::MORPH_RECT, cv::Size(55 * (int)pow(2, elementId), 3 * (int)pow(2, elementId)));
-	cv::morphologyEx(img_sobel, img_threshold, CV_MOP_CLOSE, element);
-	cv::cvtColor(img_threshold, img_threshold, CV_RGB2GRAY);
-	saveImage("morf.jpg", &img_threshold);
-
-	std::vector< std::vector< cv::Point> > contours;
-	cv::findContours(img_threshold, contours, cv::CHAIN_APPROX_NONE, cv::RETR_LIST);
-
-	std::vector<std::vector<cv::Point> > contours_poly(contours.size());
-
-	for (int i = 0; i < contours.size(); i++)
-	{
-		//if ((contours.at(i).size() > 86 * pow(2, elementId)) && (contours.at(i).size() < 600 * pow(2, elementId)))
-		{
-			cv::approxPolyDP(cv::Mat(contours.at(i)), contours_poly.at(i), 3, true);
-			cv::Rect appRect(boundingRect(cv::Mat(contours_poly.at(i))));
-
-			//if (appRect.width > appRect.height)
-				boundRect.push_back(appRect);
-		}
-	}
-
-	return boundRect;
-}
-
-
-cv::Mat makeElementOfPyramid(cv::Mat &img, int n)
-{ //TODO: Размывать Гауссом
-	cv::Mat result = img;
-
-	for (int i = 1; i < n; i++)
-		cv::pyrDown(result, result, cv::Size(result.cols / 2, result.rows / 2));
-
-	for (int i = 1; i < n; i++)
-		cv::pyrUp(result, result, cv::Size(result.cols * 2, result.rows * 2));
-
-	return result;
-}
-
-//std::vector<cv::Rect> FindRegionsWithText(cv::Mat &img)
-//{
-//	const int number_of_pyramid_elements = 4;
-//	cv::Mat tmp;
-//	std::vector<cv::Rect> result;
 //
-//	for (int i = 1; i <= number_of_pyramid_elements; i++) {
-//		tmp = makeElementOfPiramid(img, i);
-//		result.push_back
-//	}
-//
-//}
-cv::Mat rotateImage(cv::Mat image) 
-{
-	 cv::Mat thr,dst;
-	 threshold(image,thr,200,255,cv::THRESH_BINARY_INV);
-	 imshow("thr",thr);
+//#include "opencv2/opencv.hpp" 
+//#include "opencv/cv.h"
+//#include "opencv/highgui.h"
 
-	  std::vector<cv::Point> points;
-	  cv::Mat_<uchar>::iterator it = thr.begin<uchar>();
-	  cv::Mat_<uchar>::iterator end = thr.end<uchar>();
-	  for (; it != end; ++it)
-		if (*it)
-		  points.push_back(it.pos());
+#include "opencv2/text.hpp"
+#include "opencv2/core/utility.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
 
-	  cv::RotatedRect box = cv::minAreaRect(cv::Mat(points));
-	  cv::Mat rot_mat = cv::getRotationMatrix2D(box.center, box.angle, 1);
-
-	  //cv::Mat rotated(src.size(),src.type(),Scalar(255,255,255));
-	  cv::Mat rotated;
-	  cv::warpAffine(image, rotated, rot_mat, image.size(), cv::INTER_CUBIC);
-	  imshow("rotated",rotated);
-	  
-	  return rotated;
-}
+using namespace std;
+using namespace cv;
+using namespace cv::text;
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	std::string imgPath("C:/projects/MapVectorization/MapVectorization/sample/map/black/cu71Black.png");
+	std::string imgPath("C:/projects/MapVectorization/MapVectorization/sample/map/alphabet.jpg");
 
-	cv::Mat img = cv::imread(imgPath, CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat image = cv::imread(imgPath, CV_LOAD_IMAGE_GRAYSCALE);
+
+	string vocabulary = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // must have the same order as the clasifier output classes
+
+    Ptr<OCRHMMDecoder::ClassifierCallback> ocr = loadOCRHMMClassifierCNN("OCRBeamSearch_CNN_model_data.xml.gz");
+
+    double t_r = (double)getTickCount();
+    vector<int> out_classes;
+    vector<double> out_confidences;
+
+    ocr->eval(image, out_classes, out_confidences);
+
+    cout << "OCR output = \"" << vocabulary[out_classes[0]] << "\" with confidence "
+         << out_confidences[0] << ". Evaluated in "
+         << ((double)getTickCount() - t_r)*1000/getTickFrequency() << " ms." << endl << endl;
+
+    return 0;
+}
+
+////---------------------------Не для проекта-----------------------
+//void saveImage(const std::string &filename, cv::Mat *img) {
+//	std::string output("C:/projects/MapVectorization/MapVectorization/sample/output/");
+//	output += filename;
+//	cv::imwrite(output, *img);
+//}
+//
+////---------------------------Для проекта -------------------------
+//std::vector<cv::Rect> detectLetters(cv::Mat &img, unsigned char elementId)
+//{
+//	std::vector<cv::Rect> boundRect;
+//	cv::Mat img_reversed, img_sobel, img_threshold, element, img_gray;
+//
+//	cv::threshold(img, img_reversed, 0, 255, CV_THRESH_BINARY_INV);
+//	//cvtColor(img_reversed, img_reversed, CV_BGR2GRAY);
+//	//saveImage("rever1.jpg", &img_reversed);
+//
+//	//saveImage("rever1.jpg", &img_reversed);
+//	cv::Sobel(img_reversed, img_sobel, CV_8U, 1, 0, 3, 1, 0, cv::BORDER_DEFAULT);
+//	//saveImage("obel1.jpg", &img_sobel);
+//	//cv::threshold(img_sobel, img_threshold, 0, 255, CV_THRESH_OTSU + CV_THRESH_BINARY);
+//	element = getStructuringElement(cv::MORPH_RECT, cv::Size(55 * (int)pow(2, elementId), 3 * (int)pow(2, elementId)));
+//	cv::morphologyEx(img_sobel, img_threshold, CV_MOP_CLOSE, element);
+//	cv::cvtColor(img_threshold, img_threshold, CV_RGB2GRAY);
+//	saveImage("morf.jpg", &img_threshold);
+//
+//	std::vector< std::vector< cv::Point> > contours;
+//	cv::findContours(img_threshold, contours, cv::CHAIN_APPROX_NONE, cv::RETR_LIST);
+//
+//	std::vector<std::vector<cv::Point> > contours_poly(contours.size());
+//
+//	for (int i = 0; i < contours.size(); i++)
+//	{
+//		//if ((contours.at(i).size() > 86 * pow(2, elementId)) && (contours.at(i).size() < 600 * pow(2, elementId)))
+//		{
+//			cv::approxPolyDP(cv::Mat(contours.at(i)), contours_poly.at(i), 3, true);
+//			cv::Rect appRect(boundingRect(cv::Mat(contours_poly.at(i))));
+//
+//			//if (appRect.width > appRect.height)
+//				boundRect.push_back(appRect);
+//		}
+//	}
+//
+//	return boundRect;
+//}
+//
+//
+//cv::Mat makeElementOfPyramid(cv::Mat &img, int n)
+//{ //TODO: Размывать Гауссом
+//	cv::Mat result = img;
+//
+//	for (int i = 1; i < n; i++)
+//		cv::pyrDown(result, result, cv::Size(result.cols / 2, result.rows / 2));
+//
+//	for (int i = 1; i < n; i++)
+//		cv::pyrUp(result, result, cv::Size(result.cols * 2, result.rows * 2));
+//
+//	return result;
+//}
+//
+////std::vector<cv::Rect> FindRegionsWithText(cv::Mat &img)
+////{
+////	const int number_of_pyramid_elements = 4;
+////	cv::Mat tmp;
+////	std::vector<cv::Rect> result;
+////
+////	for (int i = 1; i <= number_of_pyramid_elements; i++) {
+////		tmp = makeElementOfPiramid(img, i);
+////		result.push_back
+////	}
+////
+////}
+//cv::Mat rotateImage(cv::Mat image) 
+//{
+//	 cv::Mat thr,dst;
+//	 threshold(image,thr,200,255,cv::THRESH_BINARY_INV);
+//	 imshow("thr",thr);
+//
+//	  std::vector<cv::Point> points;
+//	  cv::Mat_<uchar>::iterator it = thr.begin<uchar>();
+//	  cv::Mat_<uchar>::iterator end = thr.end<uchar>();
+//	  for (; it != end; ++it)
+//		if (*it)
+//		  points.push_back(it.pos());
+//
+//	  cv::RotatedRect box = cv::minAreaRect(cv::Mat(points));
+//	  cv::Mat rot_mat = cv::getRotationMatrix2D(box.center, box.angle, 1);
+//
+//	  //cv::Mat rotated(src.size(),src.type(),Scalar(255,255,255));
+//	  cv::Mat rotated;
+//	  cv::warpAffine(image, rotated, rot_mat, image.size(), cv::INTER_CUBIC);
+//	  imshow("rotated",rotated);
+//	  
+//	  return rotated;
+//}
+
+//int _tmain(int argc, _TCHAR* argv[])
+//{
+//	std::string imgPath("C:/projects/MapVectorization/MapVectorization/sample/map/black/cu71Black.png");
+//
+//	cv::Mat img = cv::imread(imgPath, CV_LOAD_IMAGE_GRAYSCALE);
+
+
 	//cv::threshold(img, img, 0, 255, CV_THRESH_BINARY);
 	
 
@@ -185,4 +218,4 @@ int _tmain(int argc, _TCHAR* argv[])
     //
 	//saveImage("count3.jpg", &img1);
 	//return 0;
-}
+//}

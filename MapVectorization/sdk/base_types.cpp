@@ -137,8 +137,8 @@ void WLayer::InicializeVectorContainer()
 // ------------------------------------------------------------
 WRaster::WRaster(const std::string& imgPath)
 {
-  if (imgPath != "")
-    Initialize(imgPath);
+	if (!imgPath.empty())
+		Initialize(imgPath);
 }
 // ------------------------------------------------------------
 void WRaster::Initialize(const std::string& imgPath)
@@ -441,10 +441,10 @@ std::vector<cv::Rect> WRaster::DetectLetters(const LayerUUID& layerId)
     std::vector<std::vector<cv::Point> > contours_poly(contours.size());
     for( int i = 0; i < contours.size(); i++ )
     {
-    if (contours[i].size()>100)
+    if (contours.at(i).size()>100)
     { 
-      cv::approxPolyDP(cv::Mat(contours[i]), contours_poly[i], 3, true);
-      cv::Rect appRect(boundingRect(cv::Mat(contours_poly[i])));
+      cv::approxPolyDP(cv::Mat(contours.at(i)), contours_poly.at(i), 3, true);
+      cv::Rect appRect(boundingRect(cv::Mat(contours_poly.at(i))));
       if (appRect.width>appRect.height) 
         boundRect.push_back(appRect);
     }
@@ -497,7 +497,7 @@ std::vector<int> WRaster::DefineObjectsInsidePolygon(const LayerUUID& layerId, c
 }
 // ------------------------------------------------------------
 // copy object from one layer to another
-void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, WPolygon mapPoints)
+void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, const WPolygon mapPoints)
 {
     // copy raster
     Rect roi = boundingRect(mapPoints.m_points); // GetPoints());
@@ -614,7 +614,7 @@ void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const
     
 }
 // ------------------------------------------------------------
-void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoints)
+void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, const WPolygon& mapPoints)
 {
     // delete raster
     WLayer* layer = GetLayerById(layerId);
@@ -644,7 +644,7 @@ void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoint
     for (int idx = 0; idx < layer->m_objects.size(); idx++)
     {
       if (ids.end() == std::find(ids.begin(), ids.end(), idx))
-        new_objects.push_back(layer->m_objects[idx]);
+        new_objects.push_back(layer->m_objects.at(idx));
     }
     layer->m_objects = new_objects;
 }
@@ -652,7 +652,7 @@ void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, WPolygon mapPoint
 WPolygon::WPolygon(std::vector<SMapPoint> & mapPoints)
 {
     for (int i = 0; i < mapPoints.size(); i++) {
-        m_points.push_back(Point::Point_(mapPoints[i].GetX(), mapPoints[i].GetY()));
+        m_points.push_back(Point::Point_(mapPoints.at(i).GetX(), mapPoints[i].GetY()));
     }
 };
 // ------------------------------------------------------------
@@ -763,15 +763,16 @@ WPointsContainer WLine::SimplifyLine(const WPointsContainer& linevector, double 
 Wregion::Wregion(const cv::Point& point, cv::Mat& img)
 {
     if (img.at<uchar>(point) == 0)
-        return;
+        return; // <- Исправить
 
     std::stack <cv::Point> stack;
+	cv::Point currentPoint;
 
     stack.emplace(point);
 
     while (!stack.empty())
     {
-        cv::Point currentPoint = stack.top();
+        currentPoint = stack.top();
         stack.pop(); // Удалить точку из стека
         points.push_back(currentPoint); //Добавить точку к результату
 
@@ -794,6 +795,7 @@ Wregion::Wregion(const cv::Point& point, cv::Mat& img)
             }
         }
         img.at<uchar>(currentPoint) = 0; // Закрасить на изображении
+		//stack.
     }
 }
 // ------------------------------------------------------------
@@ -820,7 +822,7 @@ void Wregion::drawOn(Mat& img, uchar color)
     for (int i = 0; i < points.size(); i++)
     {
         //if ((points[i].x<img.cols)&& (points[i].y<img.rows))
-        img.at<uchar>(points[i]) = color;
+        img.at<uchar>(points.at(i)) = color;
     }
 }
 // ------------------------------------------------------------
