@@ -652,8 +652,13 @@ void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, const WPolygon& m
 WPolygon::WPolygon(std::vector<SMapPoint> & mapPoints)
 {
     for (int i = 0; i < mapPoints.size(); i++) {
-        m_points.push_back(Point::Point_(mapPoints.at(i).GetX(), mapPoints[i].GetY()));
+        m_points.push_back(cv::Point(mapPoints[i].GetX(), mapPoints[i].GetY()));
     }
+};
+// ------------------------------------------------------------
+WPolygon::WPolygon(const std::vector<cv::Point> & mapPoints)
+{
+    m_points = mapPoints;
 };
 // ------------------------------------------------------------
 bool WPolygon::Contains(const WVectorObject& object) const

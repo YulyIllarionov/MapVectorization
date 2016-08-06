@@ -82,6 +82,7 @@ class WPolygon : public WVectorObject
 public:
 	WPolygon();
   WPolygon(std::vector<SMapPoint> & mapPoints);
+  WPolygon(const std::vector<cv::Point> & mapPoints);
   ~WPolygon() {};
 
 	//WPolygon& operator=(WPolygon& other);
@@ -133,13 +134,9 @@ class WText : public WPolygon
 public:
 	WText();
 
-	WText(const WPolygon &polygon)
-    : m_polygon(polygon)
-	{
-	}
 
-	WText(const std::string &text, const WPolygon &polygon, const WLine &textline)
-    : m_polygon(polygon), m_text(text), m_textline(textline), m_state(false)
+	WText(const std::string &text, const WLine &textline)
+    : m_text(text), m_textline(textline), m_state(true)
 	{
 	}
   ~WText() {};
@@ -148,9 +145,6 @@ public:
   bool operator==(const WText& other) {
     return other.m_text == m_text;
 	}
-	//Добавить полигон
-	void AddPolygon(WPolygon& polygon) { m_polygon = polygon; }
-	WPolygon& GetPolygon() { return m_polygon; }
 	//Добавить текст
 	void AddText(const std::string &text) { m_text = text; }
 	std::string GetText() { return m_text; }
@@ -164,7 +158,6 @@ public:
   //virtual double DistanceTo(cv::Point mapPoint) const;
 
 private:
-	WPolygon    m_polygon;  //Границы текста на карте
 	WLine       m_textline; // Линия, обозначающая направление текста внутри полигона
 	std::string m_text;     //Запись
 	bool        m_state;    //Флаг состояний: 0 - текст локализован, 1 - текст распознан
