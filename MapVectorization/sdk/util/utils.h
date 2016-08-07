@@ -33,6 +33,7 @@ namespace utils
   bool isEdgePoint(cv::Point point, const cv::Mat& image);
   int squaredDistanceBetween(const cv::Point& a, const cv::Point& b);
   WObjectContainer FindLinesOnMat(const cv::Mat& img);
+  WObjectContainer FindTextOnMat(const cv::Mat& img);
 }
 
 SDK_END_NAMESPACE

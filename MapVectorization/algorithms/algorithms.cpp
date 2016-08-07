@@ -39,28 +39,31 @@ int main(int argc, char* argv[])
     /*Text Detection*/
 
     // Extract channels to be processed individually
-    vector<Mat> channels;
+    //vector</*Mat> channels;*/
+	Mat channels;
 
-    Mat grey;
-    cvtColor(image,grey,COLOR_RGB2GRAY);
+    //Mat grey;
+    cvtColor(image,channels,COLOR_RGB2GRAY);
 
-    channels.push_back(grey);
+    //channels.push_back(grey);
 
     double t_d = (double)getTickCount();
     // Create ERFilter objects with the 1st and 2nd stage default classifiers
     Ptr<ERFilter> er_filter1 = createERFilterNM1(loadClassifierNM1("trained_classifierNM1.xml"),8,0.000015f,0.23f,0.1f,true,0.1f);
     Ptr<ERFilter> er_filter2 = createERFilterNM2(loadClassifierNM2("trained_classifierNM2.xml"),0.1f);
 
-    vector<vector<ERStat> > regions(channels.size());
+    vector<ERStat> regions;
     // Apply the default cascade classifier to each independent channel (could be done in parallel)
-    for (int c=0; c<(int)channels.size(); c++)
-    {
-        er_filter1->run(channels[c], regions[c]);
-        er_filter2->run(channels[c], regions[c]);
-    }
+    /*for (int c=0; c<(int)channels.size(); c++)
+    {*/
+        er_filter1->run(channels, regions);
+        er_filter2->run(channels, regions);
+    //}
+	vector< std::vector< Point > > points;
+	detectRegions	(channels, er_filter1, er_filter2, points);	
     cout << "TIME_REGION_DETECTION = " << ((double)getTickCount() - t_d)*1000/getTickFrequency() << endl;
 
-    Mat out_img_decomposition= Mat::zeros(image.rows+2, image.cols+2, CV_8UC1);
+    /*Mat out_img_decomposition= Mat::zeros(image.rows+2, image.cols+2, CV_8UC1);
     vector<Vec2i> tmp_group;
     for (int i=0; i<(int)regions.size(); i++)
     {
@@ -74,13 +77,13 @@ int main(int argc, char* argv[])
             tmp = tmp / 2;
         out_img_decomposition = out_img_decomposition | tmp;
         tmp_group.clear();
-    }
+    }*/
 
     double t_g = (double)getTickCount();
     // Detect character groups
     vector< vector<Vec2i> > nm_region_groups;
     vector<Rect> nm_boxes;
-    erGrouping(image, channels, regions, nm_region_groups, nm_boxes,ERGROUPING_ORIENTATION_HORIZ);
+    erGrouping(image, channels, points, nm_boxes, ERGROUPING_ORIENTATION_ANY, "trained_classifier_erGrouping.xml");
     cout << "TIME_GROUPING = " << ((double)getTickCount() - t_g)*1000/getTickFrequency() << endl;
 
 
@@ -109,7 +112,7 @@ int main(int argc, char* argv[])
         rectangle(out_img_detection, nm_boxes[i].tl(), nm_boxes[i].br(), Scalar(0,255,255), 3);
 
         Mat group_img = Mat::zeros(image.rows+2, image.cols+2, CV_8UC1);
-        er_draw(channels, regions, nm_region_groups[i], group_img);
+        //er_draw(channels, regions, nm_region_groups[i], group_img);
         Mat group_segmentation;
         group_img.copyTo(group_segmentation);
         //image(nm_boxes[i]).copyTo(group_img);
