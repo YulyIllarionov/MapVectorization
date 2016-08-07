@@ -99,9 +99,19 @@ SDKResult WLayer::InicializeLinesContainer()
 {
     if(m_type != LT_LINES)
         return kSDKResult_Error;
-    //cv::imshow("window", this->m_data);
-    //cv::waitKey(0);
+
     WObjectContainer lines = SDK_NAMESPACE::utils::FindLinesOnMat(m_data);
+    m_objects.insert(m_objects.end(), lines.begin(), lines.end());
+
+    return kSDKResult_Succeeded;
+}
+// ------------------------------------------------------------
+SDKResult WLayer::InicializeTextContainer()
+{
+	if(m_type != LT_TEXT)
+        return kSDKResult_Error;
+
+    WObjectContainer lines = SDK_NAMESPACE::utils::FindTextOnMat(m_data);
     m_objects.insert(m_objects.end(), lines.begin(), lines.end());
 
     return kSDKResult_Succeeded;
@@ -122,6 +132,7 @@ void WLayer::InicializeVectorContainer()
 
     case WLayer::LAYER_TYPE_ENUM::LT_TEXT:
     {
+		this->InicializeTextContainer();
     }
     break;
     

@@ -61,6 +61,9 @@ int main(int argc, char* argv[])
     //}
 	vector< std::vector< Point > > points;
 	detectRegions	(channels, er_filter1, er_filter2, points);	
+	
+	std::cout << "Size of points " << points.size() << "\n";
+	std::cout << "Size of regions " << regions.size() << "\n";
     cout << "TIME_REGION_DETECTION = " << ((double)getTickCount() - t_d)*1000/getTickFrequency() << endl;
 
     /*Mat out_img_decomposition= Mat::zeros(image.rows+2, image.cols+2, CV_8UC1);
@@ -83,10 +86,17 @@ int main(int argc, char* argv[])
     // Detect character groups
     vector< vector<Vec2i> > nm_region_groups;
     vector<Rect> nm_boxes;
-    erGrouping(image, channels, points, nm_boxes, ERGROUPING_ORIENTATION_ANY, "trained_classifier_erGrouping.xml");
+    erGrouping(image, channels, points, nm_boxes, ERGROUPING_ORIENTATION_HORIZ);//, "trained_classifier_erGrouping.xml");
+	std::cout << "Size of boxes " << nm_boxes.size() << "\n";
     cout << "TIME_GROUPING = " << ((double)getTickCount() - t_g)*1000/getTickFrequency() << endl;
 
-
+	Mat tmp;
+	image.copyTo(tmp);
+	for (int i = 0; i < nm_boxes.size(); i++) {
+		rectangle(tmp, nm_boxes[i], cvScalar(255, 255, 0), 4);
+	}
+	namedWindow("detection",WINDOW_NORMAL);
+    imshow("detection", tmp);
 
     /*Text Recognition (OCR)*/
 
@@ -109,7 +119,7 @@ int main(int argc, char* argv[])
     for (int i=0; i<(int)nm_boxes.size(); i++)
     {
 
-        rectangle(out_img_detection, nm_boxes[i].tl(), nm_boxes[i].br(), Scalar(0,255,255), 3);
+        rectangle(out_img_detection, nm_boxes[i], Scalar(0,255,255), 3);
 
         Mat group_img = Mat::zeros(image.rows+2, image.cols+2, CV_8UC1);
         //er_draw(channels, regions, nm_region_groups[i], group_img);

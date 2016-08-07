@@ -223,42 +223,41 @@ namespace utils {
 
 	WObjectContainer FindTextOnMat(const cv::Mat& img)
 	{
-	//	WObjectContainer textContainer;
-	//	double t_d = (double) cv::getTickCount();
-	//	// Create ERFilter objects with the 1st and 2nd stage default classifiers
-	//	cv::Ptr<cv::text::ERFilter> er_filter1 = cv::text::createERFilterNM1(cv::text::loadClassifierNM1("trained_classifierNM1.xml"),8,0.000015f,0.23f,0.1f,true,0.1f);
-	//	cv::Ptr<cv::text::ERFilter> er_filter2 = cv::text::createERFilterNM2(cv::text::loadClassifierNM2("trained_classifierNM2.xml"),0.1f);
+		WObjectContainer textContainer;
 
-	//	std::vector<cv::text::ERStat> regions;
-	//	// Apply the default cascade classifier to each independent channel (could be done in parallel)
-	//	er_filter1->run(img, regions);
-	//	er_filter2->run(img, regions);
-	//	
-	//	//cout << "TIME_REGION_DETECTION = " << ((double)getTickCount() - t_d)*1000/getTickFrequency() << endl;
+		// Create ERFilter objects with the 1st and 2nd stage default classifiers
+		cv::Ptr<cv::text::ERFilter> er_filter1 = cv::text::createERFilterNM1(cv::text::loadClassifierNM1("trained_classifierNM1.xml"),8,0.000015f,0.23f,0.1f,true,0.1f);
+		cv::Ptr<cv::text::ERFilter> er_filter2 = cv::text::createERFilterNM2(cv::text::loadClassifierNM2("trained_classifierNM2.xml"),0.1f);
 
-	//	cv::Mat out_img_decomposition= cv::Mat::zeros(img.rows + 2, img.cols + 2, CV_8UC1);
-	//	std::vector<cv::Vec2i> tmp_group;
+		std::vector<cv::text::ERStat> regions;
+		// Apply the default cascade classifier to each independent channel (could be done in parallel)
+		er_filter1->run(img, regions);
+		er_filter2->run(img, regions);
+		
+		std::vector<std::vector<cv::Point>> points;
+		detectRegions(img, er_filter1, er_filter2, points);	
+	
+		cv::Mat out_img_decomposition= cv::Mat::zeros(img.rows + 2, img.cols + 2, CV_8UC1);
+		std::vector<cv::Vec2i> tmp_group;
 
-	//	/*for (int i=0; i<(int)regions.size(); i++)
-	//	{
-	//		for (int j=0; j<(int)regions[i].size();j++)
-	//		{
-	//			tmp_group.push_back(Vec2i(i,j));
-	//		}
-	//		cv::Mat tmp= cv::Mat::zeros(img.rows + 2, img.cols + 2, CV_8UC1);
-	//		cv::text::er_draw(channels, regions, tmp_group, tmp);
-	//		if (i > 0)
-	//			tmp = tmp / 2;
-	//		out_img_decomposition = out_img_decomposition | tmp;
-	//		tmp_group.clear();
-	//	}*/
+		// Detect character groups
+		std::vector<cv::Rect> nm_boxes;
+		cv::text::erGrouping(img, img, points, nm_boxes, cv::text::ERGROUPING_ORIENTATION_HORIZ);
 
-	//	double t_g = (double) cv::getTickCount();
-	//	// Detect character groups
-	//	std::vector<cv::Vec2i> nm_region_groups;
-	//	std::vector<cv::Rect> nm_boxes;
-	//	cv::text::erGrouping(img, img, regions, nm_region_groups, nm_boxes, cv::text::ERGROUPING_ORIENTATION_HORIZ);
-	//	//cout << "TIME_GROUPING = " << ((double)getTickCount() - t_g)*1000/getTickFrequency() << endl;
+		for (int i = 0; i < nm_boxes.size(); i++)
+		{
+			//TODO
+			//std::vector<cv::Point> polygon {nm_boxes[i].tl(), nm_boxes[i].br(), 
+			//	nm_boxes[i].tl() + cv::Point(nm_boxes[i].width,0), nm_boxes[i].tl() + cv::Point(0, nm_boxes[i].height)};
+			//polygon.push_back(nm_boxes[i].tl());
+			//polygon.push_back(nm_boxes[i].br());
+
+			
+			//WText item(polygon);
+			//textContainer.push_back(item);
+		}
+
+		return textContainer;
 	}
 }
 SDK_END_NAMESPACE
