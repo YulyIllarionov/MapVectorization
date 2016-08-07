@@ -4,7 +4,7 @@
 /// \author Whiteteam authors
 
 #include "stdafx.h"
-
+#include <fstream>  
 #include "opencv2/highgui/highgui.hpp"
 
 
@@ -507,6 +507,39 @@ std::vector<int> WRaster::DefineObjectsInsidePolygon(const LayerUUID& layerId, c
 	  return ids;
 }
 // ------------------------------------------------------------
+SDKResult WRaster::RecognizeText(const LayerUUID& layerId, int idx)
+{
+    WLayer* layer = GetLayerById(layerId);
+    if (!layer -> IsSingleType())
+        return kSDKResult_Error;
+    if(layer -> getType() != WLayer::LT_TEXT)
+        return kSDKResult_Error;
+    if (idx >= layer->m_objects.size())
+        return kSDKResult_Error;
+    
+    WText currentText = layer->m_objects[0]; //Нужен cast от WVectorObject к Wtext
+
+    Rect roi = boundingRect(layer->m_objects[0].m_points);
+
+    Mat img2Recognition(roi.size(), CV_8UC1, Scalar(0));
+    for (int y = roi.y; y < roi.y + roi.height; y++)
+    {
+        for (int x = roi.x; x < roi.x + roi.width; x++)
+        {
+            Point current(x, y);
+            if (currentText.Contains(current))
+            {
+                img2Recognition.at<uchar>(y - roi.y, x - roi.x) = layer->m_data.at<uchar>(current);
+            }
+        }
+    }
+
+    //TODO
+    //Повернуть img2Recognition
+    //Распознать текст на  img2Recognition
+
+}
+// ------------------------------------------------------------
 // copy object from one layer to another
 void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, const WPolygon mapPoints)
 {
@@ -828,7 +861,11 @@ bool Wregion::IsLine()
     float radius;
     minEnclosingCircle(points, Point2f(), radius);
     double ratio = (double)this->Square() / radius / radius;
-    return (ratio < 1.6);
+    //std::fstream fs;
+    //fs.open("./testRatio.txt", std::fstream::in | std::fstream::out | std::fstream::app);
+    //fs << ratio << std::endl;
+    //fs.close();
+    return (ratio < 0.6);
 }
 // ------------------------------------------------------------
 void Wregion::drawOn(Mat& img, uchar color)

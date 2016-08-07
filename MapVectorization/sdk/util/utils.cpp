@@ -226,8 +226,10 @@ namespace utils {
 		WObjectContainer textContainer;
 
 		// Create ERFilter objects with the 1st and 2nd stage default classifiers
-		cv::Ptr<cv::text::ERFilter> er_filter1 = cv::text::createERFilterNM1(cv::text::loadClassifierNM1("trained_classifierNM1.xml"),8,0.000015f,0.23f,0.1f,true,0.1f);
-		cv::Ptr<cv::text::ERFilter> er_filter2 = cv::text::createERFilterNM2(cv::text::loadClassifierNM2("trained_classifierNM2.xml"),0.1f);
+		cv::Ptr<cv::text::ERFilter> er_filter1 = cv::text::createERFilterNM1(
+            cv::text::loadClassifierNM1("trained_classifierNM1.xml"),8,0.000015f,0.23f,0.1f,true,0.1f);
+		cv::Ptr<cv::text::ERFilter> er_filter2 = cv::text::createERFilterNM2(
+            cv::text::loadClassifierNM2("trained_classifierNM2.xml"),0.1f);
 
 		std::vector<cv::text::ERStat> regions;
 		// Apply the default cascade classifier to each independent channel (could be done in parallel)
@@ -246,15 +248,14 @@ namespace utils {
 
 		for (int i = 0; i < nm_boxes.size(); i++)
 		{
-			//TODO
-			//std::vector<cv::Point> polygon {nm_boxes[i].tl(), nm_boxes[i].br(), 
-			//	nm_boxes[i].tl() + cv::Point(nm_boxes[i].width,0), nm_boxes[i].tl() + cv::Point(0, nm_boxes[i].height)};
-			//polygon.push_back(nm_boxes[i].tl());
-			//polygon.push_back(nm_boxes[i].br());
+            std::vector<cv::Point> polygon;
+			polygon.push_back(nm_boxes[i].tl());
+            polygon.push_back(nm_boxes[i].tl() + cv::Point(nm_boxes[i].width, 0));
+            polygon.push_back(nm_boxes[i].tl() + cv::Point(0, nm_boxes[i].height));
+			polygon.push_back(nm_boxes[i].br());
 
-			
-			//WText item(polygon);
-			//textContainer.push_back(item);
+			WText item(polygon);
+			textContainer.push_back(item);
 		}
 
 		return textContainer;

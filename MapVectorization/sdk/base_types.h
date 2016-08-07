@@ -344,6 +344,7 @@ public:
 	// define objects inside polygon
 	std::vector<int> DefineObjectsInsidePolygon(const LayerUUID& layerId, const WPolygon& mapPoints);
 	std::vector<int> DefineObjectsNearPoint(const LayerUUID& layerId, SMapPoint point);
+    SDKResult RecognizeText(const LayerUUID& layerId, int idx);
 
 	// copy object from one layer to another
 	void CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, WPolygon mapPoints);

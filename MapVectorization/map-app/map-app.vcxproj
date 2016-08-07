@@ -97,6 +97,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -215,9 +216,9 @@ xcopy /d /y "$(QTDIR)\plugins\platforms\qwindowsd.dll" "$(OutDir)platforms"</Com
     <Link>
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>../3rdparty/opencv/lib;../3rdparty/opencv/bin;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../3rdparty/tesseract/lib;../3rdparty/leptonica/lib;../3rdparty/opencv/lib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>Rpcrt4.lib;opencv_world310.lib;qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Svg.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Rpcrt4.lib;qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Svg.lib;Qt5Widgets.lib;opencv_world310.lib;opencv_text310.lib;lept173.lib;tesseract.lib;tesseract305.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>if not exist "$(OutDir)platforms" mkdir "$(OutDir)platforms"
