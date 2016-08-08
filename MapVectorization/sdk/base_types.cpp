@@ -509,7 +509,7 @@ std::vector<int> WRaster::DefineObjectsInsidePolygon(const LayerUUID& layerId, c
 // ------------------------------------------------------------
 SDKResult WRaster::RecognizeText(const LayerUUID& layerId, int idx)
 {
-    WLayer* layer = GetLayerById(layerId);
+    WLayer* layer = GetLayerById(layerId);//TODO сделать kSDKResult разными
     if (!layer -> IsSingleType())
         return kSDKResult_Error;
     if(layer -> getType() != WLayer::LT_TEXT)
@@ -517,9 +517,9 @@ SDKResult WRaster::RecognizeText(const LayerUUID& layerId, int idx)
     if (idx >= layer->m_objects.size())
         return kSDKResult_Error;
     
-    WText currentText = layer->m_objects[0]; //Нужен cast от WVectorObject к Wtext
+    WPolygon& currentText = dynamic_cast<WPolygon&>(layer->m_objects[idx]); //TODO исправте это
 
-    Rect roi = boundingRect(layer->m_objects[0].m_points);
+    Rect roi = boundingRect(currentText.m_points);
 
     Mat img2Recognition(roi.size(), CV_8UC1, Scalar(0));
     for (int y = roi.y; y < roi.y + roi.height; y++)
@@ -533,6 +533,13 @@ SDKResult WRaster::RecognizeText(const LayerUUID& layerId, int idx)
             }
         }
     }
+
+    std::vector<cv::Vec4i> textLines;
+    HoughLinesP(img2Recognition, textLines, 1, CV_PI / 180, 80, img2Recognition.cols/4, img2Recognition.cols/10);
+
+
+
+
 
     //TODO
     //Повернуть img2Recognition
