@@ -98,6 +98,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <LinkIncremental>false</LinkIncremental>
+    <CustomBuildAfterTargets> </CustomBuildAfterTargets>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -222,7 +223,14 @@ xcopy /d /y "$(QTDIR)\plugins\platforms\qwindowsd.dll" "$(OutDir)platforms"</Com
     </Link>
     <PostBuildEvent>
       <Command>if not exist "$(OutDir)platforms" mkdir "$(OutDir)platforms"
-xcopy /d /y "$(QTDIR)\plugins\platforms\qwindows.dll" "$(OutDir)platforms"</Command>
+xcopy /d /y "$(QTDIR)\plugins\platforms\qwindows.dll" "$(OutDir)platforms"
+xcopy /d /y "$(ProjectDir)../3rdparty\opencv\bin\opencv_text310.dll" "$(OutDir)"
+xcopy /d /y "$(ProjectDir)../3rdparty\opencv\bin\opencv_world310.dll" "$(OutDir)"
+xcopy /d /y "$(ProjectDir)../3rdparty\leptonica\bin\lept173.dll" "$(OutDir)"
+xcopy /d /y "$(ProjectDir)../3rdparty\tesseract\bin\tesseract305.dll" "$(OutDir)"
+xcopy /d /y "$(ProjectDir)../3rdparty\tinyxml2\bin\tinyxml2.dll" "$(OutDir)"
+if not exist "$(OutDir)tessdata" mkdir "$(OutDir)tessdata"
+xcopy /d /y "$(ProjectDir)../3rdparty\tesseract\tessdata\eng.traineddata" "$(OutDir)tessdata"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
