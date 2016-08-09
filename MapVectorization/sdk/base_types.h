@@ -53,7 +53,7 @@ public:
 SDK_BEGIN_NAMESPACE
 
 
-	//Общий интерфейс всех объектов
+//Общий интерфейс всех объектов
 class WVectorObject
 {
 public:
