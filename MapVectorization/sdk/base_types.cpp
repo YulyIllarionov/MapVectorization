@@ -517,10 +517,9 @@ SDKResult WRaster::RecognizeText(const LayerUUID& layerId, int idx)
     if (idx >= layer->m_objects.size())
         return kSDKResult_Error;
     
-    WPolygon& currentText = dynamic_cast<WPolygon&>(layer->m_objects[idx]); //TODO исправте это
-
+    //Копирование полигона на отдельное изображение 
+    WText& currentText = dynamic_cast<WText&>(layer->m_objects[idx]); //TODO исправте это
     Rect roi = boundingRect(currentText.m_points);
-
     Mat img2Recognition(roi.size(), CV_8UC1, Scalar(0));
     for (int y = roi.y; y < roi.y + roi.height; y++)
     {
@@ -534,16 +533,27 @@ SDKResult WRaster::RecognizeText(const LayerUUID& layerId, int idx)
         }
     }
 
+    //Нахождение угла поворота
     std::vector<cv::Vec4i> textLines;
     HoughLinesP(img2Recognition, textLines, 1, CV_PI / 180, 80, img2Recognition.cols/4, img2Recognition.cols/10);
+    std::vector<double> lineAngles(textLines.size());
+    for (size_t i = 0; i < textLines.size(); i++)
+    {
+        lineAngles[i] = std::atan2(textLines[i][3] - textLines[i][1], textLines[i][2] - textLines[i][0]);
+    }
+    std::sort(lineAngles.begin(), lineAngles.end());
+    double angle = lineAngles[lineAngles.size() / 2];
 
-
-
-
+    //Поворот
+    cv::Point2f center(img2Recognition.cols / 2.0, img2Recognition.rows / 2.0);
+    cv::Mat rot = cv::getRotationMatrix2D(center, angle, 1.0);
+    cv::Rect bbox = cv::RotatedRect(center, img2Recognition.size(), angle).boundingRect();
+    rot.at<double>(0, 2) += bbox.width / 2.0 - center.x;
+    rot.at<double>(1, 2) += bbox.height / 2.0 - center.y;
+    cv::warpAffine(img2Recognition, img2Recognition, rot, bbox.size());
 
     //TODO
-    //Повернуть img2Recognition
-    //Распознать текст на  img2Recognition
+    //Распознать текст на  img2Recognition и заполнить поля на currentText
 
 }
 // ------------------------------------------------------------
