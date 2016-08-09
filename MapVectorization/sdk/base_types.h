@@ -123,7 +123,7 @@ private:
 	WColor    m_color;
 };
 
-
+class WLayer; //TODO используется в классе Wtext, убрать;
 //Объект текст
 class WText : public WPolygon
 {
@@ -157,6 +157,7 @@ public:
 	bool GetState() const { return m_state; }
 
 	//virtual double DistanceTo(cv::Point mapPoint) const;
+    SDKResult Recognize(WLayer* layer); //TODO избавиться от WLayer в параметрах
 
 private:
 	WLine       m_textline; // Линия, обозначающая направление текста внутри полигона
@@ -344,7 +345,6 @@ public:
 	// define objects inside polygon
 	std::vector<int> DefineObjectsInsidePolygon(const LayerUUID& layerId, const WPolygon& mapPoints);
 	std::vector<int> DefineObjectsNearPoint(const LayerUUID& layerId, SMapPoint point);
-    SDKResult RecognizeText(const LayerUUID& layerId, int idx);
 
 	// copy object from one layer to another
 	void CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, WPolygon mapPoints);
