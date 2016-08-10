@@ -34,6 +34,8 @@ protected:
 
     void on_SplitButton_clicked();
 
+    void on_RecognitionButton_clicked();
+
 private:
     Ui::LayersViewer         *m_ui;
     ImageViewer              *m_widget;

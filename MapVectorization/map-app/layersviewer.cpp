@@ -87,6 +87,13 @@ void LayersViewer::on_listWidget_currentRowChanged(int currentRow)
         }
         else m_ui->SplitButton->setEnabled(false);
 
+        if(m_layers->at(currentRow)->getType()==(WLayer::LAYER_TYPE_ENUM::LT_TEXT))
+        {
+           m_ui->RecognitionButton->setEnabled(true);
+        }
+        else m_ui->RecognitionButton->setEnabled(false);
+
+
     }
 }
 
@@ -132,4 +139,9 @@ void LayersViewer::on_SplitButton_clicked()
     }
     UpdateList();
 
+}
+
+void LayersViewer::on_RecognitionButton_clicked()
+{
+    m_layers->at(m_ui->listWidget->currentRow())->InicializeTextContainer();
 }

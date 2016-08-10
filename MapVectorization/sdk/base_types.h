@@ -283,6 +283,7 @@ private:
 	GroupID     m_group_id;
 
 	SDKResult InicializeLinesContainer();
+public:
 	SDKResult InicializeTextContainer();
 };
 // ------------------------------------------------------------

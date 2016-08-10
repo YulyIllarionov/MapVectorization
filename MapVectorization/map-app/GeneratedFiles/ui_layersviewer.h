@@ -31,13 +31,14 @@ public:
     QPushButton *Add;
     QPushButton *Remove;
     QPushButton *SplitButton;
+    QPushButton *RecognitionButton;
     QPushButton *SavePngButton;
 
     void setupUi(QWidget *LayersViewer)
     {
         if (LayersViewer->objectName().isEmpty())
             LayersViewer->setObjectName(QStringLiteral("LayersViewer"));
-        LayersViewer->resize(338, 217);
+        LayersViewer->resize(419, 238);
         verticalLayout = new QVBoxLayout(LayersViewer);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         listWidget = new QListWidget(LayersViewer);
@@ -63,6 +64,12 @@ public:
 
         horizontalLayout->addWidget(SplitButton);
 
+        RecognitionButton = new QPushButton(LayersViewer);
+        RecognitionButton->setObjectName(QStringLiteral("RecognitionButton"));
+        RecognitionButton->setEnabled(false);
+
+        horizontalLayout->addWidget(RecognitionButton);
+
         SavePngButton = new QPushButton(LayersViewer);
         SavePngButton->setObjectName(QStringLiteral("SavePngButton"));
 
@@ -83,6 +90,7 @@ public:
         Add->setText(QApplication::translate("LayersViewer", "\320\224\320\276\320\261.", 0));
         Remove->setText(QApplication::translate("LayersViewer", "\320\243\320\264\320\260\320\273.", 0));
         SplitButton->setText(QApplication::translate("LayersViewer", "Split", 0));
+        RecognitionButton->setText(QApplication::translate("LayersViewer", "Recog Text", 0));
         SavePngButton->setText(QApplication::translate("LayersViewer", "Save as PNG", 0));
     } // retranslateUi
 
