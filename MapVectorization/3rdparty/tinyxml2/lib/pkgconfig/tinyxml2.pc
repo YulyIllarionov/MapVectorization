@@ -1,0 +1,10 @@
+prefix=C:/Program Files/tinyxml2
+exec_prefix=${prefix}
+libdir=C:/Program Files/tinyxml2/lib
+includedir=C:/Program Files/tinyxml2/include
+
+Name: TinyXML2
+Description: simple, small, C++ XML parser
+Version: 4.0.1
+Libs: -L${libdir} -ltinyxml2
+Cflags: -I${includedir}

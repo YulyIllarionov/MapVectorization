@@ -31,6 +31,12 @@
     <Filter Include="Source Files\graphics">
       <UniqueIdentifier>{d48efceb-41ca-4508-b2e9-58211107ddf4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\data_mappers">
+      <UniqueIdentifier>{467e2616-b2f1-43d1-9519-e55917f902a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\data_mappers">
+      <UniqueIdentifier>{3a0c2f7a-5fa4-463a-9b49-27f74ed72e9a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -60,6 +66,12 @@
     <ClInclude Include="graphics\skeletonization.h">
       <Filter>Header Files\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="data_mappers\IDataMapper.h">
+      <Filter>Header Files\data_mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="data_mappers\SMapPointDataMapper.h">
+      <Filter>Header Files\data_mappers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -79,6 +91,9 @@
     </ClCompile>
     <ClCompile Include="graphics\skeletonization.cpp">
       <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="data_mappers\SMapPointDataMapper.cpp">
+      <Filter>Source Files\data_mappers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
