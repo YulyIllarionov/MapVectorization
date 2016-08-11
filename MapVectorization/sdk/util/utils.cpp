@@ -260,5 +260,28 @@ namespace utils {
 
 		return textContainer;
 	}
+
+	// Распознает текст на входных изображениях. В будущем будет осуществляться фильтрация результатов 
+	// по вероятности правильного распознавания (параметр minConfidences)
+	std::vector<std::vector<std::string>> RecognizeText(std::vector<cv::Mat>& input, const float minConfidences)
+	{		
+		cv::Ptr<cv::text::OCRTesseract> ocr = cv::text::OCRTesseract::create();
+		std::vector<std::vector<std::string>> result;
+		std::string output;
+		
+		for (int i = 0; i < input.size(); i++)
+		{
+			std::vector<cv::Rect>   boxes;
+			std::vector<std::string> words;
+			std::vector<float>  confidences;
+			ocr->run(input[i], output, &boxes, &words, &confidences, cv::text::OCR_LEVEL_WORD);
+
+			output.erase(remove(output.begin(), output.end(), '\n'), output.end());
+			
+			result.push_back(words);			
+		}
+
+		return result;
+	}
 }
 SDK_END_NAMESPACE

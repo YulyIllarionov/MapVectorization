@@ -34,6 +34,7 @@ namespace utils
   int squaredDistanceBetween(const cv::Point& a, const cv::Point& b);
   WObjectContainer FindLinesOnMat(const cv::Mat& img);
   WObjectContainer FindTextOnMat(const cv::Mat& img);
+  std::vector<std::vector<std::string>> RecognizeText(std::vector<cv::Mat>& input, const float minConfidences = 0);
 }
 
 SDK_END_NAMESPACE
