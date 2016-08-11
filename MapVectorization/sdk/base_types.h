@@ -157,7 +157,7 @@ public:
 	bool GetState() const { return m_state; }
 
 	//virtual double DistanceTo(cv::Point mapPoint) const;
-    SDKResult Recognize(WLayer* layer); //TODO избавиться от WLayer в параметрах
+    cv::Mat RotateToHorizon(WLayer* layer); //TODO избавиться от WLayer в параметрах
 
 private:
 	WLine       m_textline; // Линия, обозначающая направление текста внутри полигона
@@ -270,6 +270,7 @@ public:
 
 	void DrawCircle(SMapPoint point, uint radius, uchar color);
 	void InicializeVectorContainer();
+    SDKResult RecognizeText(std::vector<int> idxs, const float minConfidences);
 
 	cv::Mat     m_data;
 

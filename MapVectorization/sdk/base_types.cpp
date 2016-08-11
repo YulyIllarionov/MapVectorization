@@ -6,7 +6,7 @@
 #include "stdafx.h"
 #include <fstream>  
 #include "opencv2/highgui/highgui.hpp"
-
+#include "opencv2/text.hpp"
 
 #include "util/utils.h"
 #include "util/math_utils.h"
@@ -112,12 +112,17 @@ SDKResult WLayer::InicializeTextContainer()
         return kSDKResult_Error;
 
     WObjectContainer lines = SDK_NAMESPACE::utils::FindTextOnMat(m_data);
+    std::vector<int> idxs(lines.size());
+    for (size_t i = 0; i < idxs.size(); i++)
+    {
+        idxs[i] = m_objects.end() - m_objects.begin() + i;
+    }
     m_objects.insert(m_objects.end(), lines.begin(), lines.end());
-    //for (size_t i = 0; i < m_objects.size(); i++)
-    //{
-    //    WText* currentText = dynamic_cast<WText*>(&m_objects[i]);
-    //    currentText->Recognize(this);
-    //}
+    for (size_t i = 0; i < m_objects.size(); i++)
+    {
+        WText* currentText = dynamic_cast<WText*>(&m_objects[i]);
+        this->RecognizeText(idxs, 0.0);
+    }
     return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
@@ -374,7 +379,6 @@ SDKResult WRaster::SplitLayer(const LayerUUID& layerId, LayerIDs& splittedLayers
         //this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_OTHER);
         this->SetLayerName(othersLayer->getID(), std::string("Text from ")+layer->getName());
         this->SplitLines(layerId, linesLayer->getID(), othersLayer->getID());
-        linesLayer->InicializeVectorContainer();
         splittedLayers.clear();
         splittedLayers.push_back(linesLayer->getID());
         splittedLayers.push_back(othersLayer->getID());
@@ -387,24 +391,23 @@ SDKResult WRaster::SplitLayer(const LayerUUID& layerId, LayerIDs& splittedLayers
     //{
     //    break;
     //}
-    case WLayer::LAYER_TYPE_ENUM::LT_TEXT | WLayer::LAYER_TYPE_ENUM::LT_OTHER:
-    {
-        WLayer* textLayer = this->AddLayer(layer->getGroupId());
-        this->SetLayerType(textLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_TEXT);
-        this->SetLayerName(textLayer->getID(), std::string("Text from ") + layer->getName());
-        
-        WLayer* othersLayer = this->AddLayer(layer->getGroupId());
-        this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_OTHER);
-        this->SetLayerName(othersLayer->getID(), std::string("Other from ") + layer->getName());
-        
-        this->SplitText(layerId, textLayer->getID(), othersLayer->getID());
-        
-        textLayer->InicializeVectorContainer();
-        splittedLayers.clear();
-        splittedLayers.push_back(textLayer->getID());
-        splittedLayers.push_back(othersLayer->getID());
-        break;
-    }
+    //case WLayer::LAYER_TYPE_ENUM::LT_TEXT | WLayer::LAYER_TYPE_ENUM::LT_OTHER:
+    //{
+    //    WLayer* textLayer = this->AddLayer(layer->getGroupId());
+    //    this->SetLayerType(textLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_TEXT);
+    //    this->SetLayerName(textLayer->getID(), std::string("Text from ") + layer->getName());
+    //    
+    //    WLayer* othersLayer = this->AddLayer(layer->getGroupId());
+    //    this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_OTHER);
+    //    this->SetLayerName(othersLayer->getID(), std::string("Other from ") + layer->getName());
+    //    
+    //    this->SplitText(layerId, textLayer->getID(), othersLayer->getID());
+    //    
+    //    splittedLayers.clear();
+    //    splittedLayers.push_back(textLayer->getID());
+    //    splittedLayers.push_back(othersLayer->getID());
+    //    break;
+    //}
     default:
       {   
         WLayer* l1 = AddLayer();
@@ -780,12 +783,10 @@ WPointsContainer WLine::SimplifyLine(const WPointsContainer& linevector, double 
 	return outpoints;
 }
 // ------------------------------------------------------------
-SDKResult WText::Recognize(WLayer* layer)
+cv::Mat WText::RotateToHorizon(WLayer* layer)
 {
-    if (!layer->IsSingleType())
-        return kSDKResult_Error;
     if (layer->getType() != WLayer::LAYER_TYPE_ENUM::LT_TEXT)
-        return kSDKResult_Error;
+        return cv::Mat();
         
     //Копирование полигона на отдельное изображение 
     Rect roi = boundingRect(m_points);
@@ -821,8 +822,7 @@ SDKResult WText::Recognize(WLayer* layer)
     rot.at<double>(1, 2) += bbox.height / 2.0 - center.y;
     cv::warpAffine(img2Recognition, img2Recognition, rot, bbox.size());
 
-    //TODO
-    //Распознать текст на  img2Recognition и заполнить соответствующие поля
+    return img2Recognition;
 }
 // ------------------------------------------------------------
 Wregion::Wregion(const cv::Point& point, cv::Mat& img)
@@ -934,4 +934,37 @@ SDKResult WRaster::SplitText(const LayerUUID& layerId, const LayerUUID& textLaye
   return result;
 } 
 // ------------------------------------------------------------
+
+// Распознает текст на входных изображениях. В будущем будет осуществляться фильтрация результатов 
+// по вероятности правильного распознавания (параметр minConfidences)
+SDKResult WLayer::RecognizeText(std::vector<int> idxs, const float minConfidences)
+{
+    if (m_type != WLayer::LAYER_TYPE_ENUM::LT_TEXT)
+        return kSDKResult_Error;
+
+    cv::Ptr<cv::text::OCRTesseract> ocr = cv::text::OCRTesseract::create();
+    std::vector<std::vector<std::string>> result;
+
+    for (int i = 0; i < idxs.size(); i++)
+    {
+        if (idxs[i] < m_objects.size())
+        {
+            WText* text = dynamic_cast<WText*>(&m_objects[idxs[i]]);
+            cv::Mat rotatedTextImg = text->RotateToHorizon(this);
+
+            std::string output;
+            std::vector<cv::Rect>   boxes;
+            std::vector<std::string> words;
+            std::vector<float>  confidences;
+            ocr->run(rotatedTextImg, output, &boxes, &words, &confidences, cv::text::OCR_LEVEL_WORD);
+
+            //output.erase(remove(output.begin(), output.end(), '\n'), output.end());
+
+            text->AddText(output);
+            text->SetState(true);
+
+        }
+    }
+}
+
   SDK_END_NAMESPACE
