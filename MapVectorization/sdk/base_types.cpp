@@ -628,43 +628,49 @@ void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const
    default:
        break;
    }
-   DeleteOblectsFromLayer(departureLayerId, mapPoints);
     
 }
 // ------------------------------------------------------------
-void WRaster::DeleteOblectsFromLayer(const LayerUUID& layerId, const WPolygon& mapPoints)
+std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& layerId, std::vector<int> idxs)
 {
-    // delete raster
     WLayer* layer = GetLayerById(layerId);
-    if (mapPoints.Length() > 1)
+    if (!layer->IsSingleType())
+        return std::vector<std::vector<Wregion>>();
+
+    std::vector<std::vector<Wregion>> regions;
+    switch (layer->getType())
     {
-        Rect roi = boundingRect(mapPoints.m_points); // GetPoints());
-        for (int y = roi.y; y < roi.y + roi.height; y++)
+    case WLayer::LAYER_TYPE_ENUM::LT_LINES:
+    {
+        for (size_t i = 0; i < idxs.size(); i++)
         {
-            for (int x = roi.x; x < roi.x + roi.width; x++)
+            if (idxs[i] < layer->m_objects.size())
             {
-                Point current(x, y);
-                if (mapPoints.Contains(current))
-                    layer->m_data.at<uchar>(current) = 0;
+                //cut from raster
+                WLine* text = dynamic_cast<WLine*>(&layer->m_objects[idxs[i]]);
+                regions.push_back(text->CutFromLayer(layer));
+                //delete from vector
+                layer->m_objects.erase(layer->m_objects.begin() + idxs[i]);
+            }
+        }
+    }
+    case WLayer::LAYER_TYPE_ENUM::LT_TEXT:
+    {
+        for (size_t i = 0; i < idxs.size(); i++)
+        {
+            if (idxs[i] < layer->m_objects.size())
+            {
+                //cut from raster
+                WText* text = dynamic_cast<WText*>(&layer->m_objects[idxs[i]]);
+                regions.push_back(text->CutFromLayer(layer));
+                //delete from vector
+                layer->m_objects.erase(layer->m_objects.begin() + idxs[i]);
             }
         }
     }
 
-    // delete vector objects    
-    if (!layer->IsSingleType())
-      return;
-
-    std::vector<int> ids = DefineObjectsInsidePolygon(layerId, mapPoints);
-    WLayer::LAYER_TYPE layerType = layer->getType();
-    
-    WObjectContainer new_objects;
-    new_objects.reserve(layer->m_objects.size() - ids.size());
-    for (int idx = 0; idx < layer->m_objects.size(); idx++)
-    {
-      if (ids.end() == std::find(ids.begin(), ids.end(), idx))
-        new_objects.push_back(layer->m_objects.at(idx));
     }
-    layer->m_objects = new_objects;
+    return regions;
 }
 // ------------------------------------------------------------
 WPolygon::WPolygon(std::vector<SMapPoint> & mapPoints)
@@ -783,6 +789,46 @@ WPointsContainer WLine::SimplifyLine(const WPointsContainer& linevector, double 
 	return outpoints;
 }
 // ------------------------------------------------------------
+std::vector<Wregion> WLine::CutFromLayer(WLayer* layer)
+{
+    if (layer->getType() != WLayer::LAYER_TYPE_ENUM::LT_LINES)
+        return std::vector<Wregion>();
+
+    Point2f rectPoints[4] ;
+    cv::RotatedRect lineRect = cv::minAreaRect(m_points);
+    lineRect.points(rectPoints);
+    std::vector<Point> polygonPoints(4);
+    for (size_t i = 0; i < 4; i++)
+        polygonPoints[i] = rectPoints[i];
+ 
+    for (size_t i = 0; i < polygonPoints.size(); i++)
+    {
+        polygonPoints[i].x = std::max(polygonPoints[i].x, 0);
+        polygonPoints[i].x = std::min(polygonPoints[i].x, layer->m_data.cols);
+        polygonPoints[i].y = std::max(polygonPoints[i].x, 0);
+        polygonPoints[i].y = std::min(polygonPoints[i].x, layer->m_data.rows);
+    }
+    WPolygon linePolygon(polygonPoints);
+
+    Rect roi = boundingRect(linePolygon.m_points);
+    std::vector<Wregion> letters;
+    for (int y = roi.y; y < roi.y + roi.height; y++)
+    {
+        for (int x = roi.x; x < roi.x + roi.width; x++)
+        {
+            Point current(x, y);
+            if (linePolygon.Contains(current))
+            {
+                if (layer->m_data.at<uchar>(current) != 0)
+                {
+                    letters.push_back(Wregion(current, layer->m_data));
+                }
+            }
+        }
+    }
+    return letters;
+}
+// ------------------------------------------------------------
 cv::Mat WText::RotateToHorizon(WLayer* layer)
 {
     if (layer->getType() != WLayer::LAYER_TYPE_ENUM::LT_TEXT)
@@ -823,6 +869,30 @@ cv::Mat WText::RotateToHorizon(WLayer* layer)
     cv::warpAffine(img2Recognition, img2Recognition, rot, bbox.size());
 
     return img2Recognition;
+}
+// ------------------------------------------------------------
+std::vector<Wregion> WText::CutFromLayer(WLayer* layer)
+{
+    if (layer->getType() != WLayer::LAYER_TYPE_ENUM::LT_TEXT)
+        return std::vector<Wregion>();
+
+    Rect roi = boundingRect(m_points);
+    std::vector<Wregion> letters;
+    for (int y = roi.y; y < roi.y + roi.height; y++)
+    {
+        for (int x = roi.x; x < roi.x + roi.width; x++)
+        {
+            Point current(x, y);
+            if (this->Contains(current))
+            {
+                if (layer->m_data.at<uchar>(current) != 0)
+                {
+                    letters.push_back(Wregion(current, layer->m_data));
+                }
+            }
+        }
+    }
+    return letters;
 }
 // ------------------------------------------------------------
 Wregion::Wregion(const cv::Point& point, cv::Mat& img)

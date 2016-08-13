@@ -93,6 +93,9 @@ public:
 	//virtual double DistanceTo(cv::Point mapPoint) const;
 };
 
+class WLayer; //TODO используется в классах Wtext и WLine убрать;
+              //Объект текст
+class Wregion;
 class WLine : public WVectorObject
 {
 public:
@@ -116,6 +119,7 @@ public:
 	//virtual double DistanceTo(cv::Point mapPoint) const;
 	//Упростить линию
 	WPointsContainer SimplifyLine(const WPointsContainer& vectorline, double EPSILON, int delta);
+    std::vector<Wregion> CutFromLayer(WLayer* layer);
 
 private:
 	double    m_width;
@@ -123,8 +127,6 @@ private:
 	WColor    m_color;
 };
 
-class WLayer; //TODO используется в классе Wtext, убрать;
-//Объект текст
 class WText : public WPolygon
 {
 public:
@@ -158,6 +160,7 @@ public:
 
 	//virtual double DistanceTo(cv::Point mapPoint) const;
     cv::Mat RotateToHorizon(WLayer* layer); //TODO избавиться от WLayer в параметрах
+    std::vector<Wregion> CutFromLayer(WLayer* layer);
 
 private:
 	WLine       m_textline; // Линия, обозначающая направление текста внутри полигона
@@ -351,7 +354,7 @@ public:
 	// copy object from one layer to another
 	void CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, WPolygon mapPoints);
 	// удаление объектов со слоя 
-	void DeleteOblectsFromLayer(const LayerUUID& layerId, const WPolygon& mapPoints);
+	std::vector<std::vector<Wregion>> CutObjectsFromLayer(const LayerUUID& layerId, std::vector<int> idxs);
 
 private:
 	SDKResult SetLayerType (const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite);

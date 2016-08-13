@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
 {
     Mat image;
     //if(argc>1)
-    image  = imread("C:\\MapVectorization\\MapVectorization\\sample\\map\\black.png");
+    image  = imread("C:\\MapVectorization\\MapVectorization\\sample\\black\\cu71Black.png");
    /* else
     {
         cout << "    Usage: " << argv[0] << " <input_image> [<gt_word1> ... <gt_wordN>]" << endl;
