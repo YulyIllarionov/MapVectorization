@@ -117,8 +117,8 @@ public:
 
 	void Concat(const WLine& line);
 	//virtual double DistanceTo(cv::Point mapPoint) const;
-	//”простить линию
-	WPointsContainer SimplifyLine(const WPointsContainer& vectorline, double EPSILON, int delta);
+	//”простить линию изпользу€ алгоритм ƒугласа-ѕекера
+    void SimplifyDP(double epsilon = 2.7);
     std::vector<Wregion> CutFromLayer(WLayer* layer);
 
 private:

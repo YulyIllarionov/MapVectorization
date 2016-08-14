@@ -701,48 +701,9 @@ void WLine::Concat(const WLine& line)
     }
 }
 // ------------------------------------------------------------
-WPointsContainer WLine::SimplifyLine(const WPointsContainer& linevector, double EPSILON, int delta)
+void WLine::SimplifyDP(double epsilon)
 {
-	int i = 0;
-	double k; // curvature
-	WPointsContainer outpoints;
-	while ((i + 2 * delta) <= linevector.size())
-	{
-		k = (((linevector[i + 2 * delta].y - linevector[i + delta].y) 
-      / (linevector[i + 2 * delta].x - linevector[i + delta].x)) 
-      / ((linevector[i + delta].y - linevector[i].y) 
-      / (linevector[i + delta].x - linevector[i].x))) 
-      / pow((1 + pow((linevector[i + delta].y - linevector[i].y) 
-      / (linevector[i + delta].x - linevector[i].x), 2)), 3 / 2);
-		if (k < EPSILON)
-		{
-			std::vector<Point>::const_iterator cit = 
-        std::find(outpoints.begin(), outpoints.end(), linevector[i + 2 * delta]);
-			if((linevector[i + 2 * delta].x != (*cit).x) && (linevector[i + 2 * delta].y != (*cit).y))
-				outpoints.push_back(linevector[i + 2 * delta]);
-			
-      cit = std::find(outpoints.begin(), outpoints.end(), linevector[i + delta]);
-			if((linevector[i + delta].x != (*cit).x) && (linevector[i + delta].y != (*cit).y))
-				outpoints.push_back(linevector[i + delta]);
-			
-      cit = std::find(outpoints.begin(), outpoints.end(), linevector[i + 2 * delta]);
-			if((linevector[i].x != (*cit).x) && (linevector[i].y != (*cit).y))
-				outpoints.push_back(linevector[i]);
-		}
-		else
-		{
-			std::vector<Point>::const_iterator cit = linevector.begin() + i;
-			while (cit != (linevector.begin() + i + 2 * delta))
-			{
-				std::vector<Point>::const_iterator cit2 = 
-          std::find(outpoints.begin(), outpoints.end(), linevector[i + 2 * delta]);
-				if (((*cit).x != (*cit2).x) && ((*cit).y != (*cit2).y))
-					outpoints.push_back((*cit));
-			}
-		}
-		i += delta;
-	}
-	return outpoints;
+    cv::approxPolyDP(m_points, m_points, epsilon, false);
 }
 // ------------------------------------------------------------
 std::vector<Wregion> WLine::CutFromLayer(WLayer* layer)

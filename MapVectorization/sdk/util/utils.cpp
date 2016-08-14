@@ -213,6 +213,7 @@ namespace utils {
                         {
                             line.Concat(lines[i]);
                         }
+                        line.SimplifyDP();
                         linesContainer.push_back(line);
                     }
                 }
