@@ -19,7 +19,6 @@ extern "C"
 #include "opencv2/core/utility.hpp"
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
-#include "opencv2/text.hpp"
 
 #include "utils.h"
 #include "../graphics/skeletonization.h"
@@ -221,6 +220,47 @@ namespace utils {
         return linesContainer;
     }
 
+	void  ErDraw(const cv::Mat &src, cv::Mat &dst, cv::text::ERStat& er)
+	{
+		if (er.parent != NULL) // deprecate the root region 
+		{
+			int newMaskVal = 255;
+			int flags = 4 + (newMaskVal << 8) + cv::FLOODFILL_FIXED_RANGE + cv::FLOODFILL_MASK_ONLY;
+			floodFill(src, dst, cv::Point(er.pixel%src.cols,er.pixel/src.cols),
+				cv::Scalar(255), 0, cv::Scalar(er.level), cv::Scalar(0), flags);
+		}
+	}
+
+	void  ErDraw(const cv::Mat &src, cv::Mat &dst, cv::Rect region)
+	{
+		src(region).copyTo(dst(region));
+	}
+
+	std::vector<cv::Rect> DetectOnlyLetters(const cv::Mat &img)
+	{
+		std::vector<cv::Rect> boundRect;
+		cv::Mat img_reversed, img_sobel, img_threshold, element;
+		img.copyTo(img_reversed);
+	
+		cv::Sobel(img_reversed, img_sobel, CV_8U, 1, 0, 3, 1, 0, cv::BORDER_DEFAULT);
+		element = getStructuringElement(cv::MORPH_RECT, cv::Size(43, 18));
+		cv::morphologyEx(img_sobel, img_threshold, CV_MOP_CLOSE, element);;
+
+		std::vector< std::vector< cv::Point> > contours;
+		cv::findContours(img_threshold, contours, cv::CHAIN_APPROX_NONE, cv::RETR_LIST);
+
+		std::vector<std::vector<cv::Point> > contours_poly(contours.size());
+
+		for (int i = 0; i < contours.size(); i++)
+		{
+			cv::approxPolyDP(cv::Mat(contours.at(i)), contours_poly.at(i), 3, true);
+			cv::Rect appRect(boundingRect(cv::Mat(contours_poly.at(i))));
+			boundRect.push_back(appRect);		
+		}
+
+		return boundRect;
+	}
+
 	WObjectContainer FindTextOnMat(const cv::Mat& img)
 	{
 		WObjectContainer textContainer;
@@ -240,11 +280,26 @@ namespace utils {
 		detectRegions(img, er_filter1, er_filter2, points);	
 	
 		cv::Mat out_img_decomposition= cv::Mat::zeros(img.rows + 2, img.cols + 2, CV_8UC1);
-		std::vector<cv::Vec2i> tmp_group;
-
+		for (int i=0; i<(int)regions.size(); i++)
+		{
+			ErDraw(img, out_img_decomposition, regions[i]);
+		}
+			
+		//cv::Mat out_img_decomposition_step_2 = Mat::zeros(image.rows+2, image.cols+2, CV_8UC1);
+		//out_img_decomposition.copyTo(out_img_decomposition_step_2);
+		
 		// Detect character groups
 		std::vector<cv::Rect> nm_boxes;
 		cv::text::erGrouping(img, img, points, nm_boxes, cv::text::ERGROUPING_ORIENTATION_HORIZ);
+
+		for (int i = 0; i < nm_boxes.size(); i++) 
+		{
+			cv::Mat tmp = cv::Mat::zeros(nm_boxes[i].height, nm_boxes[i].width, CV_8UC1);
+			tmp.copyTo(out_img_decomposition(nm_boxes[i]));
+		}
+
+		std::vector<cv::Rect> only_letters = DetectOnlyLetters(out_img_decomposition);
+		nm_boxes.insert(nm_boxes.end(), only_letters.begin(), only_letters.end());
 
 		for (int i = 0; i < nm_boxes.size(); i++)
 		{

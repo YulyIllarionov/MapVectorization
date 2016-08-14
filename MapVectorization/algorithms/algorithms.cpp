@@ -21,13 +21,14 @@ bool   sort_by_lenght(const string &a, const string &b);
 //Draw ER's in an image via floodFill
 void  er_draw(Mat &src, Mat &dst, ERStat& er);
 void  er_draw(Mat &src, Mat &dst, Rect region);
+std::vector<cv::Rect> detectLetters(cv::Mat &img);	
 
 //Perform text detection and recognition and evaluate results using edit distance
 int main(int argc, char* argv[])
 {
     Mat image;
     //if(argc>1)
-    image  = imread("C:\\MapVectorization\\MapVectorization\\sample\\black\\cu71Black.png");
+    image  = imread("C:\\MapVectorization\\MapVectorization\\sample\\map\\black.png");
    /* else
     {
         cout << "    Usage: " << argv[0] << " <input_image> [<gt_word1> ... <gt_wordN>]" << endl;
@@ -94,6 +95,10 @@ int main(int argc, char* argv[])
 	for (int i = 0; i < nm_boxes.size(); i++) {
 		rectangle(tmp, nm_boxes[i], cvScalar(255, 255, 0), 4);
 	}*/
+	auto numb = detectLetters(out_img_decomposition_step_2);
+	nm_boxes.insert(nm_boxes.end(), numb.begin(), numb.end());
+	cout << "ajaj " << numb.size() << "\n";
+	
 	namedWindow("detection",WINDOW_NORMAL);
     imshow("detection", out_img_decomposition_step_2);
 
@@ -165,7 +170,12 @@ int main(int argc, char* argv[])
 
     cout << "TIME_OCR = " << ((double)getTickCount() - t_r)*1000/getTickFrequency() << endl;
 
+	//for (int i = 0; i < numb.size(); i++)
+	//{
+	//	rectangle(out_img, numb[i], Scalar(0,0,255), 3);
+	//}
 
+	imwrite("1.png", out_img);
     namedWindow("recognition",WINDOW_NORMAL);
     imshow("recognition", out_img);
     waitKey(0);
@@ -254,43 +264,30 @@ void saveImage(const std::string &filename, cv::Mat *img) {
 //}
 //
 ////---------------------------Для проекта -------------------------
-//std::vector<cv::Rect> detectLetters(cv::Mat &img, unsigned char elementId)
-//{
-//	std::vector<cv::Rect> boundRect;
-//	cv::Mat img_reversed, img_sobel, img_threshold, element, img_gray;
-//
-//	cv::threshold(img, img_reversed, 0, 255, CV_THRESH_BINARY_INV);
-//	//cvtColor(img_reversed, img_reversed, CV_BGR2GRAY);
-//	//saveImage("rever1.jpg", &img_reversed);
-//
-//	//saveImage("rever1.jpg", &img_reversed);
-//	cv::Sobel(img_reversed, img_sobel, CV_8U, 1, 0, 3, 1, 0, cv::BORDER_DEFAULT);
-//	//saveImage("obel1.jpg", &img_sobel);
-//	//cv::threshold(img_sobel, img_threshold, 0, 255, CV_THRESH_OTSU + CV_THRESH_BINARY);
-//	element = getStructuringElement(cv::MORPH_RECT, cv::Size(55 * (int)pow(2, elementId), 3 * (int)pow(2, elementId)));
-//	cv::morphologyEx(img_sobel, img_threshold, CV_MOP_CLOSE, element);
-//	cv::cvtColor(img_threshold, img_threshold, CV_RGB2GRAY);
-//	saveImage("morf.jpg", &img_threshold);
-//
-//	std::vector< std::vector< cv::Point> > contours;
-//	cv::findContours(img_threshold, contours, cv::CHAIN_APPROX_NONE, cv::RETR_LIST);
-//
-//	std::vector<std::vector<cv::Point> > contours_poly(contours.size());
-//
-//	for (int i = 0; i < contours.size(); i++)
-//	{
-//		//if ((contours.at(i).size() > 86 * pow(2, elementId)) && (contours.at(i).size() < 600 * pow(2, elementId)))
-//		{
-//			cv::approxPolyDP(cv::Mat(contours.at(i)), contours_poly.at(i), 3, true);
-//			cv::Rect appRect(boundingRect(cv::Mat(contours_poly.at(i))));
-//
-//			//if (appRect.width > appRect.height)
-//				boundRect.push_back(appRect);
-//		}
-//	}
-//
-//	return boundRect;
-//}
+std::vector<cv::Rect> detectLetters(cv::Mat &img)
+{
+	std::vector<cv::Rect> boundRect;
+	cv::Mat img_reversed, img_sobel, img_threshold, element;
+	img.copyTo(img_reversed);
+	
+	cv::Sobel(img_reversed, img_sobel, CV_8U, 1, 0, 3, 1, 0, cv::BORDER_DEFAULT);
+	element = getStructuringElement(cv::MORPH_RECT, cv::Size(43, 18));
+	cv::morphologyEx(img_sobel, img_threshold, CV_MOP_CLOSE, element);;
+
+	std::vector< std::vector< cv::Point> > contours;
+	cv::findContours(img_threshold, contours, cv::CHAIN_APPROX_NONE, cv::RETR_LIST);
+
+	std::vector<std::vector<cv::Point> > contours_poly(contours.size());
+
+	for (int i = 0; i < contours.size(); i++)
+	{
+		cv::approxPolyDP(cv::Mat(contours.at(i)), contours_poly.at(i), 3, true);
+		cv::Rect appRect(boundingRect(cv::Mat(contours_poly.at(i))));
+		boundRect.push_back(appRect);		
+	}
+
+	return boundRect;
+}
 //
 //
 //cv::Mat makeElementOfPyramid(cv::Mat &img, int n)

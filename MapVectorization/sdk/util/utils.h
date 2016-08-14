@@ -14,6 +14,7 @@
 #include "opencv2/opencv.hpp" 
 #include "opencv/cv.h"
 #include "opencv/highgui.h"
+#include "opencv2/text.hpp"
 #include "../base_types.h"
 
 SDK_BEGIN_NAMESPACE
@@ -34,6 +35,9 @@ namespace utils
   int squaredDistanceBetween(const cv::Point& a, const cv::Point& b);
   WObjectContainer FindLinesOnMat(const cv::Mat& img);
   WObjectContainer FindTextOnMat(const cv::Mat& img);
+  std::vector<cv::Rect> DetectOnlyLetters(const cv::Mat &img);
+  void  ErDraw(const cv::Mat &src, cv::Mat &dst, cv::text::ERStat& er);
+  void  ErDraw(const cv::Mat &src, cv::Mat &dst, cv::Rect region);
   std::vector<std::vector<std::string>> RecognizeText(std::vector<cv::Mat>& input, const float minConfidences = 0);
 }
 
