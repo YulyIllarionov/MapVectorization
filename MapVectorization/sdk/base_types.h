@@ -117,8 +117,8 @@ public:
 
 	void Concat(const WLine& line);
 	//virtual double DistanceTo(cv::Point mapPoint) const;
-	//Упростить линию
-	WPointsContainer SimplifyLine(const WPointsContainer& vectorline, double EPSILON, int delta);
+	//Упростить линию изпользуя алгоритм Дугласа-Пекера
+    void SimplifyDP(double epsilon = 2.7);
     std::vector<Wregion> CutFromLayer(WLayer* layer);
 
 private:
@@ -152,8 +152,8 @@ public:
 	void AddText(const std::string &text) { m_text = text; }
 	std::string GetText() { return m_text; }
 	//Добавить линию текста
-	void   AddTextLine(WLine &textline) { m_textline = textline; }
-	WLine& GetTextLine() { return m_textline; }
+	//void   AddTextLine(WLine &textline) { m_textline = textline; }
+	//WLine& GetTextLine() { return m_textline; }
 	//Изменить флаг
 	void SetState(bool state) { m_state = state; }
 	bool GetState() const { return m_state; }
@@ -163,7 +163,7 @@ public:
     std::vector<Wregion> CutFromLayer(WLayer* layer);
 
 private:
-	WLine       m_textline; // Линия, обозначающая направление текста внутри полигона
+	//WLine       m_textline; // Линия, обозначающая направление текста внутри полигона
 	std::string m_text;     //Запись
 	bool        m_state;    //Флаг состояний: 0 - текст локализован, 1 - текст распознан
 };

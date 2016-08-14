@@ -19,6 +19,7 @@
 
 #include "base_types.h"
 
+
 SDK_BEGIN_NAMESPACE
 
 using namespace cv;
@@ -26,69 +27,69 @@ using namespace cv;
 // ------------------------------------------------------------
 w_color::w_color(uchar r, uchar g, uchar b)
 {
-  this->r = r;
-  this->g = g;
-  this->b = b;
+    this->r = r;
+    this->g = g;
+    this->b = b;
 }
 // ------------------------------------------------------------
 w_color::w_color(const cv::Vec3b& color)
 {
-  this->r = color[2];
-  this->g = color[1];
-  this->b = color[0];
+    this->r = color[2];
+    this->g = color[1];
+    this->b = color[0];
 }
 // ------------------------------------------------------------
 w_color::w_color(const cv::Vec4b& color)
 {
-  this->r = color[2];
-  this->g = color[1];
-  this->b = color[0];
+    this->r = color[2];
+    this->g = color[1];
+    this->b = color[0];
 }
 // ------------------------------------------------------------
 cv::Vec3b w_color::toVec3b() const
 {
-  return Vec3b(this->b, this->g, this->r);
+    return Vec3b(this->b, this->g, this->r);
 }
 // ------------------------------------------------------------
 inline bool operator <= (const w_color &first, const cv::Vec3b &second)
 {
-  return bool((first.r <= second[2]) && (first.g <= second[1]) && (first.b <= second[0]));
+    return bool((first.r <= second[2]) && (first.g <= second[1]) && (first.b <= second[0]));
 }
 // ------------------------------------------------------------
 inline bool operator >= (const w_color &first, const cv::Vec3b &second)
 {
-  return bool((first.r >= second[2]) && (first.g >= second[1]) && (first.b >= second[0]));
+    return bool((first.r >= second[2]) && (first.g >= second[1]) && (first.b >= second[0]));
 }
 // ------------------------------------------------------------
 w_range::w_range()
 {
-  this->low = Vec3b(255, 255, 255);
-  this->high = Vec3b(0, 0, 0);
+    this->low = Vec3b(255, 255, 255);
+    this->high = Vec3b(0, 0, 0);
 }
 // ------------------------------------------------------------
 void w_range::addColor(const w_color& color)
 {
-  this->low[2] = std::min<uchar>(color.r, low[2]);
-  this->low[1] = std::min<uchar>(color.g, low[1]);
-  this->low[0] = std::min<uchar>(color.b,low[0]);
-  this->high[2] = std::max<uchar>(color.r, high[2]);
-  this->high[1] = std::max<uchar>(color.g, high[1]);
-  this->high[0] = std::max<uchar>(color.b, high[0]);
+    this->low[2] = std::min<uchar>(color.r, low[2]);
+    this->low[1] = std::min<uchar>(color.g, low[1]);
+    this->low[0] = std::min<uchar>(color.b, low[0]);
+    this->high[2] = std::max<uchar>(color.r, high[2]);
+    this->high[1] = std::max<uchar>(color.g, high[1]);
+    this->high[0] = std::max<uchar>(color.b, high[0]);
 }
 // ------------------------------------------------------------
 inline bool w_range::contains(const cv::Vec3b& color)
 {
-  return ((color >= this->low) && (color <= this->high));
+    return ((color >= this->low) && (color <= this->high));
 }
 // ------------------------------------------------------------
 w_color w_range::getLow()
 {
-  return w_color(this->low);
+    return w_color(this->low);
 }
 // ------------------------------------------------------------
 w_color w_range::getHigh()
 {
-  return w_color(this->high);
+    return w_color(this->high);
 }
 // ------------------------------------------------------------
 void WLayer::DrawCircle(SMapPoint point, uint radius, uchar color)
@@ -98,7 +99,7 @@ void WLayer::DrawCircle(SMapPoint point, uint radius, uchar color)
 // ------------------------------------------------------------
 SDKResult WLayer::InicializeLinesContainer()
 {
-    if(m_type != LT_LINES)
+    if (m_type != LT_LINES)
         return kSDKResult_Error;
 
     WObjectContainer lines = SDK_NAMESPACE::utils::FindLinesOnMat(m_data);
@@ -109,7 +110,7 @@ SDKResult WLayer::InicializeLinesContainer()
 // ------------------------------------------------------------
 SDKResult WLayer::InicializeTextContainer()
 {
-	if(m_type != LT_TEXT)
+    if (m_type != LT_TEXT)
         return kSDKResult_Error;
 
     WObjectContainer lines = SDK_NAMESPACE::utils::FindTextOnMat(m_data);
@@ -133,7 +134,7 @@ void WLayer::InicializeVectorContainer()
     {
     case WLayer::LAYER_TYPE_ENUM::LT_NONE:
         break;
-        
+
     case WLayer::LAYER_TYPE_ENUM::LT_LINES:
     {
         this->InicializeLinesContainer();
@@ -142,10 +143,10 @@ void WLayer::InicializeVectorContainer()
 
     case WLayer::LAYER_TYPE_ENUM::LT_TEXT:
     {
-		this->InicializeTextContainer();
+        this->InicializeTextContainer();
     }
     break;
-    
+
     case WLayer::LAYER_TYPE_ENUM::LT_OTHER:
     {
     }
@@ -158,55 +159,55 @@ void WLayer::InicializeVectorContainer()
 // ------------------------------------------------------------
 WRaster::WRaster(const std::string& imgPath)
 {
-	if (!imgPath.empty())
-		Initialize(imgPath);
+    if (!imgPath.empty())
+        Initialize(imgPath);
 }
 // ------------------------------------------------------------
 void WRaster::Initialize(const std::string& imgPath)
 {
-  // Read the file
-  Mat raster = imread(String(imgPath), CV_LOAD_IMAGE_COLOR);   
-  cvtColor(raster, m_raster, CV_BGR2BGRA, 4);
+    // Read the file
+    Mat raster = imread(String(imgPath), CV_LOAD_IMAGE_COLOR);
+    cvtColor(raster, m_raster, CV_BGR2BGRA, 4);
 }
 // ------------------------------------------------------------
 SDKResult WRaster::IncreaseSharpness(double k) const
 {
-  //filter2D(m_raster, m_raster, m_raster.depth(), utils::SharpKernel(k));
+    //filter2D(m_raster, m_raster, m_raster.depth(), utils::SharpKernel(k));
 
-  Mat kernel = utils::SharpKernel(k);
-  Mat img;
-  cvtColor(m_raster, img, CV_BGRA2BGR);
-  Mat imgOut(img);
-  Mat imgGray;
-  Mat imgEdges;
+    Mat kernel = utils::SharpKernel(k);
+    Mat img;
+    cvtColor(m_raster, img, CV_BGRA2BGR);
+    Mat imgOut(img);
+    Mat imgGray;
+    Mat imgEdges;
 
-  cvtColor(m_raster, imgGray, COLOR_RGB2GRAY);
-  Canny(imgGray, imgEdges, 90, 200);
-  
-  for (int y = 1; y < img.rows - 1; y++)
-  {
-    for (int x = 1; x < img.cols - 1; x++)
+    cvtColor(m_raster, imgGray, COLOR_RGB2GRAY);
+    Canny(imgGray, imgEdges, 90, 200);
+
+    for (int y = 1; y < img.rows - 1; y++)
     {
-      if (imgEdges.at<uchar>(y, x) > 0)
-      {
-        Rect region_of_interest = Rect(x - 1, y - 1, 3, 3);
-        Mat image_roi = img(region_of_interest);
-        Vec3d sum(0.0, 0.0, 0.0);
-        Vec3d currentColor;
-        for (int y1 = 0; y1 < image_roi.rows; y1++)
+        for (int x = 1; x < img.cols - 1; x++)
         {
-          for (int x1 = 0; x1 < image_roi.cols; x1++)
-          {
-            currentColor = image_roi.at<Vec3b>(y1, x1);
-            sum += kernel.at<double>(y1, x1)*currentColor;
-          }
+            if (imgEdges.at<uchar>(y, x) > 0)
+            {
+                Rect region_of_interest = Rect(x - 1, y - 1, 3, 3);
+                Mat image_roi = img(region_of_interest);
+                Vec3d sum(0.0, 0.0, 0.0);
+                Vec3d currentColor;
+                for (int y1 = 0; y1 < image_roi.rows; y1++)
+                {
+                    for (int x1 = 0; x1 < image_roi.cols; x1++)
+                    {
+                        currentColor = image_roi.at<Vec3b>(y1, x1);
+                        sum += kernel.at<double>(y1, x1)*currentColor;
+                    }
+                }
+                imgOut.at<Vec3b>(y, x) = sum;
+            }
         }
-        imgOut.at<Vec3b>(y, x) = sum;
-      }
     }
-  }
-  cvtColor(imgOut, m_raster, CV_BGR2BGRA);
-  return kSDKResult_Succeeded;
+    cvtColor(imgOut, m_raster, CV_BGR2BGRA);
+    return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
 void WRaster::SegmentationBilateral()
@@ -229,147 +230,147 @@ void WRaster::SegmentationMeanshift()
 // ------------------------------------------------------------
 WLayer* WRaster::AddLayer(const GroupID& groupId)
 {
-  WLayer layer;
-  layer.m_data = Mat(m_raster.size(), CV_8UC1, Scalar(0));
-  layer.m_uuid = utils::genUUID();
-  layer.m_group_id = groupId.empty() ? utils::genUUID() : groupId;
-  m_layers.push_back(layer);
+    WLayer layer;
+    layer.m_data = Mat(m_raster.size(), CV_8UC1, Scalar(0));
+    layer.m_uuid = utils::genUUID();
+    layer.m_group_id = groupId.empty() ? utils::genUUID() : groupId;
+    m_layers.push_back(layer);
 
-  return &m_layers.back();
+    return &m_layers.back();
 }
 // ------------------------------------------------------------
 SDKResult WRaster::RemoveLayer(const LayerUUID& layerId)
 {
-  LayersContainer::const_iterator cit = m_layers.begin();
-  for ( ; cit != m_layers.end(); ++cit)
-  {
-    if (cit->m_uuid == layerId)
-      break;
-  }
+    LayersContainer::const_iterator cit = m_layers.begin();
+    for (; cit != m_layers.end(); ++cit)
+    {
+        if (cit->m_uuid == layerId)
+            break;
+    }
 
-  if (cit == m_layers.end())
-    return kSDKResult_NotFound;
+    if (cit == m_layers.end())
+        return kSDKResult_NotFound;
 
-  m_layers.remove(*cit);
+    m_layers.remove(*cit);
 
-  return kSDKResult_Succeeded;
+    return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
 SDKResult WRaster::AddColorToLayer(const LayerUUID& layerId, const w_color& color)
 {
-  WLayer* layer = GetLayerById(layerId);
-  if (layer == nullptr)
-    return kSDKResult_NotFound;
+    WLayer* layer = GetLayerById(layerId);
+    if (layer == nullptr)
+        return kSDKResult_NotFound;
 
-  layer->m_color_range.addColor(color);
+    layer->m_color_range.addColor(color);
 
-  for (int y = 0; y < m_raster.rows; y++)
-  {
-    for (int x = 0; x < m_raster.cols; x++)
+    for (int y = 0; y < m_raster.rows; y++)
     {
-      const Vec4b currentColorOld = m_raster.at<Vec4b>(y, x);
-      const Vec3b currentColor(currentColorOld[0], currentColorOld[1], currentColorOld[2]);
-      layer->m_data.at<uchar>(y, x) = layer->m_color_range.contains(currentColor) ? 1 : 0;
+        for (int x = 0; x < m_raster.cols; x++)
+        {
+            const Vec4b currentColorOld = m_raster.at<Vec4b>(y, x);
+            const Vec3b currentColor(currentColorOld[0], currentColorOld[1], currentColorOld[2]);
+            layer->m_data.at<uchar>(y, x) = layer->m_color_range.contains(currentColor) ? 1 : 0;
+        }
     }
-  }
 
-  return kSDKResult_Succeeded;
+    return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
 SDKResult WRaster::AddLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE type)
 {
-  return SetLayerType(layerId, type, false);
+    return SetLayerType(layerId, type, false);
 }
 // ------------------------------------------------------------
 SDKResult WRaster::SetLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE type)
 {
-  return SetLayerType(layerId, type, true);
+    return SetLayerType(layerId, type, true);
 }
 // ------------------------------------------------------------
 SDKResult WRaster::RemoveLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE type)
 {
-  WLayer* layer = GetLayerById(layerId);
-  if (layer == nullptr)
-    return kSDKResult_NotFound;
- 
-  layer->m_type &= ~type;
+    WLayer* layer = GetLayerById(layerId);
+    if (layer == nullptr)
+        return kSDKResult_NotFound;
 
-  return kSDKResult_Succeeded;
+    layer->m_type &= ~type;
+
+    return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
 SDKResult WRaster::SetLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite)
 {
-  WLayer* layer = GetLayerById(layerId);
-  if (layer == nullptr)
-    return kSDKResult_NotFound;
-  
-  if (overwrite)
-    layer->m_type = type;
-  else
-    layer->m_type |= type;
-  
-  return kSDKResult_Succeeded;
+    WLayer* layer = GetLayerById(layerId);
+    if (layer == nullptr)
+        return kSDKResult_NotFound;
+
+    if (overwrite)
+        layer->m_type = type;
+    else
+        layer->m_type |= type;
+
+    return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
 SDKResult WRaster::SetLayerName(const LayerUUID& layerId, const std::string& name)
 {
-  WLayer* layer = GetLayerById(layerId);
-  if (layer == nullptr)
-    return kSDKResult_NotFound;
+    WLayer* layer = GetLayerById(layerId);
+    if (layer == nullptr)
+        return kSDKResult_NotFound;
 
-  layer->m_name = name;
-  return kSDKResult_Succeeded;
+    layer->m_name = name;
+    return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
 WLayer* WRaster::GetLayerById(const LayerUUID& layerId)
 {
-  for (LayersContainer::iterator cit = m_layers.begin(); cit != m_layers.end(); ++cit)
-  {
-    if (cit->m_uuid == layerId)
-      return &(*cit);    
-  }
-  return nullptr;
+    for (LayersContainer::iterator cit = m_layers.begin(); cit != m_layers.end(); ++cit)
+    {
+        if (cit->m_uuid == layerId)
+            return &(*cit);
+    }
+    return nullptr;
 }
 // ------------------------------------------------------------
 WLayer* WRaster::GetLayerByName(const std::string& name)
 {
-  for (LayersContainer::iterator cit = m_layers.begin(); cit != m_layers.end(); ++cit)
-  {
-    if (cit->m_name == name)
-      return &(*cit);  
-  }
-  return nullptr;
+    for (LayersContainer::iterator cit = m_layers.begin(); cit != m_layers.end(); ++cit)
+    {
+        if (cit->m_name == name)
+            return &(*cit);
+    }
+    return nullptr;
 }
 // ------------------------------------------------------------
 SDKResult WRaster::GetLayersByType(WLayer::LAYER_TYPE type, LayerIDs& layer_ids) const
 {
-  layer_ids.clear();
-  for (LayersContainer::const_iterator cit = m_layers.begin(); cit != m_layers.end(); ++cit)
-  {
-    if ((cit->m_type & type) != 0)
-      layer_ids.push_back(cit->m_uuid);      
-  }
-  return kSDKResult_Succeeded;
+    layer_ids.clear();
+    for (LayersContainer::const_iterator cit = m_layers.begin(); cit != m_layers.end(); ++cit)
+    {
+        if ((cit->m_type & type) != 0)
+            layer_ids.push_back(cit->m_uuid);
+    }
+    return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
 // use only as an example. define other split funcs as a member of the WRaster class
 SDKResult splitFuncExample(WLayer* layer, WLayer* l1, WLayer* l2)
 {
-  return kSDKResult_Succeeded;
+    return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
 SDKResult WRaster::SplitLayer(const LayerUUID& layerId, LayerIDs& splittedLayers)
 {
-  WLayer* layer = GetLayerById(layerId);
-  if (layer == nullptr)
-    return kSDKResult_NotFound;
+    WLayer* layer = GetLayerById(layerId);
+    if (layer == nullptr)
+        return kSDKResult_NotFound;
 
-  SDKResult result = kSDKResult_Error;
+    SDKResult result = kSDKResult_Error;
 
-  switch(layer->m_type)
-  {
+    switch (layer->m_type)
+    {
     case WLayer::LAYER_TYPE_ENUM::LT_NONE:
-      break;
+        break;
     case WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT /*| WLayer::LAYER_TYPE_ENUM::LT_OTHER*/:
     {
         WLayer* linesLayer = this->AddLayer(layer->getGroupId());
@@ -378,7 +379,7 @@ SDKResult WRaster::SplitLayer(const LayerUUID& layerId, LayerIDs& splittedLayers
         WLayer* othersLayer = this->AddLayer(layer->getGroupId());
         this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_TEXT);
         //this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_OTHER);
-        this->SetLayerName(othersLayer->getID(), std::string("Text from ")+layer->getName());
+        this->SetLayerName(othersLayer->getID(), std::string("Text from ") + layer->getName());
         this->SplitLines(layerId, linesLayer->getID(), othersLayer->getID());
         splittedLayers.clear();
         splittedLayers.push_back(linesLayer->getID());
@@ -410,66 +411,66 @@ SDKResult WRaster::SplitLayer(const LayerUUID& layerId, LayerIDs& splittedLayers
     //    break;
     //}
     default:
-      {   
+    {
         WLayer* l1 = AddLayer();
         WLayer* l2 = AddLayer();
         result = splitFuncExample(layer, l1, l2);
         l1 = nullptr;
         l2 = nullptr;
         if (S_Ok(result))
-          RemoveLayer(layer->m_uuid);
+            RemoveLayer(layer->m_uuid);
         layer = nullptr;
-      }
-      break;
-  }
-  
-  return result;
+    }
+    break;
+    }
+
+    return result;
 }
 // ------------------------------------------------------------
 SDKResult WRaster::GetLayersByGroupId(const GroupID& groupId, LayerIDs& relatedLayers) const
 {
-  relatedLayers.clear();
-  for (LayersContainer::const_iterator cit = m_layers.begin(); cit != m_layers.end(); ++cit)
-  {
-    if (cit->m_group_id == groupId)
-      relatedLayers.push_back(cit->m_uuid);      
-  }
-  
-  return kSDKResult_Succeeded;
+    relatedLayers.clear();
+    for (LayersContainer::const_iterator cit = m_layers.begin(); cit != m_layers.end(); ++cit)
+    {
+        if (cit->m_group_id == groupId)
+            relatedLayers.push_back(cit->m_uuid);
+    }
+
+    return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
 std::vector<cv::Rect> WRaster::DetectLetters(const LayerUUID& layerId)
 {
-	std::vector<cv::Rect> boundRect;
+    std::vector<cv::Rect> boundRect;
 
-  WLayer* layer = GetLayerById(layerId);
-  if (layer == nullptr)
-    return boundRect;
+    WLayer* layer = GetLayerById(layerId);
+    if (layer == nullptr)
+        return boundRect;
 
-	cv::Mat img = layer->m_data;
+    cv::Mat img = layer->m_data;
     cv::Mat img_sobel, img_threshold, element;
     cv::Sobel(img, img_sobel, CV_8U, 1, 0, 3, 1, 0, cv::BORDER_DEFAULT);
-    cv::threshold(img_sobel, img_threshold, 0, 255, CV_THRESH_OTSU+CV_THRESH_BINARY);
-    
-    element = getStructuringElement(cv::MORPH_RECT, cv::Size(17, 3) );
+    cv::threshold(img_sobel, img_threshold, 0, 255, CV_THRESH_OTSU + CV_THRESH_BINARY);
+
+    element = getStructuringElement(cv::MORPH_RECT, cv::Size(17, 3));
     cv::morphologyEx(img_threshold, img_threshold, CV_MOP_CLOSE, element);
-    
+
     std::vector< std::vector< cv::Point> > contours;
-    cv::findContours(img_threshold, contours, 0, 1); 
-    
+    cv::findContours(img_threshold, contours, 0, 1);
+
     std::vector<std::vector<cv::Point> > contours_poly(contours.size());
-    for( int i = 0; i < contours.size(); i++ )
+    for (int i = 0; i < contours.size(); i++)
     {
-    if (contours.at(i).size()>100)
-    { 
-      cv::approxPolyDP(cv::Mat(contours.at(i)), contours_poly.at(i), 3, true);
-      cv::Rect appRect(boundingRect(cv::Mat(contours_poly.at(i))));
-      if (appRect.width>appRect.height) 
-        boundRect.push_back(appRect);
+        if (contours.at(i).size()>100)
+        {
+            cv::approxPolyDP(cv::Mat(contours.at(i)), contours_poly.at(i), 3, true);
+            cv::Rect appRect(boundingRect(cv::Mat(contours_poly.at(i))));
+            if (appRect.width > appRect.height)
+                boundRect.push_back(appRect);
+        }
     }
-  }
-  
-  return boundRect;
+
+    return boundRect;
 }
 // ------------------------------------------------------------
 std::vector<int> WRaster::DefineObjectsNearPoint(const LayerUUID& layerId, SMapPoint point)
@@ -503,16 +504,16 @@ std::vector<int> WRaster::DefineObjectsInsidePolygon(const LayerUUID& layerId, c
     WLayer* layer = GetLayerById(layerId);
     if (!layer->IsSingleType() || mapPoints.Length() == 0)
         return ids;
-    
+
     int idx = 0;
     WObjectContainer::const_iterator cit = layer->m_objects.begin();
     for (; cit != layer->m_objects.end(); ++cit, ++idx)
     {
         if (mapPoints.Contains(*cit))
-          ids.push_back(idx);
+            ids.push_back(idx);
     }
-    
-	  return ids;
+
+    return ids;
 }
 // ------------------------------------------------------------
 SDKResult WRaster::PasteObjectsToLayer(const LayerUUID& layerId, std::vector<std::vector<Wregion>> rasterObjects)
@@ -643,21 +644,21 @@ WPolygon::WPolygon(const std::vector<cv::Point> & mapPoints)
 // ------------------------------------------------------------
 bool WPolygon::Contains(const WVectorObject& object) const
 {
-  bool result = false;
-  WPointsContainer::const_iterator cit = object.m_points.begin();
-  for (; cit != object.m_points.end(); cit++)
-  {
-    if (pointPolygonTest(m_points, *cit, false) >= 0)
-      result = true;
-    else
-      return false;
-  }
-  return result;
+    bool result = false;
+    WPointsContainer::const_iterator cit = object.m_points.begin();
+    for (; cit != object.m_points.end(); cit++)
+    {
+        if (pointPolygonTest(m_points, *cit, false) >= 0)
+            result = true;
+        else
+            return false;
+    }
+    return result;
 }
 // ------------------------------------------------------------
 bool WPolygon::Contains(const cv::Point& point) const
 {
-  return pointPolygonTest(m_points, point, false) >= 0;
+    return pointPolygonTest(m_points, point, false) >= 0;
 }
 // ------------------------------------------------------------
 double WVectorObject::DistanceTo(const cv::Point& mapPoint) const
@@ -701,48 +702,9 @@ void WLine::Concat(const WLine& line)
     }
 }
 // ------------------------------------------------------------
-WPointsContainer WLine::SimplifyLine(const WPointsContainer& linevector, double EPSILON, int delta)
+void WLine::SimplifyDP(double epsilon)
 {
-	int i = 0;
-	double k; // curvature
-	WPointsContainer outpoints;
-	while ((i + 2 * delta) <= linevector.size())
-	{
-		k = (((linevector[i + 2 * delta].y - linevector[i + delta].y) 
-      / (linevector[i + 2 * delta].x - linevector[i + delta].x)) 
-      / ((linevector[i + delta].y - linevector[i].y) 
-      / (linevector[i + delta].x - linevector[i].x))) 
-      / pow((1 + pow((linevector[i + delta].y - linevector[i].y) 
-      / (linevector[i + delta].x - linevector[i].x), 2)), 3 / 2);
-		if (k < EPSILON)
-		{
-			std::vector<Point>::const_iterator cit = 
-        std::find(outpoints.begin(), outpoints.end(), linevector[i + 2 * delta]);
-			if((linevector[i + 2 * delta].x != (*cit).x) && (linevector[i + 2 * delta].y != (*cit).y))
-				outpoints.push_back(linevector[i + 2 * delta]);
-			
-      cit = std::find(outpoints.begin(), outpoints.end(), linevector[i + delta]);
-			if((linevector[i + delta].x != (*cit).x) && (linevector[i + delta].y != (*cit).y))
-				outpoints.push_back(linevector[i + delta]);
-			
-      cit = std::find(outpoints.begin(), outpoints.end(), linevector[i + 2 * delta]);
-			if((linevector[i].x != (*cit).x) && (linevector[i].y != (*cit).y))
-				outpoints.push_back(linevector[i]);
-		}
-		else
-		{
-			std::vector<Point>::const_iterator cit = linevector.begin() + i;
-			while (cit != (linevector.begin() + i + 2 * delta))
-			{
-				std::vector<Point>::const_iterator cit2 = 
-          std::find(outpoints.begin(), outpoints.end(), linevector[i + 2 * delta]);
-				if (((*cit).x != (*cit2).x) && ((*cit).y != (*cit2).y))
-					outpoints.push_back((*cit));
-			}
-		}
-		i += delta;
-	}
-	return outpoints;
+    cv::approxPolyDP(m_points, m_points, epsilon, false);
 }
 // ------------------------------------------------------------
 std::vector<Wregion> WLine::CutFromLayer(WLayer* layer)
@@ -750,13 +712,13 @@ std::vector<Wregion> WLine::CutFromLayer(WLayer* layer)
     if (layer->getType() != WLayer::LAYER_TYPE_ENUM::LT_LINES)
         return std::vector<Wregion>();
 
-    Point2f rectPoints[4] ;
+    Point2f rectPoints[4];
     cv::RotatedRect lineRect = cv::minAreaRect(m_points);
     lineRect.points(rectPoints);
     std::vector<Point> polygonPoints(4);
     for (size_t i = 0; i < 4; i++)
         polygonPoints[i] = rectPoints[i];
- 
+
     for (size_t i = 0; i < polygonPoints.size(); i++)
     {
         polygonPoints[i].x = std::max(polygonPoints[i].x, 0);
@@ -768,18 +730,18 @@ std::vector<Wregion> WLine::CutFromLayer(WLayer* layer)
 
     Rect roi = boundingRect(linePolygon.m_points);
     std::vector<Wregion> letters;
-  
+
     for (size_t i = 0; i < m_points.size(); i++)
     {
-            if (linePolygon.Contains(m_points[i]))
+        if (linePolygon.Contains(m_points[i]))
+        {
+            if (layer->m_data.at<uchar>(m_points[i]) != 0)
             {
-                if (layer->m_data.at<uchar>(m_points[i]) != 0)
-                {
-                    Wregion currentRegion(m_points[i], layer->m_data);
-                    if (!currentRegion.IsEmpty())
-                        letters.push_back(currentRegion);
-                }
+                Wregion currentRegion(m_points[i], layer->m_data);
+                if (!currentRegion.IsEmpty())
+                    letters.push_back(currentRegion);
             }
+        }
     }
     return letters;
 }
@@ -788,7 +750,7 @@ cv::Mat WText::RotateToHorizon(WLayer* layer)
 {
     if (layer->getType() != WLayer::LAYER_TYPE_ENUM::LT_TEXT)
         return cv::Mat();
-        
+
     //Копирование полигона на отдельное изображение 
     Rect roi = boundingRect(m_points);
     Mat img2Recognition(roi.size(), CV_8UC1, Scalar(0));
@@ -813,7 +775,9 @@ cv::Mat WText::RotateToHorizon(WLayer* layer)
         lineAngles[i] = std::atan2(textLines[i][3] - textLines[i][1], textLines[i][2] - textLines[i][0]);
     }
     std::sort(lineAngles.begin(), lineAngles.end());
-    double angle = lineAngles[lineAngles.size() / 2];
+    //double angle = 0.0;
+    //if (std::abs(lineAngles.back() - lineAngles.front()) < (std::M_PI_2))
+    double    angle = lineAngles[lineAngles.size() / 2] * 180 / 3.141592; //TODO заменить на пи
 
     //Поворот
     cv::Point2f center(img2Recognition.cols / 2.0, img2Recognition.rows / 2.0);
@@ -844,7 +808,7 @@ std::vector<Wregion> WText::CutFromLayer(WLayer* layer)
                 {
                     Wregion currentRegion(current, layer->m_data);
                     if (!currentRegion.IsEmpty())
-                    letters.push_back(currentRegion);
+                        letters.push_back(currentRegion);
                 }
             }
         }
@@ -857,7 +821,7 @@ Wregion::Wregion(const cv::Point& point, cv::Mat& img)
     if (img.at<uchar>(point) == 0)
         return; // <- Исправить
 
-	cv::Point currentPoint;
+    cv::Point currentPoint;
     std::stack <cv::Point> stack;
 
     stack.push(point);
@@ -873,13 +837,13 @@ Wregion::Wregion(const cv::Point& point, cv::Mat& img)
         img.at<uchar>(currentPoint) = 0; // Закрасить на изображении
 
         for (int k = currentPoint.x - 1; k <= currentPoint.x + 1; k++)
-        {    
+        {
             for (int l = currentPoint.y - 1; l <= currentPoint.y + 1; l++)
             {
                 //if ((l == point.y) && (k == point.x))
                   //  continue;
-        
-                if (img.at<uchar>(l, k) != 0) 
+
+                if (img.at<uchar>(l, k) != 0)
                 {
                     stack.push(Point(k, l));
                     img.at<uchar>(l, k) = 0; // Закрасить на изображении
@@ -956,10 +920,10 @@ SDKResult WRaster::SplitLines(const LayerUUID& layerId, const LayerUUID& linesLa
 // ------------------------------------------------------------
 SDKResult WRaster::SplitText(const LayerUUID& layerId, const LayerUUID& textLayerID, const LayerUUID& othersLayerID)
 {
-  SDKResult result = kSDKResult_Succeeded;
+    SDKResult result = kSDKResult_Succeeded;
 
-  return result;
-} 
+    return result;
+}
 // ------------------------------------------------------------
 
 // Распознает текст на входных изображениях. В будущем будет осуществляться фильтрация результатов 
@@ -994,4 +958,4 @@ SDKResult WLayer::RecognizeText(std::vector<int> idxs, const float minConfidence
     }
 }
 
-  SDK_END_NAMESPACE
+SDK_END_NAMESPACE
