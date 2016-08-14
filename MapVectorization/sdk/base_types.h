@@ -351,10 +351,10 @@ public:
 	std::vector<int> DefineObjectsInsidePolygon(const LayerUUID& layerId, const WPolygon& mapPoints);
 	std::vector<int> DefineObjectsNearPoint(const LayerUUID& layerId, SMapPoint point);
 
-	// copy object from one layer to another
-	void CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, WPolygon mapPoints);
-	// удаление объектов со слоя 
+	// вырезание объектов со слоя
 	std::vector<std::vector<Wregion>> CutObjectsFromLayer(const LayerUUID& layerId, std::vector<int> idxs);
+    //вставление объектов на слой 
+    SDKResult PasteObjectsToLayer(const LayerUUID& layerId, std::vector<std::vector<Wregion>> rasterObjects);
 
 private:
 	SDKResult SetLayerType (const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite);
@@ -402,6 +402,8 @@ public:
 	int Square();
 	bool IsLine();
 	void drawOn(cv::Mat& img, uchar color);
+    bool IsEmpty() { return (points.size() > 0); }
+    std::vector<cv::Point> GetPoints() { return points; }
 private:
 	std::vector<cv::Point> points;
 };

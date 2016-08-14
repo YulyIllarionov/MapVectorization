@@ -12,6 +12,7 @@
 #include "util/math_utils.h"
 #include "graphics/skeletonization.h"
 #include <stack>
+#include <numeric>
 
 #include <math.h>
 #include <algorithm>
@@ -514,121 +515,76 @@ std::vector<int> WRaster::DefineObjectsInsidePolygon(const LayerUUID& layerId, c
 	  return ids;
 }
 // ------------------------------------------------------------
-// copy object from one layer to another
-void WRaster::CopyObjectsToAnotherLayer(const LayerUUID& departureLayerId, const LayerUUID& arrivalLayerId, const WPolygon mapPoints)
+SDKResult WRaster::PasteObjectsToLayer(const LayerUUID& layerId, std::vector<std::vector<Wregion>> rasterObjects)
 {
-    // copy raster
-    Rect roi = boundingRect(mapPoints.m_points); // GetPoints());
-    WLayer* departureLayer = GetLayerById(arrivalLayerId);
-    WLayer* arrivalLayer = GetLayerById(departureLayerId);
-    //for (int y = roi.y; y < roi.y + roi.height; y++)
-    //{
-    //    for (int x = roi.x; x < roi.x + roi.width; x++)
-    //    {
-    //        Point current(x, y);
-    //        if (mapPoints.Contains(current))
-    //            arrivalLayer->m_data.at<uchar>(current) = departureLayer->m_data.at<uchar>(current);
-    //    }
-    //}
+    WLayer* layer = GetLayerById(layerId);
+    if (!layer->IsSingleType())
+        return kSDKResult_Error;
+    for (size_t i = 0; i < rasterObjects.size(); i++)
+    {
+        //Объединение всех связных областей текущего объекта в один вектор
+        std::vector<Point> objectPoints;
+        for (size_t j = 0; j < rasterObjects[i].size(); j++)
+        {
+            std::vector<Point> currentPoints = rasterObjects[i][j].GetPoints();
+            objectPoints.insert(objectPoints.end(), currentPoints.begin(), currentPoints.end());
+        }
+        //Вставка растровых объектов на слой
+        for (size_t j = 0; j < objectPoints.size(); j++)
+        {
+            layer->m_data.at<uchar>(objectPoints[j]) = 255;
+        }
+        //Получение векторных объектов для имеющихся растровых
+        WObjectContainer vectorObjects;
+        switch (layer->getType())
+        {
+        case WLayer::LT_LINES:
+        {
+            Rect roi = boundingRect(objectPoints);
+            Mat linesImg(roi.size(), CV_8UC1, Scalar(0));
+            for (size_t j = 0; j < objectPoints.size(); j++)
+            {
+                linesImg.at<uchar>(objectPoints[i] - roi.tl()) = 255;
+            }
+            vectorObjects = SDK_NAMESPACE::utils::FindLinesOnMat(linesImg);
+            for (size_t j = 0; j < vectorObjects.size(); j++)
+                for (size_t k = 0; k < vectorObjects[i].m_points.size(); k++)
+                    vectorObjects[i].m_points[k] += roi.tl();
 
-    // copy vector objects
-    if (!departureLayer->IsSingleType() || !arrivalLayer->IsSingleType())
-      return;
+            break;
+        }
+        case WLayer::LT_TEXT:
+        {
+            Point2f rectPoints[4];
+            cv::RotatedRect lineRect = cv::minAreaRect(objectPoints);
+            lineRect.points(rectPoints);
+            std::vector<Point> polygonPoints(4);
+            for (size_t i = 0; i < 4; i++)
+                polygonPoints[i] = rectPoints[i];
+            for (size_t i = 0; i < polygonPoints.size(); i++)
+            {
+                polygonPoints[i].x = std::max(polygonPoints[i].x, 0);
+                polygonPoints[i].x = std::min(polygonPoints[i].x, layer->m_data.cols);
+                polygonPoints[i].y = std::max(polygonPoints[i].x, 0);
+                polygonPoints[i].y = std::min(polygonPoints[i].x, layer->m_data.rows);
+            }
+            vectorObjects.push_back(WText(polygonPoints));
 
-    WLayer::LAYER_TYPE departureType = departureLayer->getType();
-    WLayer::LAYER_TYPE arrivalType   = arrivalLayer->getType();
-
-    std::vector<int> ids;
-    if (mapPoints.Length() == 1)
-        ids = DefineObjectsNearPoint(departureLayerId, SMapPoint(mapPoints.m_points[0]));
-    else
-        ids = DefineObjectsInsidePolygon(departureLayerId, mapPoints);
-    
-    if (ids.empty())
-        return;
-
-   switch (departureType)
-   {
-       // from Text layer
-   case WLayer::LT_TEXT:
-   {
-       switch (arrivalType)
-       {
-           // from Text layerto Lines layer
-       case WLayer::LT_LINES:
-       {
-           for (size_t i = 0; i < ids.size(); i++)
-           {
-               Mat linesImg(roi.size(), CV_8UC1, Scalar(0));
-               for (int y = roi.y; y < roi.y + roi.height; y++)
-               {
-                   for (int x = roi.x; x < roi.x + roi.width; x++)
-                   {
-                       Point current(x, y);
-                       if (mapPoints.Contains(current))
-                       {
-                           arrivalLayer->m_data.at<uchar>(current) = departureLayer->m_data.at<uchar>(current);
-                           linesImg.at<uchar>(y - roi.y, x - roi.x) = departureLayer->m_data.at<uchar>(current);
-                           //departureLayer->m_data.at<uchar>(current) = 0;
-                       }
-                   }
-               }
-               WObjectContainer lines = SDK_NAMESPACE::utils::FindLinesOnMat(linesImg);
-               for (size_t m = 0; m < lines.size(); m++)
-                   for (size_t n = 0; n < lines[m].Length(); n++)
-                       lines[m].m_points[n] += roi.tl();
-               arrivalLayer->m_objects.insert(arrivalLayer->m_objects.begin(), lines.begin(), lines.end());
-           }
-       }
-       break;
-       case WLayer::LT_OTHER:
-       {
-           // from Text layer to Other layer
-       }
-       break;
-       default:
-           break;
-       }
-   }
-   // from Lines layer
-   case WLayer::LT_LINES:
-   {
-       switch (arrivalType)
-       {
-       case WLayer::LT_TEXT:
-       {
-           // from Lines layer to Text layer
-           if (mapPoints.Length() == 1)
-               return;
-           for (int y = roi.y; y < roi.y + roi.height; y++)
-           {
-               for (int x = roi.x; x < roi.x + roi.width; x++)
-               {
-                   Point current(x, y);
-                   if (mapPoints.Contains(current))
-                   {
-                       arrivalLayer->m_data.at<uchar>(current) = departureLayer->m_data.at<uchar>(current);
-                   }
-               }
-           }
-           //TODO
-           //arrivalLayer->m_objects.push_back(WText(mapPoints)); 
-       }
-       break;
-       case WLayer::LT_OTHER:
-       {
-           // from Lines layer to Other layer
-       }
-       break;
-       default:
-           break;
-       }
-   }
-   break;
-   default:
-       break;
-   }
-    
+            break;
+        }
+        default:
+            break;
+        }
+        layer->m_objects.insert(layer->m_objects.end(), vectorObjects.begin(), vectorObjects.end());
+    }
+    //Распознавание текста при необходимости
+    if (layer->getType() == WLayer::LT_TEXT)
+    {
+        std::vector<int> textIdxs(rasterObjects.size());
+        std::iota(textIdxs.begin(), textIdxs.end(), layer->m_objects.size() - 1 - rasterObjects.size());
+        layer->RecognizeText(textIdxs, 0.0);
+    }
+    return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
 std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& layerId, std::vector<int> idxs)
@@ -812,19 +768,18 @@ std::vector<Wregion> WLine::CutFromLayer(WLayer* layer)
 
     Rect roi = boundingRect(linePolygon.m_points);
     std::vector<Wregion> letters;
-    for (int y = roi.y; y < roi.y + roi.height; y++)
+  
+    for (size_t i = 0; i < m_points.size(); i++)
     {
-        for (int x = roi.x; x < roi.x + roi.width; x++)
-        {
-            Point current(x, y);
-            if (linePolygon.Contains(current))
+            if (linePolygon.Contains(m_points[i]))
             {
-                if (layer->m_data.at<uchar>(current) != 0)
+                if (layer->m_data.at<uchar>(m_points[i]) != 0)
                 {
-                    letters.push_back(Wregion(current, layer->m_data));
+                    Wregion currentRegion(m_points[i], layer->m_data);
+                    if (!currentRegion.IsEmpty())
+                        letters.push_back(currentRegion);
                 }
             }
-        }
     }
     return letters;
 }
@@ -887,7 +842,9 @@ std::vector<Wregion> WText::CutFromLayer(WLayer* layer)
             {
                 if (layer->m_data.at<uchar>(current) != 0)
                 {
-                    letters.push_back(Wregion(current, layer->m_data));
+                    Wregion currentRegion(current, layer->m_data);
+                    if (!currentRegion.IsEmpty())
+                    letters.push_back(currentRegion);
                 }
             }
         }
