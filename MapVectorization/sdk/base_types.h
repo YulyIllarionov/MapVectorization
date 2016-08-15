@@ -22,6 +22,8 @@
 typedef std::vector<cv::Point>            WPointsContainer;
 typedef unsigned char                     WColor; 
 
+//Используется для общения с графическим интерфейсом 
+//TODO желательно убрать
 struct SMapPoint
 {
 private:
@@ -53,26 +55,16 @@ public:
 SDK_BEGIN_NAMESPACE
 
 
-//Общий интерфейс всех объектов
+//Общий интерфейс всех векторных объектов
 class WVectorObject
 {
 public:
-	//virtual void Add(/*const*/ cv::Point& point) { m_points.push_back(point); };
-	////Добавить точку в по указанному индексу
-	//virtual bool AddPointAt(/*const*/ cv::Point& point, size_t idx);
-	////Удалить точку
-	//virtual bool RemovePoint(size_t idx);
-	////Взять точку по индексу
-	//virtual cv::Point GetPoint(size_t idx) { return m_points.size() > idx ? m_points[idx] : cv::Point::Point_(); };
-	// // get points
-	//const WPointsContainer& GetPoints() const { return m_points; };
-	// get length
 	virtual size_t Length() const { return m_points.size(); };
 	virtual double DistanceTo(const cv::Point& mapPoint) const;
 
 	SMapPoint GetPoint(int i) { return SMapPoint(m_points.at(i).x, m_points.at(i).y); };
 
-	//protected:
+	//TODO переделать в private, но много где используется
 	WPointsContainer  m_points;
 };
 
@@ -85,21 +77,21 @@ public:
 	WPolygon(const std::vector<cv::Point> & mapPoints);
 	~WPolygon() {};
 
-	//WPolygon& operator=(WPolygon& other);
+	WPolygon& operator=(WPolygon& other);
 
-	//Проверка точки на принадлежность
+	//Проверка точки на принадлежность полигону
 	bool Contains(const cv::Point& object) const;
+    //Проверка другого векторноко объекта на принадлежность полигону
 	bool Contains(const WVectorObject& object) const;
 	//virtual double DistanceTo(cv::Point mapPoint) const;
 };
 
-class WLayer; //TODO используется в классах Wtext и WLine убрать;
-              //Объект текст
+class WLayer; //TODO используется в классах Wtext и WLine убрать
 class Wregion;
+// Объект кривая линия
 class WLine : public WVectorObject
 {
 public:
-	WLine() : m_width(0) {};
 
 	WLine(const WPointsContainer& points)
 	{
@@ -108,34 +100,22 @@ public:
 	~WLine() {};
 
 	//WLine& operator=(WLine& other);
-	//void clearPoints();
 
-	// line width
-	void   SetWidth(double width);
-	double GetWidth() { return m_width; };
-	void   SetColor(WColor color) { m_color = color; };
-
+    //Конкатенация двух линий
 	void Concat(const WLine& line);
 	//virtual double DistanceTo(cv::Point mapPoint) const;
 	//Упростить линию изпользуя алгоритм Дугласа-Пекера
     void SimplifyDP(double epsilon = 2.7);
+    //Вырезать объект со слоя
     std::vector<Wregion> CutFromLayer(WLayer* layer);
 
 private:
-	double    m_width;
-	int       m_scaler;
-	WColor    m_color;
-};
 
+};
+//Объект текст
 class WText : public WPolygon
 {
 public:
-	//WText();
-
-	//WText(const std::string &text, const WLine &textline)
-	//	: m_text(text), m_textline(textline), m_state(true)
-	//{
-	//}
 
 	WText(const std::vector<cv::Point> & mapPoints) : 
 		WPolygon(mapPoints)
@@ -144,27 +124,25 @@ public:
 
 	~WText() {};
 
-	//WText& operator=(WText& other);
 	bool operator==(const WText& other) {
 		return other.m_text == m_text;
 	}
 	//Добавить текст
 	void AddText(const std::string &text) { m_text = text; }
 	std::string GetText() { return m_text; }
-	//Добавить линию текста
-	//void   AddTextLine(WLine &textline) { m_textline = textline; }
-	//WLine& GetTextLine() { return m_textline; }
 	//Изменить флаг
 	void SetState(bool state) { m_state = state; }
 	bool GetState() const { return m_state; }
 
-	//virtual double DistanceTo(cv::Point mapPoint) const;
-    cv::Mat RotateToHorizon(WLayer* layer); //TODO избавиться от WLayer в параметрах
+	//Копирование полигона с текстом на cv::Mat и поворот до горизонтального положения
+    //Угол находится при помощи преобразования Хафа для линий
+    //Используется при распознавании текста
+    cv::Mat RotateToHorizon(WLayer* layer); 
+    //Вырезать со слоя
     std::vector<Wregion> CutFromLayer(WLayer* layer);
 
 private:
-	//WLine       m_textline; // Линия, обозначающая направление текста внутри полигона
-	std::string m_text;     //Запись
+	std::string m_text;     //Содержащийся текст
 	bool        m_state;    //Флаг состояний: 0 - текст локализован, 1 - текст распознан
 };
 
@@ -174,12 +152,12 @@ public:
 	WMapObject() {};
 	~WMapObject() {};
 
-	//virtual double DistanceTo(cv::Point mapPoint) const;
 private:
 };
-
+//Контейнер для векторных объектов 
 typedef std::vector<WVectorObject> WObjectContainer;
 
+//TODO Убрать если не нужен
 //  Enumerator
 class IEnumItem {
 public:
@@ -196,6 +174,8 @@ protected:
 // ------------------------------------------------------------
 struct w_color;
 // ------------------------------------------------------------
+//Структура, хранящая диапазон слоев
+//Используется при разделении исходного изображения на слои
 struct w_range
 {
 	w_range();
@@ -205,19 +185,23 @@ struct w_range
 	w_color getHigh();
 
 private:
+    //Верхняя и нижняя границы диапазона
 	cv::Vec3b low;
 	cv::Vec3b high;
 };
 
 // ------------------------------------------------------------
+//TODO оставить умный комментарий
 typedef std::string             LayerUUID;
 typedef std::string             GroupID;
 typedef std::vector<LayerUUID>  LayerIDs;
 // ------------------------------------------------------------
+//Объект слой. Содержит растровую маску слоя и контейнер для распознанных векторных объектов
 class WLayer
 {
 
 public:
+    //Возможные типы слоя, на данный момент используются типы LT_TEXT и LT_LINES
 	typedef uint LAYER_TYPE;
 	enum/* class*/ LAYER_TYPE_ENUM : uint
 	{
@@ -232,7 +216,7 @@ public:
 	friend class WRaster;
 
 private:
-	// check if type is single
+	//Проверка, является ли тип слоя единственным
 	static bool IsSingleType(LAYER_TYPE type)
 	{
 		int typesCount = 0;
@@ -274,35 +258,48 @@ public:
 	void DrawCircle(SMapPoint point, uint radius, uchar color);
 	void InicializeVectorContainer();
     SDKResult RecognizeText(std::vector<int> idxs, const float minConfidences);
-
+    
+    //Растровая бинарная маска слоя
+    //Каждый пиксель маски представляет собой переменную типа uchar
+    //Нулевое значение пикселя означает отсутствие пикселя на маске, ненулевое - присутствие
 	cv::Mat     m_data;
 
+    //Контейнер для векторных объектов найденных на слое 
 	WObjectContainer  m_objects;
 
 private:
+    //ID слоя
 	LayerUUID   m_uuid;
+    //Тип слоя
 	LAYER_TYPE  m_type;
+    //Диапазон цветов принадлежащих слою 
 	w_range     m_color_range;
+    //Имя слоя
 	std::string m_name;
+    //Групповое ID. При разделении одного слоя на несколько полученные слои получают одно групповое ID
 	GroupID     m_group_id;
 
+    //Выполняет векторизацию для слоя линий 
 	SDKResult InicializeLinesContainer();
+    //Выполняет векторизацию для слоя текста
     SDKResult InicializeTextContainer();
 public:
 };
 // ------------------------------------------------------------
+//Контейнер для слоев
 typedef std::list<WLayer>       LayersContainer;
 // ------------------------------------------------------------
+// Структура хрянящая компоненты rgb цвета, изспользуется для общения с графическим интерфейсом
 struct w_color
 {
-	//friend w_range;
 	w_color(uchar r, uchar g, uchar b);
 	w_color(const cv::Vec3b& color);
 	w_color(const cv::Vec4b& color);
-
+    //Перевод цвета в формат используемый в opencv
 	cv::Vec3b toVec3b() const;
 	friend inline bool operator <= (const w_color &first, const cv::Vec3b &second);
 	friend inline bool operator >= (const w_color &first, const cv::Vec3b &second);
+    //Добавление цвета в диапазон
 	friend void w_range::addColor(const w_color& color);
 
 	uchar r;
@@ -310,20 +307,22 @@ struct w_color
 	uchar b;
 };
 // ------------------------------------------------------------
-class WRaster //: public IEnumItem<cv::Mat>
+//Объект, хранящий растровое изображение и его слои 
+class WRaster
 {
 public:
 	WRaster(const std::string& imgPath = "");
 
 	virtual ~WRaster(){}
-
+    //Увеличение резкости 
 	SDKResult IncreaseSharpness(double k) const;
+    //Сегментация изображения по цветам
 	void SegmentationBilateral();
 	void SegmentationMeanshift();
+    //TODO убрать если не используется
 	std::vector<cv::Rect> DetectLetters(const LayerUUID& layerId);
 
-	//{ layer
-	// create and add new layer
+	//TODO убрать все что не используется
 	WLayer*   AddLayer(const GroupID& groupId = "");      
 	// create and add new layer
 	SDKResult RemoveLayer     (const LayerUUID& layerId);
@@ -347,29 +346,32 @@ public:
 	// get related layers
 	SDKResult GetLayersByGroupId(const GroupID& groupId, LayerIDs& relatedLayers) const;
 
-	// define objects inside polygon
+	//Опеределяет лежащие внутри полигона объекты слоя и возвращает их индексы в контейнере слоя
+    //Используется в графическом интерфейсе
 	std::vector<int> DefineObjectsInsidePolygon(const LayerUUID& layerId, const WPolygon& mapPoints);
+    //Опеределяет ближайший к указанной точке объект слоя и возвращает его индекс в контейнере слоя
+    //Используется в графическом интерфейсе
 	std::vector<int> DefineObjectsNearPoint(const LayerUUID& layerId, SMapPoint point);
 
-	// вырезание объектов со слоя
+	//Вырезание объектов со слоя
 	std::vector<std::vector<Wregion>> CutObjectsFromLayer(const LayerUUID& layerId, std::vector<int> idxs);
-    //вставление объектов на слой 
+    //Вставка объектов на слой 
     SDKResult PasteObjectsToLayer(const LayerUUID& layerId, std::vector<std::vector<Wregion>> rasterObjects);
 
 private:
 	SDKResult SetLayerType (const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite);
 	void Initialize(const std::string& imgPath);
+    //Разделяет слой на слои линий и текста
 	SDKResult SplitLines(const LayerUUID& layerId, const LayerUUID& linesLayerID, const LayerUUID& othersLayerID);
-	SDKResult SplitText(const LayerUUID& layerId, const LayerUUID& textLayerID, const LayerUUID& othersLayerID);
 
-	// depricate copy and move operations
+	//Запрещает копирование и перемещение
 	WRaster(const WRaster& other)
 		/*: m_raster{other.m_raster},
 		m_layers{other.m_layers},
 		m_image_path{other.m_image_path}*/
 	{
 	}
-
+    
 	WRaster(WRaster&& other)
 		/*: m_raster{std::move(other.m_raster)},
 		m_layers{std::move(other.m_layers)},
@@ -384,27 +386,37 @@ private:
 	//  return *this;
 	//}
 
-
+    //Контейнер из слоев
 	LayersContainer   m_layers;
 public:
+    //Обрабатываемое растровое изображение
 	cv::Mat           m_raster;
 
 private:
-
+    //Путь к растрововму изображение
 	std::wstring                      m_image_path;
 };
 // ------------------------------------------------------------
+//Объект представляющий собой связную область на слое
 class Wregion
 {
 public:
+    //Поиск связной области по точке
 	Wregion(const cv::Point& point, cv::Mat& img);
+    //Возвращает описанный прямоугольник, параллельный горизонту
 	cv::Rect boundingRectangle();
+    //Площадь связной области
 	int Square();
+    //Проверка, является ли связная область линией 
+    //Используется при разделении на слои линий и текста
 	bool IsLine();
+    //Рисование области на изображении
 	void drawOn(cv::Mat& img, uchar color);
+    //Проверка не является ли область пустой
     bool IsEmpty() { return (points.size() > 0); }
     std::vector<cv::Point> GetPoints() { return points; }
 private:
+    //Вектор из точек области
 	std::vector<cv::Point> points;
 };
 
