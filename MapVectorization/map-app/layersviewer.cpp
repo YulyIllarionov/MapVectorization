@@ -87,11 +87,12 @@ void LayersViewer::on_listWidget_currentRowChanged(int currentRow)
         }
         else m_ui->SplitButton->setEnabled(false);
 
-        if(m_layers->at(currentRow)->getType()==(WLayer::LAYER_TYPE_ENUM::LT_TEXT))
+        if(m_layers->at(currentRow)->getType()==(WLayer::LAYER_TYPE_ENUM::LT_TEXT)||
+                m_layers->at(currentRow)->getType()==(WLayer::LAYER_TYPE_ENUM::LT_LINES))
         {
-           m_ui->RecognitionButton->setEnabled(true);
+           m_ui->VectorizationButton->setEnabled(true);
         }
-        else m_ui->RecognitionButton->setEnabled(false);
+        else m_ui->VectorizationButton->setEnabled(false);
 
 
     }
@@ -131,17 +132,15 @@ void LayersViewer::on_SplitButton_clicked()
 {
     LayerIDs vec;
     m_image->SplitLayer(m_layers->at(m_ui->listWidget->currentRow())->getID(),vec);
-    for(int i=0;i<vec.size();i++)
+    for (int i = 0;i < vec.size();i++)
     {
         m_layers->append(m_image->GetLayerById(vec.at(i)));
-        if(m_image->GetLayerById(vec.at(i))->getType()==WLayer::LAYER_TYPE_ENUM::LT_LINES)
-            m_image->GetLayerById(vec.at(i))->InicializeVectorContainer();
     }
     UpdateList();
 
 }
 
-void LayersViewer::on_RecognitionButton_clicked()
+void LayersViewer::on_VectorizationButton_clicked()
 {
-    m_layers->at(m_ui->listWidget->currentRow())->InicializeTextContainer();
+    m_layers->at(m_ui->listWidget->currentRow())->InicializeVectorContainer();
 }

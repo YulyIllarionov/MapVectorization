@@ -287,8 +287,8 @@ private:
 	GroupID     m_group_id;
 
 	SDKResult InicializeLinesContainer();
+    SDKResult InicializeTextContainer();
 public:
-	SDKResult InicializeTextContainer();
 };
 // ------------------------------------------------------------
 typedef std::list<WLayer>       LayersContainer;

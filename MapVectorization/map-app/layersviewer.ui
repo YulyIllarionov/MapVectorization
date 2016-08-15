@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>419</width>
+    <width>426</width>
     <height>238</height>
    </rect>
   </property>
@@ -44,12 +44,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="RecognitionButton">
+      <widget class="QPushButton" name="VectorizationButton">
        <property name="enabled">
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Recog Text</string>
+        <string>Векторизация</string>
        </property>
       </widget>
      </item>

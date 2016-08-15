@@ -141,11 +141,11 @@ void ClassificWidget::GetCoordAndType(int x, int y, int type)
                 vec.push_back(SMapPoint((int)pf.x(), (int)pf.y()));
             }
 
-            if(m_states==lasso_delete)
-            m_image->DeleteOblectsFromLayer(m_layers.at(m_ui->listWidget->currentRow())->getID(), WPolygon(vec));
+            //if(m_states==lasso_delete)
+            //m_image->DeleteOblectsFromLayer(m_layers.at(m_ui->listWidget->currentRow())->getID(), WPolygon(vec));
 
-            if(m_states==lasso_move)
-            m_image->CopyObjectsToAnotherLayer(m_layers.at(m_ui->listWidget->currentRow())->getID(),m_layers.at(m_ui->comboBox->currentIndex())->getID(),WPolygon(vec));
+           // if(m_states==lasso_move)
+           // m_image->CopyObjectsToAnotherLayer(m_layers.at(m_ui->listWidget->currentRow())->getID(),m_layers.at(m_ui->comboBox->currentIndex())->getID(),WPolygon(vec));
 
             m_ui->listWidget_2->clear();
             m_selectPoints.clear();

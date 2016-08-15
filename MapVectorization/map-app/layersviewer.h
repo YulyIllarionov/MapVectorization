@@ -34,7 +34,7 @@ protected:
 
     void on_SplitButton_clicked();
 
-    void on_RecognitionButton_clicked();
+    void on_VectorizationButton_clicked();
 
 private:
     Ui::LayersViewer         *m_ui;
