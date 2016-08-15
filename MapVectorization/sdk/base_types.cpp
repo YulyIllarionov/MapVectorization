@@ -918,14 +918,6 @@ SDKResult WRaster::SplitLines(const LayerUUID& layerId, const LayerUUID& linesLa
     return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
-SDKResult WRaster::SplitText(const LayerUUID& layerId, const LayerUUID& textLayerID, const LayerUUID& othersLayerID)
-{
-    SDKResult result = kSDKResult_Succeeded;
-
-    return result;
-}
-// ------------------------------------------------------------
-
 // Распознает текст на входных изображениях. В будущем будет осуществляться фильтрация результатов 
 // по вероятности правильного распознавания (параметр minConfidences)
 SDKResult WLayer::RecognizeText(std::vector<int> idxs, const float minConfidences)

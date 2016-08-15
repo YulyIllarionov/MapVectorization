@@ -107,7 +107,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\3rdparty\opencv\lib;C:\MapVectorization\MapVectorization\3rdparty\tesseract\lib;C:\MapVectorization\MapVectorization\3rdparty\leptonica\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world310d.lib;lept173.lib;tesseract305.lib;tesseract.lib;opencv_text310.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_world310d.lib;lept173d.lib;tesseract305d.lib;tesseract.lib;opencv_text310d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
