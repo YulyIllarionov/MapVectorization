@@ -268,7 +268,7 @@ namespace utils {
 
 		// Create ERFilter objects with the 1st and 2nd stage default classifiers
 		cv::Ptr<cv::text::ERFilter> er_filter1 = cv::text::createERFilterNM1(
-            cv::text::loadClassifierNM1("trained_classifierNM1.xml"),8,0.000015f,0.23f,0.1f,true,0.1f);
+            cv::text::loadClassifierNM1("trained_classifierNM1.xml"),8,0.00000015f,0.0023f,0.1f,true,0.1f);
 		cv::Ptr<cv::text::ERFilter> er_filter2 = cv::text::createERFilterNM2(
             cv::text::loadClassifierNM2("trained_classifierNM2.xml"),0.1f);
 
@@ -291,7 +291,10 @@ namespace utils {
 		
 		// Detect character groups
 		std::vector<cv::Rect> nm_boxes;
-		cv::text::erGrouping(img, img, points, nm_boxes, cv::text::ERGROUPING_ORIENTATION_HORIZ);
+        cv::Mat img1, img2;
+        img.copyTo(img1);
+        img.copyTo(img2);
+		cv::text::erGrouping(img1, img2, points, nm_boxes, cv::text::ERGROUPING_ORIENTATION_HORIZ);
 
 		for (int i = 0; i < nm_boxes.size(); i++) 
 		{

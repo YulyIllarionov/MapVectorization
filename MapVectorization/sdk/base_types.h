@@ -73,6 +73,8 @@ class WPolygon : public WVectorObject
 {
 public:
 	WPolygon();
+    WPolygon(cv::Rect rect);
+    WPolygon(cv::RotatedRect rect, cv::Size borders);
 	WPolygon(std::vector<SMapPoint> & mapPoints);
 	WPolygon(const std::vector<cv::Point> & mapPoints);
 	~WPolygon() {};
@@ -403,6 +405,8 @@ class Wregion
 public:
     //Поиск связной области по точке
 	Wregion(const cv::Point& point, cv::Mat& img);
+    //Поиск связной области по точке с границами поиска заданными полигоном
+    Wregion(const cv::Point& point, cv::Mat& img, WPolygon edges);
     //Возвращает описанный прямоугольник, параллельный горизонту
 	cv::Rect boundingRectangle();
     //Площадь связной области
@@ -413,7 +417,7 @@ public:
     //Рисование области на изображении
 	void drawOn(cv::Mat& img, uchar color);
     //Проверка не является ли область пустой
-    bool IsEmpty() { return (points.size() > 0); }
+    bool IsEmpty() { return (points.size() == 0); }
     std::vector<cv::Point> GetPoints() { return points; }
 private:
     //Вектор из точек области

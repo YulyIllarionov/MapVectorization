@@ -556,20 +556,8 @@ SDKResult WRaster::PasteObjectsToLayer(const LayerUUID& layerId, std::vector<std
         }
         case WLayer::LT_TEXT:
         {
-            Point2f rectPoints[4];
             cv::RotatedRect lineRect = cv::minAreaRect(objectPoints);
-            lineRect.points(rectPoints);
-            std::vector<Point> polygonPoints(4);
-            for (size_t i = 0; i < 4; i++)
-                polygonPoints[i] = rectPoints[i];
-            for (size_t i = 0; i < polygonPoints.size(); i++)
-            {
-                polygonPoints[i].x = std::max(polygonPoints[i].x, 0);
-                polygonPoints[i].x = std::min(polygonPoints[i].x, layer->m_data.cols);
-                polygonPoints[i].y = std::max(polygonPoints[i].x, 0);
-                polygonPoints[i].y = std::min(polygonPoints[i].x, layer->m_data.rows);
-            }
-            vectorObjects.push_back(WText(polygonPoints));
+            vectorObjects.push_back(WText(WPolygon(lineRect, layer->m_data.size()).m_points));//TODO 
 
             break;
         }
@@ -604,8 +592,8 @@ std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& 
             if (idxs[i] < layer->m_objects.size())
             {
                 //cut from raster
-                WLine* text = dynamic_cast<WLine*>(&layer->m_objects[idxs[i]]);
-                regions.push_back(text->CutFromLayer(layer));
+                WLine* line = static_cast<WLine*>(&layer->m_objects[idxs[i]]);
+                regions.push_back(line->CutFromLayer(layer));
                 //delete from vector
                 layer->m_objects.erase(layer->m_objects.begin() + idxs[i]);
             }
@@ -628,6 +616,28 @@ std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& 
 
     }
     return regions;
+}
+// ------------------------------------------------------------
+WPolygon::WPolygon(cv::Rect rect)
+{
+    m_points.push_back(rect.tl());
+    m_points.push_back(rect.tl() + cv::Point(rect.width, 0));
+    m_points.push_back(rect.br());
+    m_points.push_back(rect.tl() + cv::Point(0, rect.height));
+}
+// ------------------------------------------------------------
+WPolygon::WPolygon(cv::RotatedRect rect, cv::Size borders)
+{
+    Point2f rectPoints[4];
+    rect.points(rectPoints);
+    m_points.resize(4);
+    for (size_t i = 0; i < 4; i++)
+    { 
+        m_points[i].x = std::max((int)rectPoints[i].x, 0);
+        m_points[i].x = std::min((int)rectPoints[i].x, borders.width);
+        m_points[i].y = std::max((int)rectPoints[i].y, 0);
+        m_points[i].y = std::min((int)rectPoints[i].y, borders.height);
+    }
 }
 // ------------------------------------------------------------
 WPolygon::WPolygon(std::vector<SMapPoint> & mapPoints)
@@ -712,35 +722,17 @@ std::vector<Wregion> WLine::CutFromLayer(WLayer* layer)
     if (layer->getType() != WLayer::LAYER_TYPE_ENUM::LT_LINES)
         return std::vector<Wregion>();
 
-    Point2f rectPoints[4];
     cv::RotatedRect lineRect = cv::minAreaRect(m_points);
-    lineRect.points(rectPoints);
-    std::vector<Point> polygonPoints(4);
-    for (size_t i = 0; i < 4; i++)
-        polygonPoints[i] = rectPoints[i];
-
-    for (size_t i = 0; i < polygonPoints.size(); i++)
-    {
-        polygonPoints[i].x = std::max(polygonPoints[i].x, 0);
-        polygonPoints[i].x = std::min(polygonPoints[i].x, layer->m_data.cols);
-        polygonPoints[i].y = std::max(polygonPoints[i].x, 0);
-        polygonPoints[i].y = std::min(polygonPoints[i].x, layer->m_data.rows);
-    }
-    WPolygon linePolygon(polygonPoints);
-
-    Rect roi = boundingRect(linePolygon.m_points);
+    WPolygon linePolygon(lineRect, layer->m_data.size());
     std::vector<Wregion> letters;
-
+    
     for (size_t i = 0; i < m_points.size(); i++)
     {
-        if (linePolygon.Contains(m_points[i]))
+        if (layer->m_data.at<uchar>(m_points[i]) != 0)
         {
-            if (layer->m_data.at<uchar>(m_points[i]) != 0)
-            {
-                Wregion currentRegion(m_points[i], layer->m_data);
-                if (!currentRegion.IsEmpty())
-                    letters.push_back(currentRegion);
-            }
+            Wregion currentRegion(m_points[i], layer->m_data, linePolygon);
+            if (!currentRegion.IsEmpty())
+                letters.push_back(currentRegion);
         }
     }
     return letters;
@@ -842,6 +834,48 @@ Wregion::Wregion(const cv::Point& point, cv::Mat& img)
             {
                 //if ((l == point.y) && (k == point.x))
                   //  continue;
+
+                if (img.at<uchar>(l, k) != 0)
+                {
+                    stack.push(Point(k, l));
+                    img.at<uchar>(l, k) = 0; // Закрасить на изображении
+                }
+            }
+        }
+    }
+}
+// ------------------------------------------------------------
+Wregion::Wregion(const cv::Point& point, cv::Mat& img, WPolygon edges)
+{
+    if (img.at<uchar>(point) == 0)
+        return; 
+    if (!edges.Contains(point))
+        return;
+
+
+    cv::Point currentPoint;
+    std::stack <cv::Point> stack;
+
+    stack.push(point);
+
+    while (!stack.empty())
+    {
+        currentPoint = stack.top();
+        stack.pop(); // Удалить точку из стека
+        if (SDK_NAMESPACE::utils::isEdgePoint(currentPoint, img))
+            continue;
+        if (!edges.Contains(currentPoint))
+            continue;
+        points.push_back(currentPoint); //Добавить точку к результату
+
+        img.at<uchar>(currentPoint) = 0; // Закрасить на изображении
+
+        for (int k = currentPoint.x - 1; k <= currentPoint.x + 1; k++)
+        {
+            for (int l = currentPoint.y - 1; l <= currentPoint.y + 1; l++)
+            {
+                //if ((l == point.y) && (k == point.x))
+                //  continue;
 
                 if (img.at<uchar>(l, k) != 0)
                 {
