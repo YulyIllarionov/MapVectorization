@@ -14,14 +14,14 @@ ClassificWidget::ClassificWidget(WRaster *image, ImageViewer *widget,QList<WLaye
     {
         WLayer* tlay=layers->at(i);
         if(tlay->getType()==WLayer::LT_TEXT||
-                tlay->getType()==WLayer::LT_LINES||
-                tlay->getType()==WLayer::LT_AREAS)
+                tlay->getType()==WLayer::LT_LINES)
         m_layers.append(tlay);
     }
+    UpdateList();
     if(!m_layers.isEmpty()) m_ui->listWidget->setCurrentRow(0);
     QObject::connect(m_widget->GetPixItem(), SIGNAL(sendCoordAndType(int,int,int)), this, SLOT(GetCoordAndType(int,int,int)));
-    UpdateList();
-    m_states=nothing;
+    m_states=click_selection;
+
 }
 void ClassificWidget::closeEvent(QCloseEvent *event)
 {
@@ -107,6 +107,7 @@ void ClassificWidget::on_listWidget_currentRowChanged(int currentRow)
     for(int i=0;i<cont.size();i++)
     {
         m_ui->listWidget_2->addItem("#"+QString::number(i));
+
     }
 }
 
@@ -118,38 +119,53 @@ void ClassificWidget::GetCoordAndType(int x, int y, int type)
         {
             delete m_polygon;
             m_polygon = NULL;
-            m_ui->lasso->setChecked(false);
+            m_ui->ClickSelectionButton->setChecked(false);
+            m_ui->PolygonSelectionButton->setChecked(false);
             m_selectPoints.clear();
+
         }
         if(type==1)
         {
-            delete m_polygon;
-            m_polygon = NULL;
-            m_selectPoints.append(QPointF(x,y));
-            m_polygon=m_widget->AddSelection(QPolygonF(m_selectPoints));
+            if(m_states==polygon_selection)
+            {
+                delete m_polygon;
+                m_polygon = NULL;
+                m_selectPoints.append(QPointF(x,y));
+                m_polygon=m_widget->AddSelection(QPolygonF(m_selectPoints));
+            }
+            if(m_states==click_selection)
+            {
+                std::vector<int> temp_vector=m_image->DefineObjectsNearPoint(m_layers.at(m_ui->listWidget->currentRow())->getID(),SMapPoint(x,y));
+                for(int i=0;i<temp_vector.size();i++)
+                {
+                    m_ui->listWidget_2->setItemSelected(m_ui->listWidget_2->item(temp_vector.at(i)), 1);
+                }
+                UpdateCollectionList();
+            }
+
         }
         if (type == 9)
         {
-            delete m_polygon;
-            m_polygon = NULL;
-            m_selectPoints.append(QPointF(x, y));
-            // Создание вектора
-            std::vector<SMapPoint> vec;
-            for (int i = 0;i < m_selectPoints.size();i++)
+            if(m_states==polygon_selection)
             {
-                QPointF pf= m_selectPoints.at(i);
-                vec.push_back(SMapPoint((int)pf.x(), (int)pf.y()));
+                delete m_polygon;
+                m_polygon = NULL;
+                m_selectPoints.append(QPointF(x, y));
+                // Создание вектора
+                std::vector<SMapPoint> vec;
+                for (int i = 0;i < m_selectPoints.size();i++)
+                {
+                    QPointF pf= m_selectPoints.at(i);
+                    vec.push_back(SMapPoint((int)pf.x(), (int)pf.y()));
+                }
+                std::vector<int> temp_vector=m_image->DefineObjectsInsidePolygon(m_layers.at(m_ui->listWidget->currentRow())->getID(),WPolygon(vec));
+                for(int i=0;i<temp_vector.size();i++)
+                {
+                    m_ui->listWidget_2->setItemSelected(m_ui->listWidget_2->item(temp_vector.at(i)), 1);
+                }
+                UpdateCollectionList();
+                m_selectPoints.clear();
             }
-
-            //if(m_states==lasso_delete)
-            //m_image->DeleteOblectsFromLayer(m_layers.at(m_ui->listWidget->currentRow())->getID(), WPolygon(vec));
-
-           // if(m_states==lasso_move)
-           // m_image->CopyObjectsToAnotherLayer(m_layers.at(m_ui->listWidget->currentRow())->getID(),m_layers.at(m_ui->comboBox->currentIndex())->getID(),WPolygon(vec));
-
-            m_ui->listWidget_2->clear();
-            m_selectPoints.clear();
-            //UpdateCollectionList();
         }
 
     }
@@ -163,7 +179,7 @@ void ClassificWidget::on_listWidget_2_currentRowChanged(int currentRow)
 
 void ClassificWidget::on_catLinesButton_clicked()
 {
-    WObjectContainer &cont=m_layers.at(m_ui->listWidget->currentRow())->m_objects;
+    /*WObjectContainer &cont=m_layers.at(m_ui->listWidget->currentRow())->m_objects;
     WLine* vobj;
     bool isFirst=true;
     for(int i=0;i<cont.size();i++)
@@ -181,7 +197,7 @@ void ClassificWidget::on_catLinesButton_clicked()
                 //vobj->Concat(*vobj2);
             }
         }
-    }
+    }*/
 }
 
 void ClassificWidget::clearCollectionList()
@@ -202,30 +218,46 @@ void ClassificWidget::clearCollectionList()
         m_rectForLines.clear();
 }
 
-void ClassificWidget::on_lasso_clicked()
+void ClassificWidget::on_ClickSelectionButton_clicked()
 {
-    m_states = lasso_delete;
-    /*if(m_ui->lasso->isChecked())
-    {
-        m_states=nothing;
-        m_ui->lasso->setChecked(false);
-    }
-    else
-    {
-        
-    }*/
+    m_states=click_selection;
 }
 
-void ClassificWidget::on_lassoMove_clicked()
+void ClassificWidget::on_PolygonSelectionButton_clicked()
 {
-    m_states = lasso_move;
-    /*if(m_ui->lassoMove->isChecked())
+    m_states=polygon_selection;
+}
+
+void ClassificWidget::on_DeleteButton_clicked()
+{
+    WObjectContainer &cont = m_layers.at(m_ui->listWidget->currentRow())->m_objects;
+    std::vector<int> idx;
+    for(int i=0;i<cont.size();i++)
     {
-        m_states=nothing;
-        m_ui->lassoMove->setChecked(false);
+        if(m_ui->listWidget_2->item(i)->isSelected())
+        {
+            idx.push_back(i);
+        }
     }
-    else
+    m_image->CutObjectsFromLayer(m_layers.at(m_ui->listWidget->currentRow())->getID(),idx);
+    UpdateCollectionList();
+
+}
+
+void ClassificWidget::on_MoveButton_clicked()
+{
+    WObjectContainer &cont = m_layers.at(m_ui->listWidget->currentRow())->m_objects;
+    std::vector<int> idx;
+    for(int i=0;i<cont.size();i++)
     {
-        
-    }*/
+        if(m_ui->listWidget_2->item(i)->isSelected())
+        {
+            idx.push_back(i);
+        }
+    }
+    m_image->PasteObjectsToLayer(m_layers.at(m_ui->comboBox->currentIndex())->getID(),
+                                 m_image->CutObjectsFromLayer(m_layers.at(m_ui->listWidget->currentRow())->getID(),idx));
+    UpdateCollectionList();
+
+
 }

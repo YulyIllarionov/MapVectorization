@@ -20,9 +20,38 @@
       <widget class="QListWidget" name="listWidget"/>
      </item>
      <item>
+      <widget class="QPushButton" name="ClickSelectionButton">
+       <property name="text">
+        <string>Выбор объектов кликом</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">buttonGroup</string>
+       </attribute>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="PolygonSelectionButton">
+       <property name="text">
+        <string>Выбор объектов полигоном</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">buttonGroup</string>
+       </attribute>
+      </widget>
+     </item>
+     <item>
       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,10">
        <item>
-        <widget class="QPushButton" name="lasso">
+        <widget class="QPushButton" name="DeleteButton">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -33,24 +62,18 @@
           <string>Удаление</string>
          </property>
          <property name="checkable">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
-         <attribute name="buttonGroup">
-          <string notr="true">buttonGroup</string>
-         </attribute>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="lassoMove">
+        <widget class="QPushButton" name="MoveButton">
          <property name="text">
           <string>Перенос</string>
          </property>
          <property name="checkable">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
-         <attribute name="buttonGroup">
-          <string notr="true">buttonGroup</string>
-         </attribute>
         </widget>
        </item>
        <item>
@@ -59,41 +82,20 @@
       </layout>
      </item>
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QPushButton" name="catLinesButton">
        <property name="text">
-        <string>Распознанный текст:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPlainTextEdit" name="plainTextEdit">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="readOnly">
-        <bool>true</bool>
+        <string>Объединение ( только линии)</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <widget class="QListWidget" name="listWidget_2">
-       <property name="selectionMode">
-        <enum>QAbstractItemView::MultiSelection</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="catLinesButton">
-       <property name="text">
-        <string>Объединить линии</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QListWidget" name="listWidget_2">
+     <property name="selectionMode">
+      <enum>QAbstractItemView::MultiSelection</enum>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

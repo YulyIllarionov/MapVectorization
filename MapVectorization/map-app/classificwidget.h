@@ -31,9 +31,13 @@ private slots:
 
     void on_catLinesButton_clicked();
 
-    void on_lasso_clicked();
+    void on_ClickSelectionButton_clicked();
 
-    void on_lassoMove_clicked();
+    void on_PolygonSelectionButton_clicked();
+
+    void on_DeleteButton_clicked();
+
+    void on_MoveButton_clicked();
 
 private:
     void clearCollectionList();
@@ -49,7 +53,7 @@ private:
     QList< QList<QGraphicsRectItem*> >      m_rectForLines;
     enum States
     {
-        nothing=0,lasso_delete,lasso_move
+        nothing=0,polygon_selection,click_selection
     } m_states;
 
 };

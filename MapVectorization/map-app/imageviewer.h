@@ -16,7 +16,7 @@ public:
     QGraphicsPolygonItem *AddSelection(QPolygonF polygon);
     QGraphicsPolygonItem *AddTextSelection(QPolygonF polygon);
     void AddLineSelection(QVector<QPointF> &vec, QList<QGraphicsRectItem *> &items);
-
+    void ClearObjects();
 
 signals:
 
@@ -32,6 +32,11 @@ private:
      MyPixmapItem*      m_pixItem;
      QImage             m_image;
      QImage             img;
+     QList<QPointF>                          m_selectPoints;
+     QList<QPolygonF>                        m_textPolygons;
+     QList<QGraphicsPolygonItem*>            m_polygonForText;
+     QList< QList<QGraphicsRectItem*> >      m_rectForLines;
+
 };
 
 #endif // IMAGEVIEWER_H

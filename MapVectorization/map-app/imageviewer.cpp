@@ -75,6 +75,11 @@ void ImageViewer::AddLineSelection(QVector<QPointF> &vec, QList<QGraphicsRectIte
     }
 }
 
+void ImageViewer::ClearObjects()
+{
+
+}
+
 
 MyPixmapItem* ImageViewer::GetPixItem() const
 {
