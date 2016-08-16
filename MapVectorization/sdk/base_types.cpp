@@ -67,6 +67,7 @@ w_range::w_range()
     this->high = Vec3b(0, 0, 0);
 }
 // ------------------------------------------------------------
+//Каждая из компонент входного цвета является кандидатом на новое значение границы
 void w_range::addColor(const w_color& color)
 {
     this->low[2] = std::min<uchar>(color.r, low[2]);
@@ -101,7 +102,7 @@ SDKResult WLayer::InicializeLinesContainer()
 {
     if (m_type != LT_LINES)
         return kSDKResult_Error;
-
+    
     WObjectContainer lines = SDK_NAMESPACE::utils::FindLinesOnMat(m_data);
     m_objects.insert(m_objects.end(), lines.begin(), lines.end());
 
@@ -112,7 +113,7 @@ SDKResult WLayer::InicializeTextContainer()
 {
     if (m_type != LT_TEXT)
         return kSDKResult_Error;
-
+    //Локализация текста
     WObjectContainer lines = SDK_NAMESPACE::utils::FindTextOnMat(m_data);
     std::vector<int> idxs(lines.size());
     for (size_t i = 0; i < idxs.size(); i++)
@@ -120,6 +121,7 @@ SDKResult WLayer::InicializeTextContainer()
         idxs[i] = m_objects.end() - m_objects.begin() + i;
     }
     m_objects.insert(m_objects.end(), lines.begin(), lines.end());
+    //Распознавание текста
     for (size_t i = 0; i < m_objects.size(); i++)
     {
         WText* currentText = dynamic_cast<WText*>(&m_objects[i]);
@@ -173,7 +175,7 @@ void WRaster::Initialize(const std::string& imgPath)
 SDKResult WRaster::IncreaseSharpness(double k) const
 {
     //filter2D(m_raster, m_raster, m_raster.depth(), utils::SharpKernel(k));
-
+    //Ядро свертки для увеличения резкости
     Mat kernel = utils::SharpKernel(k);
     Mat img;
     cvtColor(m_raster, img, CV_BGRA2BGR);
@@ -181,9 +183,10 @@ SDKResult WRaster::IncreaseSharpness(double k) const
     Mat imgGray;
     Mat imgEdges;
 
+    //Детектор границ Кэнни
     cvtColor(m_raster, imgGray, COLOR_RGB2GRAY);
     Canny(imgGray, imgEdges, 90, 200);
-
+    //Увеличени резкости: свертка изображения с ядром
     for (int y = 1; y < img.rows - 1; y++)
     {
         for (int x = 1; x < img.cols - 1; x++)
@@ -591,10 +594,10 @@ std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& 
         {
             if (idxs[i] < layer->m_objects.size())
             {
-                //cut from raster
+                //Вырезание с растрового слоя 
                 WLine* line = static_cast<WLine*>(&layer->m_objects[idxs[i]]);
                 regions.push_back(line->CutFromLayer(layer));
-                //delete from vector
+                //Удаление из векторной коллекции 
                 layer->m_objects.erase(layer->m_objects.begin() + idxs[i]);
             }
         }
@@ -605,10 +608,10 @@ std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& 
         {
             if (idxs[i] < layer->m_objects.size())
             {
-                //cut from raster
+                //Вырезание с растрового слоя 
                 WText* text = dynamic_cast<WText*>(&layer->m_objects[idxs[i]]);
                 regions.push_back(text->CutFromLayer(layer));
-                //delete from vector
+                //Удаление из векторной коллекции
                 layer->m_objects.erase(layer->m_objects.begin() + idxs[i]);
             }
         }
@@ -683,6 +686,7 @@ double WVectorObject::DistanceTo(const cv::Point& mapPoint) const
     return std::sqrt((double)squaredDistance);
 }
 // ------------------------------------------------------------
+//Конкатенация двух линий. Производится по двум ближайщим концам линий
 void WLine::Concat(const WLine& line)
 {
     std::vector<int> distances;
@@ -822,6 +826,7 @@ Wregion::Wregion(const cv::Point& point, cv::Mat& img)
     {
         currentPoint = stack.top();
         stack.pop(); // Удалить точку из стека
+        //Пропуск граничных точек изображения
         if (SDK_NAMESPACE::utils::isEdgePoint(currentPoint, img))
             continue;
         points.push_back(currentPoint); //Добавить точку к результату
@@ -862,8 +867,10 @@ Wregion::Wregion(const cv::Point& point, cv::Mat& img, WPolygon edges)
     {
         currentPoint = stack.top();
         stack.pop(); // Удалить точку из стека
+        //Пропуск граничных точек изображения
         if (SDK_NAMESPACE::utils::isEdgePoint(currentPoint, img))
             continue;
+        //Пропуск граничных точек полигона
         if (!edges.Contains(currentPoint))
             continue;
         points.push_back(currentPoint); //Добавить точку к результату
@@ -897,18 +904,18 @@ int Wregion::Square()
     return (int)points.size();
 }
 // ------------------------------------------------------------
+//Проверка является ли связная область линией 
 bool Wregion::IsLine()
 {
     float radius;
     minEnclosingCircle(points, Point2f(), radius);
+    //Отношение площади связной области к площади описанного круга
     double ratio = (double)this->Square() / radius / radius;
-    //std::fstream fs;
-    //fs.open("./testRatio.txt", std::fstream::in | std::fstream::out | std::fstream::app);
-    //fs << ratio << std::endl;
-    //fs.close();
+    //Превышение отношением порога 
     return (ratio < 0.6);
 }
 // ------------------------------------------------------------
+//Рисование региона на слое
 void Wregion::drawOn(Mat& img, uchar color)
 {
     for (int i = 0; i < points.size(); i++)

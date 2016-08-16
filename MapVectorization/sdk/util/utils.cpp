@@ -52,10 +52,6 @@ namespace utils {
         return std::string(nstring);
     }
     // ----------------------------------------------------
-    // Inline Функция:
-    //       1. именование: WsharpKernel(float k) функция возвращающая ядро свертки для увеличения резкости 
-    //       2. аргументы функции:  k - коэффицент ядра
-    // ----------------------------------------------------
     cv::Mat SharpKernel(double k)
     {
         cv::Mat kernel(3, 3, CV_64F, -0.125);
@@ -102,6 +98,7 @@ namespace utils {
     #endif
       return s;
     }
+    //Операторы для сравнения RGB цветов
     // ----------------------------------------------------
     inline bool operator < (cv::Vec3b& first, cv::Vec3b& second)
     {
@@ -176,6 +173,7 @@ namespace utils {
     {
         WObjectContainer linesContainer;
         cv::Mat skeleton;
+        //Скелетизация изображения
         SDK_NAMESPACE::WSkeletonizer::Instance().Skeletonize(img, skeleton);
         cv::imwrite("skeleton.png", skeleton);
         for (int y = 1; y < skeleton.rows - 1; y++)
@@ -183,16 +181,18 @@ namespace utils {
             for (int x = 1; x < skeleton.cols - 1; x++)
             {
                 cv::Point initial(x, y);
+                //Поиск ненулевой точки на изображении
                 if (skeleton.at<uchar>(initial) > 0)
                 {
                     std::vector<cv::Point> firstNeighbors = SDK_NAMESPACE::utils::getNeghboursClockwise(initial, skeleton);
                     if (firstNeighbors.size() > 2)
                         continue;
                     else if (firstNeighbors.size() != 0)
-                    {
+                    {   
                         std::vector<WPointsContainer> lines(firstNeighbors.size());
                         lines[0].push_back(initial);
                         skeleton.at<uchar>(initial) = 0;
+                        //Поиск линии в обе стороны от найденной точки
                         for (int i = 0; i < firstNeighbors.size(); i++)
                         {
                             cv::Point current(firstNeighbors[i]);
@@ -202,16 +202,19 @@ namespace utils {
                                 lines[i].push_back(current);
                                 neighbors = SDK_NAMESPACE::utils::getNeghboursClockwise(current, skeleton);
                                 skeleton.at<uchar>(current) = 0;
+                                //Прекращение поиска если достигнут перекресток
                                 if (neighbors.size() != 1)
                                     break;
                                 current = neighbors[0];
                             }
                         }
+                        //Объединение двух найденных частей линии 
                         WLine line(lines[0]);
                         for (int i = 1; i < lines.size(); i++)
                         {
                             line.Concat(lines[i]);
                         }
+                        //Упрощение линии
                         line.SimplifyDP();
                         linesContainer.push_back(line);
                     }

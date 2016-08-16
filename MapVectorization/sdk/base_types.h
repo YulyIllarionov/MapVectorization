@@ -60,6 +60,7 @@ class WVectorObject
 {
 public:
 	virtual size_t Length() const { return m_points.size(); };
+    //расстояние от векторного объекта до точки
 	virtual double DistanceTo(const cv::Point& mapPoint) const;
 
 	SMapPoint GetPoint(int i) { return SMapPoint(m_points.at(i).x, m_points.at(i).y); };
@@ -83,7 +84,7 @@ public:
 
 	//Проверка точки на принадлежность полигону
 	bool Contains(const cv::Point& object) const;
-    //Проверка другого векторноко объекта на принадлежность полигону
+    //Проверка другого векторного объекта на принадлежность полигону
 	bool Contains(const WVectorObject& object) const;
 	//virtual double DistanceTo(cv::Point mapPoint) const;
 };
@@ -108,7 +109,7 @@ public:
 	//virtual double DistanceTo(cv::Point mapPoint) const;
 	//Упростить линию изпользуя алгоритм Дугласа-Пекера
     void SimplifyDP(double epsilon = 2.7);
-    //Вырезать объект со слоя
+    //Вырезать объект с растрового слоя
     std::vector<Wregion> CutFromLayer(WLayer* layer);
 
 private:
@@ -140,7 +141,7 @@ public:
     //Угол находится при помощи преобразования Хафа для линий
     //Используется при распознавании текста
     cv::Mat RotateToHorizon(WLayer* layer); 
-    //Вырезать со слоя
+    //Вырезать с растрового слоя
     std::vector<Wregion> CutFromLayer(WLayer* layer);
 
 private:
@@ -181,7 +182,9 @@ struct w_color;
 struct w_range
 {
 	w_range();
+    //Добавление цвета в диапазон
 	void addColor(const w_color& color);
+    //Проверка цвета на принадлежность диапазону
 	inline bool contains(const cv::Vec3b& color);
 	w_color getLow();
 	w_color getHigh();
@@ -257,8 +260,13 @@ public:
 	std::string getName()      const { return m_name; }
 	GroupID     getGroupId()   const { return m_group_id; }
 
+    //Рисование круга на растровом слое.
+    //Используется в качестве ластика
 	void DrawCircle(SMapPoint point, uint radius, uchar color);
+    //Инициализация векторного контейнера для слоя
+    //Вызывает необходимый вид векторизации в зависимости от типа слоя
 	void InicializeVectorContainer();
+    //Распознавание текста объектов векторной коллекции по задаваемым индексам
     SDKResult RecognizeText(std::vector<int> idxs, const float minConfidences);
     
     //Растровая бинарная маска слоя
@@ -313,6 +321,7 @@ struct w_color
 class WRaster
 {
 public:
+    //Загрузка растрового изображения
 	WRaster(const std::string& imgPath = "");
 
 	virtual ~WRaster(){}
