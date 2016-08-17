@@ -114,13 +114,13 @@ SDKResult WLayer::InicializeTextContainer()
     if (m_type != LT_TEXT)
         return kSDKResult_Error;
     //Локализация текста
-    WObjectContainer lines = SDK_NAMESPACE::utils::FindTextOnMat(m_data);
-    std::vector<int> idxs(lines.size());
+    WObjectContainer text = SDK_NAMESPACE::utils::FindTextOnMat(m_data);
+    std::vector<int> idxs(text.size());
     for (size_t i = 0; i < idxs.size(); i++)
     {
         idxs[i] = m_objects.end() - m_objects.begin() + i;
     }
-    m_objects.insert(m_objects.end(), lines.begin(), lines.end());
+    m_objects.insert(m_objects.end(), text.begin(), text.end());
     //Распознавание текста
     for (size_t i = 0; i < m_objects.size(); i++)
     {
@@ -742,48 +742,47 @@ std::vector<Wregion> WLine::CutFromLayer(WLayer* layer)
     return letters;
 }
 // ------------------------------------------------------------
-cv::Mat WText::RotateToHorizon(WLayer* layer)
+void WText::RotateToHorizon(WLayer* layer, cv::Mat& image)
 {
     if (layer->getType() != WLayer::LAYER_TYPE_ENUM::LT_TEXT)
-        return cv::Mat();
+        return;
 
     //Копирование полигона на отдельное изображение 
-    Rect roi = boundingRect(m_points);
+    Rect roi = cv::boundingRect(m_points);
     Mat img2Recognition(roi.size(), CV_8UC1, Scalar(0));
     for (int y = roi.y; y < roi.y + roi.height; y++)
     {
         for (int x = roi.x; x < roi.x + roi.width; x++)
         {
             Point current(x, y);
-            if (this->Contains(current))
-            {
-                img2Recognition.at<uchar>(y - roi.y, x - roi.x) = layer->m_data.at<uchar>(current);
-            }
+            img2Recognition.at<uchar>(y - roi.y, x - roi.x) = layer->m_data.at<uchar>(current);
         }
     }
-
+    //namedWindow("window", CV_WINDOW_KEEPRATIO);
+    //imshow("window", img2Recognition);
+    waitKey();
     //Нахождение угла поворота
     std::vector<cv::Vec4i> textLines;
-    HoughLinesP(img2Recognition, textLines, 1, CV_PI / 180, 80, img2Recognition.cols / 4, img2Recognition.cols / 10);
+    cv::HoughLinesP(img2Recognition, textLines, 1, CV_PI / 180, 80, img2Recognition.cols / 4, img2Recognition.cols / 10);
     std::vector<double> lineAngles(textLines.size());
     for (size_t i = 0; i < textLines.size(); i++)
     {
         lineAngles[i] = std::atan2(textLines[i][3] - textLines[i][1], textLines[i][2] - textLines[i][0]);
     }
     std::sort(lineAngles.begin(), lineAngles.end());
-    //double angle = 0.0;
-    //if (std::abs(lineAngles.back() - lineAngles.front()) < (std::M_PI_2))
-    double    angle = lineAngles[lineAngles.size() / 2] * 180 / 3.141592; //TODO заменить на пи
+    double angle = 0.0;
+    if (!lineAngles.empty())//(std::abs(lineAngles.back() - lineAngles.front()) < (std::M_PI_2))
+        angle = lineAngles[lineAngles.size() / 2] * 180 / 3.141592; //TODO заменить на пи
 
     //Поворот
-    cv::Point2f center(img2Recognition.cols / 2.0, img2Recognition.rows / 2.0);
-    cv::Mat rot = cv::getRotationMatrix2D(center, angle, 1.0);
-    cv::Rect bbox = cv::RotatedRect(center, img2Recognition.size(), angle).boundingRect();
-    rot.at<double>(0, 2) += bbox.width / 2.0 - center.x;
-    rot.at<double>(1, 2) += bbox.height / 2.0 - center.y;
-    cv::warpAffine(img2Recognition, img2Recognition, rot, bbox.size());
+    //cv::Point2f center(img2Recognition.cols / 2.0, img2Recognition.rows / 2.0);
+    //cv::Mat rot = cv::getRotationMatrix2D(center, angle, 1.0);
+    //cv::Rect bbox = cv::RotatedRect(center, img2Recognition.size(), angle).boundingRect();
+    //rot.at<double>(0, 2) += bbox.width / 2.0 - center.x;
+    //rot.at<double>(1, 2) += bbox.height / 2.0 - center.y;
+    //cv::warpAffine(img2Recognition, image, rot, bbox.size());
+    image = img2Recognition;
 
-    return img2Recognition;
 }
 // ------------------------------------------------------------
 std::vector<Wregion> WText::CutFromLayer(WLayer* layer)
@@ -973,13 +972,17 @@ SDKResult WLayer::RecognizeText(std::vector<int> idxs, const float minConfidence
     {
         if (idxs[i] < m_objects.size())
         {
-            WText* text = dynamic_cast<WText*>(&m_objects[idxs[i]]);
-            cv::Mat rotatedTextImg = text->RotateToHorizon(this);
+            WText* text = static_cast<WText*>(&m_objects[idxs[i]]);
+            cv::Mat rotatedTextImg;
+            text->RotateToHorizon(this, rotatedTextImg);
 
             std::string output;
             std::vector<cv::Rect>   boxes;
             std::vector<std::string> words;
             std::vector<float>  confidences;
+            cv::imshow("window", rotatedTextImg);
+            cv::waitKey();
+            cv::imwrite("rotatedTextImg.png", rotatedTextImg);
             ocr->run(rotatedTextImg, output, &boxes, &words, &confidences, cv::text::OCR_LEVEL_WORD);
 
             //output.erase(remove(output.begin(), output.end(), '\n'), output.end());

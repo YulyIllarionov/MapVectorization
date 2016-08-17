@@ -269,7 +269,7 @@ public:
     void retranslateUi(QWidget *LayerConfigureDialog)
     {
         LayerConfigureDialog->setWindowTitle(QApplication::translate("LayerConfigureDialog", "Dialog", 0));
-        Pipette->setText(QApplication::translate("LayerConfigureDialog", "\320\237", 0));
+        Pipette->setText(QApplication::translate("LayerConfigureDialog", "\320\237\320\270\320\277\320\265\321\202\320\272\320\260", 0));
         AddColor->setText(QApplication::translate("LayerConfigureDialog", "\320\224\320\276\320\261\320\260\320\262\320\270\321\202\321\214 \321\206\320\262\320\265\321\202", 0));
         groupBox->setTitle(QApplication::translate("LayerConfigureDialog", "\320\224\320\270\320\260\320\277\320\260\320\267\320\276\320\275 \321\206\320\262\320\265\321\202\320\276\320\262", 0));
         label->setText(QApplication::translate("LayerConfigureDialog", "\320\236\321\202:", 0));

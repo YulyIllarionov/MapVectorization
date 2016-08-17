@@ -140,7 +140,7 @@ public:
 	//Копирование полигона с текстом на cv::Mat и поворот до горизонтального положения
     //Угол находится при помощи преобразования Хафа для линий
     //Используется при распознавании текста
-    cv::Mat RotateToHorizon(WLayer* layer); 
+    void RotateToHorizon(WLayer* layer, cv::Mat& image);
     //Вырезать с растрового слоя
     std::vector<Wregion> CutFromLayer(WLayer* layer);
 

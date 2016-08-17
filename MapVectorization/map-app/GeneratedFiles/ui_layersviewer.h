@@ -89,7 +89,7 @@ public:
         LayersViewer->setWindowTitle(QApplication::translate("LayersViewer", "Form", 0));
         Add->setText(QApplication::translate("LayersViewer", "\320\224\320\276\320\261.", 0));
         Remove->setText(QApplication::translate("LayersViewer", "\320\243\320\264\320\260\320\273.", 0));
-        SplitButton->setText(QApplication::translate("LayersViewer", "Split", 0));
+        SplitButton->setText(QApplication::translate("LayersViewer", "\320\240\320\260\320\267\320\264\320\265\320\273\320\270\321\202\321\214", 0));
         VectorizationButton->setText(QApplication::translate("LayersViewer", "\320\222\320\265\320\272\321\202\320\276\321\200\320\270\320\267\320\260\321\206\320\270\321\217", 0));
         SavePngButton->setText(QApplication::translate("LayersViewer", "Save as PNG", 0));
     } // retranslateUi
