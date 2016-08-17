@@ -39,7 +39,7 @@
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Split</string>
+        <string>Разделить</string>
        </property>
       </widget>
      </item>

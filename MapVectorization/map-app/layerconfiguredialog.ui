@@ -27,7 +27,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>П</string>
+          <string>Пипетка</string>
          </property>
          <property name="checkable">
           <bool>true</bool>
