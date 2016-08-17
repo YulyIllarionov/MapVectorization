@@ -986,7 +986,6 @@ SDKResult WLayer::RecognizeText(std::vector<int> idxs, const float minConfidence
 
             text->AddText(output);
             text->SetState(true);
-
         }
     }
 }

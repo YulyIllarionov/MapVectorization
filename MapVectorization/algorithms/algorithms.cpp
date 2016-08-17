@@ -43,15 +43,16 @@ int main(int argc, char* argv[])
     // Extract channels to be processed individually
     //vector</*Mat> channels;*/
 	Mat channels;
-
     //Mat grey;
     cvtColor(image,channels,COLOR_RGB2GRAY);
-
+	
+	//channels = 255 - channels;
+	imwrite("inv.png", channels);
     //channels.push_back(grey);
 
     double t_d = (double)getTickCount();
     // Create ERFilter objects with the 1st and 2nd stage default classifiers
-    Ptr<ERFilter> er_filter1 = createERFilterNM1(loadClassifierNM1("trained_classifierNM1.xml"),8,0.000015f,0.23f,0.1f,true,0.1f);
+    Ptr<ERFilter> er_filter1 = createERFilterNM1(loadClassifierNM1("trained_classifierNM1.xml"),8,0.00000015f,0.23f,0.1f,true,0.1f);
     Ptr<ERFilter> er_filter2 = createERFilterNM2(loadClassifierNM2("trained_classifierNM2.xml"),0.1f);
 
     vector<ERStat> regions;
@@ -78,7 +79,9 @@ int main(int argc, char* argv[])
     // Detect character groups
     //vector< vector<Vec2i> > nm_region_groups;
     vector<Rect> nm_boxes;
-    erGrouping(image, channels, points, nm_boxes, ERGROUPING_ORIENTATION_HORIZ);//, "trained_classifier_erGrouping.xml");
+	Mat tmp;
+	cvtColor(channels,tmp,COLOR_GRAY2RGB);
+    erGrouping(tmp, channels, points, nm_boxes, ERGROUPING_ORIENTATION_HORIZ);//, "trained_classifier_erGrouping.xml");
 	std::cout << "Size of boxes " << nm_boxes.size() << "\n";
     cout << "TIME_GROUPING = " << ((double)getTickCount() - t_g)*1000/getTickFrequency() << endl;
 
