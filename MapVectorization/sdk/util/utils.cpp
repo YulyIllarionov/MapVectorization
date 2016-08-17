@@ -275,18 +275,22 @@ namespace utils {
 		cv::Ptr<cv::text::ERFilter> er_filter2 = cv::text::createERFilterNM2(
             cv::text::loadClassifierNM2("trained_classifierNM2.xml"),0.1f);
 
+		cv::Mat tmp;
+		img.copyTo(tmp);
+		tmp = 255 - tmp;
 		std::vector<cv::text::ERStat> regions;
+
 		// Apply the default cascade classifier to each independent channel (could be done in parallel)
-		er_filter1->run(img, regions);
-		er_filter2->run(img, regions);
+		er_filter1->run(tmp, regions);
+		er_filter2->run(tmp, regions);
 		
 		std::vector<std::vector<cv::Point>> points;
-		detectRegions(img, er_filter1, er_filter2, points);	
+		detectRegions(tmp, er_filter1, er_filter2, points);	
 	
-		cv::Mat out_img_decomposition= cv::Mat::zeros(img.rows + 2, img.cols + 2, CV_8UC1);
+		cv::Mat out_img_decomposition= cv::Mat::zeros(tmp.rows + 2, tmp.cols + 2, CV_8UC1);
 		for (int i=0; i<(int)regions.size(); i++)
 		{
-			ErDraw(img, out_img_decomposition, regions[i]);
+			ErDraw(tmp, out_img_decomposition, regions[i]);
 		}
 			
 		//cv::Mat out_img_decomposition_step_2 = Mat::zeros(image.rows+2, image.cols+2, CV_8UC1);
@@ -294,10 +298,9 @@ namespace utils {
 		
 		// Detect character groups
 		std::vector<cv::Rect> nm_boxes;
-        cv::Mat img1, img2;
-        img.copyTo(img1);
-        img.copyTo(img2);
-		cv::text::erGrouping(img1, img2, points, nm_boxes, cv::text::ERGROUPING_ORIENTATION_HORIZ);
+		cv::Mat tmp_rgb;
+		cv::cvtColor(tmp, tmp_rgb, cv::COLOR_GRAY2RGB);
+        cv::text::erGrouping(tmp_rgb, tmp, points, nm_boxes, cv::text::ERGROUPING_ORIENTATION_HORIZ);
 
 		for (int i = 0; i < nm_boxes.size(); i++) 
 		{
@@ -306,6 +309,7 @@ namespace utils {
 		}
 
 		std::vector<cv::Rect> only_letters = DetectOnlyLetters(out_img_decomposition);
+
 		nm_boxes.insert(nm_boxes.end(), only_letters.begin(), only_letters.end());
 
 		for (int i = 0; i < nm_boxes.size(); i++)
