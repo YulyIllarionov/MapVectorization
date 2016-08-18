@@ -49,6 +49,8 @@ namespace utils
   void  ErDraw(const cv::Mat &src, cv::Mat &dst, cv::text::ERStat& er);
   //TODO
   void  ErDraw(const cv::Mat &src, cv::Mat &dst, cv::Rect region);
+  //
+  double SquareFilling(const cv::Mat &image, cv::Point center, int radius);
 }
 
 SDK_END_NAMESPACE

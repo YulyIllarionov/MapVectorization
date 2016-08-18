@@ -102,7 +102,7 @@ SDKResult WLayer::InicializeLinesContainer()
 {
     if (m_type != LT_LINES)
         return kSDKResult_Error;
-    
+
     WObjectContainer lines = SDK_NAMESPACE::utils::FindLinesOnMat(m_data);
     m_objects.insert(m_objects.end(), lines.begin(), lines.end());
 
@@ -635,7 +635,7 @@ WPolygon::WPolygon(cv::RotatedRect rect, cv::Size borders)
     rect.points(rectPoints);
     m_points.resize(4);
     for (size_t i = 0; i < 4; i++)
-    { 
+    {
         m_points[i].x = std::max((int)rectPoints[i].x, 0);
         m_points[i].x = std::min((int)rectPoints[i].x, borders.width);
         m_points[i].y = std::max((int)rectPoints[i].y, 0);
@@ -697,7 +697,7 @@ void WLine::Concat(const WLine& line)
     std::vector<int>::iterator result = std::min_element(distances.begin(), distances.end());
     if (result == distances.end())
         return;
-    switch (*result)
+    switch (result - distances.begin())
     {
     case 0:
         m_points.insert(m_points.begin(), line.m_points.rbegin(), line.m_points.rend());
@@ -726,20 +726,81 @@ std::vector<Wregion> WLine::CutFromLayer(WLayer* layer)
     if (layer->getType() != WLayer::LAYER_TYPE_ENUM::LT_LINES)
         return std::vector<Wregion>();
 
-    cv::RotatedRect lineRect = cv::minAreaRect(m_points);
-    WPolygon linePolygon(lineRect, layer->m_data.size());
-    std::vector<Wregion> letters;
-    
-    for (size_t i = 0; i < m_points.size(); i++)
+    if (this->Length() <= 1)
+        return std::vector<Wregion>();
+
+    Wregion line;
+    MathUtils::Wvector vec1;
+    MathUtils::Wvector vec2;
+    MathUtils::Wvector bisectVec;
+    cv::Point2f point1;
+    cv::Point2f point2;
+    std::vector<Point> borderPoints;
+
+    vec1 = MathUtils::Wvector(m_points[0], m_points[1]);
+    vec2 = vec1.PerpendicularVec();
+    point1 = vec2.ÑodirectionalVec(m_width).End();
+    point2 = vec2.OppositeVec().ÑodirectionalVec(m_width).End();
+    borderPoints.push_back(vec1.ÑodirectionalVec(m_width).End());
+    borderPoints.push_back(vec2.ÑodirectionalVec(m_width).End());
+    borderPoints.push_back(vec1.OppositeVec().ÑodirectionalVec(m_width).End());
+    borderPoints.push_back(vec2.OppositeVec().ÑodirectionalVec(m_width).End());
+    line.Concat(Wregion(m_points.front(), layer->m_data, WPolygon(borderPoints)));
+
+    vec1 = MathUtils::Wvector(m_points.back(), m_points[m_points.size() - 2]);
+    vec2 = vec1.PerpendicularVec();
+    borderPoints.clear();
+    borderPoints.push_back(vec1.ÑodirectionalVec(m_width).End());
+    borderPoints.push_back(vec2.ÑodirectionalVec(m_width).End());
+    borderPoints.push_back(vec1.OppositeVec().ÑodirectionalVec(m_width).End());
+    borderPoints.push_back(vec2.OppositeVec().ÑodirectionalVec(m_width).End());
+    line.Concat(Wregion(m_points.back(), layer->m_data, WPolygon(borderPoints)));
+
+    for (size_t i = 1; i < m_points.size() - 1; i++)
     {
-        if (layer->m_data.at<uchar>(m_points[i]) != 0)
-        {
-            Wregion currentRegion(m_points[i], layer->m_data, linePolygon);
-            if (!currentRegion.IsEmpty())
-                letters.push_back(currentRegion);
-        }
+        borderPoints.clear();
+        borderPoints.push_back(point1);
+        borderPoints.push_back(point2);
+        vec1 = MathUtils::Wvector(m_points[i], m_points[i - 1]);
+        vec2 = MathUtils::Wvector(m_points[i], m_points[i + 1]);
+        bisectVec = vec1.BisectorVec(vec2);
+        bisectVec = bisectVec.ÑodirectionalVec(m_width);
+        point1 = bisectVec.End();
+        point2 = bisectVec.OppositeVec().End();
+        borderPoints.push_back(point1);
+        borderPoints.push_back(point2);
+        //cv::RotatedRect borderRect = cv::minAreaRect(borderPoints);
+        line.Concat(Wregion(MathUtils::Wvector(m_points[i - 1], m_points[i]).Middle(),
+            layer->m_data, WPolygon(cv::minAreaRect(borderPoints), layer->m_data.size())));
     }
-    return letters;
+    vec1 = MathUtils::Wvector(m_points.back(), m_points[m_points.size() - 2]);
+    vec2 = vec1.PerpendicularVec();
+    borderPoints.clear();
+    borderPoints.push_back(point1);
+    borderPoints.push_back(point2);
+    borderPoints.push_back(vec2.ÑodirectionalVec(m_width).End());
+    borderPoints.push_back(vec2.OppositeVec().ÑodirectionalVec(m_width).End());
+    line.Concat(Wregion(MathUtils::Wvector(m_points[m_points.size() - 2], m_points.back()).Middle()
+        , layer->m_data, WPolygon(cv::minAreaRect(borderPoints), layer->m_data.size())));
+
+    return std::vector<Wregion> (1, line);
+}
+// ------------------------------------------------------------
+void WLine::FindWidth(const cv::Mat& image)
+{
+    if (m_points.empty())
+        return;
+
+    std::vector<int> widths(m_points.size());
+    for (size_t i = 0; i < widths.size(); i++)
+    {
+        int halfWidth = 1;
+        while (SDK_NAMESPACE::utils::SquareFilling(image, m_points[i], halfWidth) > 0.7)
+            halfWidth++;
+        widths[i] = halfWidth * 2 - 1;
+    }
+    std::sort(widths.begin(), widths.end());
+    m_width = (double)widths[widths.size() / 2];
 }
 // ------------------------------------------------------------
 void WText::RotateToHorizon(WLayer* layer, cv::Mat& image)
@@ -849,7 +910,7 @@ Wregion::Wregion(const cv::Point& point, cv::Mat& img)
 Wregion::Wregion(const cv::Point& point, cv::Mat& img, WPolygon edges)
 {
     if (img.at<uchar>(point) == 0)
-        return; 
+        return;
     if (!edges.Contains(point))
         return;
 
@@ -921,6 +982,11 @@ void Wregion::drawOn(Mat& img, uchar color)
     }
 }
 // ------------------------------------------------------------
+void Wregion::Concat(const Wregion& other)
+{
+    points.insert(points.end(), other.points.begin(), other.points.end());
+}
+// ------------------------------------------------------------
 SDKResult WRaster::SplitLines(const LayerUUID& layerId, const LayerUUID& linesLayerID, const LayerUUID& othersLayerID)
 {
     WLayer* layer = GetLayerById(layerId);
@@ -980,7 +1046,6 @@ SDKResult WLayer::RecognizeText(std::vector<int> idxs, const float minConfidence
             rotatedTextImg = 255 - rotatedTextImg;
             cv::cvtColor(rotatedTextImg, rotatedTextImg, CV_GRAY2BGR);
             ocr->run(rotatedTextImg, output, &boxes, &words, &confidences, cv::text::OCR_LEVEL_WORD);
-
             //output.erase(remove(output.begin(), output.end(), '\n'), output.end());
 
             text->AddText(output);

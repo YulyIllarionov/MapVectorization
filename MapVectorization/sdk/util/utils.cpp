@@ -216,6 +216,7 @@ namespace utils {
                         }
                         //”прощение линии
                         line.SimplifyDP();
+                        line.FindWidth(img);
                         linesContainer.push_back(line);
                     }
                 }
@@ -328,5 +329,24 @@ namespace utils {
 
 		return textContainer;
 	}
+    double SquareFilling(const cv::Mat &image, cv::Point center, int radius)
+    {
+        int tlX = std::max(center.x - radius, 0);
+        int tlY = std::max(center.y - radius, 0);
+        int brX = std::min(center.x + radius, image.cols - 1);
+        int brY = std::min(center.y + radius, image.rows - 1);
+        double square = 0;
+        cv::Rect roi(cv::Point(tlX, tlY), cv::Point(brX, brY));
+        for (int y = roi.y; y <= roi.y + roi.height; y++)
+        {
+            for (int x = roi.x; x <= roi.x + roi.width; x++)
+            {
+                //if (squaredDistanceBetween(center, cv::Point(x, y)) < ((radius + 1) * (radius + 1)))
+                if (image.at<uchar>(y, x) != 0)
+                    square++;
+            }
+        }
+        return square / ((roi.height + 1) * (roi.width + 1));
+    }
 }
 SDK_END_NAMESPACE

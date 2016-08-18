@@ -99,6 +99,7 @@ public:
 	WLine(const WPointsContainer& points)
 	{
 		m_points = points;
+        m_width = -1;
 	};
 	~WLine() {};
 
@@ -108,12 +109,15 @@ public:
 	void Concat(const WLine& line);
 	//virtual double DistanceTo(cv::Point mapPoint) const;
 	//Упростить линию изпользуя алгоритм Дугласа-Пекера
-    void SimplifyDP(double epsilon = 2.7);
+    void SimplifyDP(double epsilon = 2.0);
     //Вырезать объект с растрового слоя
     std::vector<Wregion> CutFromLayer(WLayer* layer);
-
-private:
-
+    //Нахождение толщины линии
+    void FindWidth(const cv::Mat& image);
+    //Окружающий полигон
+//private:
+    //Толщина линии
+    volatile double m_width;
 };
 //Объект текст
 class WText : public WPolygon
@@ -412,6 +416,7 @@ private:
 class Wregion
 {
 public:
+    Wregion() {};
     //Поиск связной области по точке
 	Wregion(const cv::Point& point, cv::Mat& img);
     //Поиск связной области по точке с границами поиска заданными полигоном
@@ -428,6 +433,7 @@ public:
     //Проверка не является ли область пустой
     bool IsEmpty() { return (points.size() == 0); }
     std::vector<cv::Point> GetPoints() { return points; }
+    void Concat(const Wregion& other);
 private:
     //Вектор из точек области
 	std::vector<cv::Point> points;
