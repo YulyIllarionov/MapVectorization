@@ -758,9 +758,6 @@ void WText::RotateToHorizon(WLayer* layer, cv::Mat& image)
             img2Recognition.at<uchar>(y - roi.y, x - roi.x) = layer->m_data.at<uchar>(current);
         }
     }
-    //namedWindow("window", CV_WINDOW_KEEPRATIO);
-    //imshow("window", img2Recognition);
-    waitKey();
     //Нахождение угла поворота
     std::vector<cv::Vec4i> textLines;
     cv::HoughLinesP(img2Recognition, textLines, 1, CV_PI / 180, 80, img2Recognition.cols / 4, img2Recognition.cols / 10);
