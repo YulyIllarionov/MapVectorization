@@ -115,7 +115,7 @@ public:
     //Нахождение толщины линии
     void FindWidth(const cv::Mat& image);
     //Окружающий полигон
-//private:
+private:
     //Толщина линии
     volatile double m_width;
 };
@@ -162,7 +162,7 @@ public:
 private:
 };
 //Контейнер для векторных объектов 
-typedef std::vector<WVectorObject> WObjectContainer;
+typedef std::vector<WVectorObject*> WObjectContainer;
 
 //TODO Убрать если не нужен
 //  Enumerator

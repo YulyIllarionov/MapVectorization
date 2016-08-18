@@ -209,14 +209,14 @@ namespace utils {
                             }
                         }
                         //ќбъединение двух найденных частей линии 
-                        WLine line(lines[0]);
+                        WLine* line = new WLine(lines[0]);
                         for (int i = 1; i < lines.size(); i++)
                         {
-                            line.Concat(lines[i]);
+                            line->Concat(lines[i]);
                         }
                         //”прощение линии
-                        line.SimplifyDP();
-                        line.FindWidth(img);
+                        line->SimplifyDP();
+                        line->FindWidth(img);
                         linesContainer.push_back(line);
                     }
                 }
@@ -321,8 +321,8 @@ namespace utils {
             polygon.push_back(nm_boxes[i].tl() + cv::Point(0, nm_boxes[i].height));
 			polygon.push_back(nm_boxes[i].br());
 
-			WText item(polygon);
-            item.SetState(false);
+			WText* item = new WText(polygon);
+            item->SetState(false);
 			textContainer.push_back(item);
 
 		}

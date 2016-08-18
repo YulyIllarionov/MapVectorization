@@ -124,7 +124,7 @@ SDKResult WLayer::InicializeTextContainer()
     //Распознавание текста
     for (size_t i = 0; i < m_objects.size(); i++)
     {
-        WText* currentText = dynamic_cast<WText*>(&m_objects[i]);
+        WText* currentText = dynamic_cast<WText*>(m_objects[i]);
         this->RecognizeText(idxs, 0.0);
     }
     return kSDKResult_Succeeded;
@@ -489,7 +489,7 @@ std::vector<int> WRaster::DefineObjectsNearPoint(const LayerUUID& layerId, SMapP
 
     for (size_t i = 0; i < layer->m_objects.size(); i++)
     {
-        double currentDistance = layer->m_objects[i].DistanceTo(pointCV);
+        double currentDistance = layer->m_objects[i]->DistanceTo(pointCV);
         if (currentDistance < distance)
         {
             distance = currentDistance;
@@ -508,12 +508,11 @@ std::vector<int> WRaster::DefineObjectsInsidePolygon(const LayerUUID& layerId, c
     if (!layer->IsSingleType() || mapPoints.Length() == 0)
         return ids;
 
-    int idx = 0;
-    WObjectContainer::const_iterator cit = layer->m_objects.begin();
-    for (; cit != layer->m_objects.end(); ++cit, ++idx)
+
+    for (size_t i =0 ; i != layer->m_objects.size(); i++)
     {
-        if (mapPoints.Contains(*cit))
-            ids.push_back(idx);
+        if (mapPoints.Contains(*layer->m_objects[i]))
+            ids.push_back(i);
     }
 
     return ids;
@@ -552,15 +551,15 @@ SDKResult WRaster::PasteObjectsToLayer(const LayerUUID& layerId, std::vector<std
             }
             vectorObjects = SDK_NAMESPACE::utils::FindLinesOnMat(linesImg);
             for (size_t j = 0; j < vectorObjects.size(); j++)
-                for (size_t k = 0; k < vectorObjects[i].m_points.size(); k++)
-                    vectorObjects[i].m_points[k] += roi.tl();
+                for (size_t k = 0; k < vectorObjects[i]->m_points.size(); k++)
+                    vectorObjects[i]->m_points[k] += roi.tl();
 
             break;
         }
         case WLayer::LT_TEXT:
         {
             cv::RotatedRect lineRect = cv::minAreaRect(objectPoints);
-            vectorObjects.push_back(WText(WPolygon(lineRect, layer->m_data.size()).m_points));//TODO 
+            vectorObjects.push_back(new WText(WPolygon(lineRect, layer->m_data.size()).m_points));//TODO 
 
             break;
         }
@@ -595,7 +594,7 @@ std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& 
             if (idxs[i] < layer->m_objects.size())
             {
                 //Вырезание с растрового слоя 
-                WLine* line = static_cast<WLine*>(&layer->m_objects[idxs[i]]);
+                WLine* line = dynamic_cast<WLine*>(layer->m_objects[idxs[i]]);
                 regions.push_back(line->CutFromLayer(layer));
                 //Удаление из векторной коллекции 
                 layer->m_objects.erase(layer->m_objects.begin() + idxs[i]);
@@ -609,7 +608,7 @@ std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& 
             if (idxs[i] < layer->m_objects.size())
             {
                 //Вырезание с растрового слоя 
-                WText* text = dynamic_cast<WText*>(&layer->m_objects[idxs[i]]);
+                WText* text = dynamic_cast<WText*>(layer->m_objects[idxs[i]]);
                 regions.push_back(text->CutFromLayer(layer));
                 //Удаление из векторной коллекции
                 layer->m_objects.erase(layer->m_objects.begin() + idxs[i]);
@@ -1035,7 +1034,7 @@ SDKResult WLayer::RecognizeText(std::vector<int> idxs, const float minConfidence
     {
         if (idxs[i] < m_objects.size())
         {
-            WText* text = static_cast<WText*>(&m_objects[idxs[i]]);
+            WText* text = dynamic_cast<WText*>(m_objects[idxs[i]]);
             cv::Mat rotatedTextImg;
             text->RotateToHorizon(this, rotatedTextImg);
 

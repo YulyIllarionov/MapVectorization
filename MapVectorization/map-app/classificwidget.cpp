@@ -60,11 +60,11 @@ void ClassificWidget::UpdateCollectionList()
     {
         if(m_ui->listWidget_2->item(i)->isSelected()|| m_ui->listWidget_2->currentRow()==i)
         {
-            WVectorObject &vobj=cont.at(i);
+            WVectorObject* vobj=cont.at(i);
             QVector<QPointF> tempPoints;
-            for (int j = 0;j<vobj.Length();j++)
+            for (int j = 0;j<vobj->Length();j++)
             {
-                tempPoints.append(QPointF(vobj.GetPoint(j).GetX(), vobj.GetPoint(j).GetY()));
+                tempPoints.append(QPointF(vobj->GetPoint(j).GetX(), vobj->GetPoint(j).GetY()));
             }
             switch(type)
             {
