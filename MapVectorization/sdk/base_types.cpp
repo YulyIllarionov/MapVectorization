@@ -980,9 +980,8 @@ SDKResult WLayer::RecognizeText(std::vector<int> idxs, const float minConfidence
             std::vector<cv::Rect>   boxes;
             std::vector<std::string> words;
             std::vector<float>  confidences;
-            cv::imshow("window", rotatedTextImg);
-            cv::waitKey();
-            cv::imwrite("rotatedTextImg.png", rotatedTextImg);
+            rotatedTextImg = 255 - rotatedTextImg;
+            cv::cvtColor(rotatedTextImg, rotatedTextImg, CV_GRAY2BGR);
             ocr->run(rotatedTextImg, output, &boxes, &words, &confidences, cv::text::OCR_LEVEL_WORD);
 
             //output.erase(remove(output.begin(), output.end(), '\n'), output.end());
