@@ -376,12 +376,15 @@ SDKResult WRaster::SplitLayer(const LayerUUID& layerId, LayerIDs& splittedLayers
     case WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT /*| WLayer::LAYER_TYPE_ENUM::LT_OTHER*/:
     {
         WLayer* linesLayer = this->AddLayer(layer->getGroupId());
-        this->SetLayerType(linesLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_LINES);
-        this->SetLayerName(linesLayer->getID(), std::string("Lines from ") + layer->getName());
+        linesLayer->setType(WLayer::LAYER_TYPE_ENUM::LT_LINES);
+        linesLayer->setName(std::string("Lines from ") + layer->getName());
+        //this->SetLayerType(linesLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_LINES);
+        //this->SetLayerName(linesLayer->getID(), std::string("Lines from ") + layer->getName());
         WLayer* othersLayer = this->AddLayer(layer->getGroupId());
-        this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_TEXT);
-        //this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_OTHER);
-        this->SetLayerName(othersLayer->getID(), std::string("Text from ") + layer->getName());
+        othersLayer->setType(WLayer::LAYER_TYPE_ENUM::LT_TEXT);
+        othersLayer->setName(std::string("Text from ") + layer->getName());
+        //this->SetLayerType(othersLayer->getID(), WLayer::LAYER_TYPE_ENUM::LT_TEXT);
+        //this->SetLayerName(othersLayer->getID(), std::string("Text from ") + layer->getName());
         this->SplitLines(layerId, linesLayer->getID(), othersLayer->getID());
         splittedLayers.clear();
         splittedLayers.push_back(linesLayer->getID());
