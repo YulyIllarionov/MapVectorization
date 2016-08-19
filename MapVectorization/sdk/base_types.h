@@ -112,7 +112,7 @@ public:
 	//Упростить линию изпользуя алгоритм Дугласа-Пекера
     void SimplifyDP(double epsilon = 2.0);
     //Вырезать объект с растрового слоя
-    std::vector<Wregion> CutFromLayer(WLayer* layer);
+    virtual std::vector<Wregion> CutFromLayer(WLayer* layer);
     //Нахождение толщины линии
     void FindWidth(const cv::Mat& image);
     //Окружающий полигон
@@ -147,21 +147,13 @@ public:
     //Используется при распознавании текста
     void RotateToHorizon(WLayer* layer, cv::Mat& image);
     //Вырезать с растрового слоя
-    std::vector<Wregion> CutFromLayer(WLayer* layer);
+    virtual std::vector<Wregion> CutFromLayer(WLayer* layer);
 
 private:
 	std::string m_text;     //Содержащийся текст
 	bool        m_state;    //Флаг состояний: 0 - текст локализован, 1 - текст распознан
 };
 
-class WMapObject : public WVectorObject
-{
-public:
-	WMapObject() {};
-	~WMapObject() {};
-
-private:
-};
 //Контейнер для векторных объектов 
 typedef std::vector<WVectorObject*> WObjectContainer;
 
@@ -223,7 +215,7 @@ public:
 		LT_OTHER   = 0x0010, 
 		LT_ALL     = 0xFFFF, 
 	};
-	friend class WRaster;
+	//friend class WRaster;
 
 private:
 	//Проверка, является ли тип слоя единственным
@@ -264,6 +256,12 @@ public:
 	w_range     getRange()     const { return m_color_range; }
 	std::string getName()      const { return m_name; }
 	GroupID     getGroupId()   const { return m_group_id; }
+    void        setName(std::string name) { m_name = name; }
+    void        setType(LAYER_TYPE type) { m_type = type; }
+    void        addType(LAYER_TYPE type) { m_type |= type; }
+    void        removeType(LAYER_TYPE type) { m_type &= ~type; }
+    void        addColorToRange(const w_color& color) { m_color_range.addColor(color); }
+    bool        colorContains(cv::Vec3b color) { return m_color_range.contains(color); }
 
     //Рисование круга на растровом слое.
     //Используется в качестве ластика
@@ -274,15 +272,20 @@ public:
     //Распознавание текста объектов векторной коллекции по задаваемым индексам
     SDKResult RecognizeText(std::vector<int> idxs, const float minConfidences);
     
+    void AddVectorElement(WVectorObject* element);
+    WVectorObject* GetVectorElement(size_t idx);
+    void RemoveVectorElement(size_t idx);
+    //Костыль для графического интерфейса
+    size_t VectorContainerElementsNumber() { return m_objects.size(); };
+
     //Растровая бинарная маска слоя
     //Каждый пиксель маски представляет собой переменную типа uchar
     //Нулевое значение пикселя означает отсутствие пикселя на маске, ненулевое - присутствие
 	cv::Mat     m_data;
-
-    //Контейнер для векторных объектов найденных на слое 
-	WObjectContainer  m_objects;
-
+    
 private:
+    //Контейнер для векторных объектов найденных на слое 
+    WObjectContainer  m_objects;
     //ID слоя
 	LayerUUID   m_uuid;
     //Тип слоя

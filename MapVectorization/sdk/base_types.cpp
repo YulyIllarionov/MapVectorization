@@ -236,8 +236,8 @@ WLayer* WRaster::AddLayer(const GroupID& groupId)
 {
     WLayer layer;
     layer.m_data = Mat(m_raster.size(), CV_8UC1, Scalar(0));
-    layer.m_uuid = utils::genUUID();
-    layer.m_group_id = groupId.empty() ? utils::genUUID() : groupId;
+    layer.getID() = utils::genUUID();
+    layer.getGroupId() = groupId.empty() ? utils::genUUID() : groupId;
     m_layers.push_back(layer);
 
     return &m_layers.back();
@@ -248,7 +248,7 @@ SDKResult WRaster::RemoveLayer(const LayerUUID& layerId)
     LayersContainer::const_iterator cit = m_layers.begin();
     for (; cit != m_layers.end(); ++cit)
     {
-        if (cit->m_uuid == layerId)
+        if (cit->getID() == layerId)
             break;
     }
 
@@ -266,7 +266,7 @@ SDKResult WRaster::AddColorToLayer(const LayerUUID& layerId, const w_color& colo
     if (layer == nullptr)
         return kSDKResult_NotFound;
 
-    layer->m_color_range.addColor(color);
+    layer->addColorToRange(color);
 
     for (int y = 0; y < m_raster.rows; y++)
     {
@@ -274,7 +274,7 @@ SDKResult WRaster::AddColorToLayer(const LayerUUID& layerId, const w_color& colo
         {
             const Vec4b currentColorOld = m_raster.at<Vec4b>(y, x);
             const Vec3b currentColor(currentColorOld[0], currentColorOld[1], currentColorOld[2]);
-            layer->m_data.at<uchar>(y, x) = layer->m_color_range.contains(currentColor) ? 1 : 0;
+            layer->m_data.at<uchar>(y, x) = layer->colorContains(currentColor) ? 1 : 0;
         }
     }
 
@@ -283,12 +283,24 @@ SDKResult WRaster::AddColorToLayer(const LayerUUID& layerId, const w_color& colo
 // ------------------------------------------------------------
 SDKResult WRaster::AddLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE type)
 {
-    return SetLayerType(layerId, type, false);
+    WLayer* layer = GetLayerById(layerId);
+    if (layer == nullptr)
+        return kSDKResult_NotFound;
+
+    layer->addType(type);
+
+    return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
 SDKResult WRaster::SetLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE type)
 {
-    return SetLayerType(layerId, type, true);
+    WLayer* layer = GetLayerById(layerId);
+    if (layer == nullptr)
+        return kSDKResult_NotFound;
+
+    layer->setType(type);
+
+    return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
 SDKResult WRaster::RemoveLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE type)
@@ -297,21 +309,7 @@ SDKResult WRaster::RemoveLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE 
     if (layer == nullptr)
         return kSDKResult_NotFound;
 
-    layer->m_type &= ~type;
-
-    return kSDKResult_Succeeded;
-}
-// ------------------------------------------------------------
-SDKResult WRaster::SetLayerType(const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite)
-{
-    WLayer* layer = GetLayerById(layerId);
-    if (layer == nullptr)
-        return kSDKResult_NotFound;
-
-    if (overwrite)
-        layer->m_type = type;
-    else
-        layer->m_type |= type;
+    layer->removeType(type);
 
     return kSDKResult_Succeeded;
 }
@@ -322,7 +320,7 @@ SDKResult WRaster::SetLayerName(const LayerUUID& layerId, const std::string& nam
     if (layer == nullptr)
         return kSDKResult_NotFound;
 
-    layer->m_name = name;
+    layer->setName(name);
     return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
@@ -330,7 +328,7 @@ WLayer* WRaster::GetLayerById(const LayerUUID& layerId)
 {
     for (LayersContainer::iterator cit = m_layers.begin(); cit != m_layers.end(); ++cit)
     {
-        if (cit->m_uuid == layerId)
+        if (cit->getID() == layerId)
             return &(*cit);
     }
     return nullptr;
@@ -340,7 +338,7 @@ WLayer* WRaster::GetLayerByName(const std::string& name)
 {
     for (LayersContainer::iterator cit = m_layers.begin(); cit != m_layers.end(); ++cit)
     {
-        if (cit->m_name == name)
+        if (cit->getName() == name)
             return &(*cit);
     }
     return nullptr;
@@ -351,8 +349,8 @@ SDKResult WRaster::GetLayersByType(WLayer::LAYER_TYPE type, LayerIDs& layer_ids)
     layer_ids.clear();
     for (LayersContainer::const_iterator cit = m_layers.begin(); cit != m_layers.end(); ++cit)
     {
-        if ((cit->m_type & type) != 0)
-            layer_ids.push_back(cit->m_uuid);
+        if ((cit->getType() & type) != 0)
+            layer_ids.push_back(cit->getID());
     }
     return kSDKResult_Succeeded;
 }
@@ -371,7 +369,7 @@ SDKResult WRaster::SplitLayer(const LayerUUID& layerId, LayerIDs& splittedLayers
 
     SDKResult result = kSDKResult_Error;
 
-    switch (layer->m_type)
+    switch (layer->getType())
     {
     case WLayer::LAYER_TYPE_ENUM::LT_NONE:
         break;
@@ -422,7 +420,7 @@ SDKResult WRaster::SplitLayer(const LayerUUID& layerId, LayerIDs& splittedLayers
         l1 = nullptr;
         l2 = nullptr;
         if (S_Ok(result))
-            RemoveLayer(layer->m_uuid);
+            RemoveLayer(layer->getID());
         layer = nullptr;
     }
     break;
@@ -436,8 +434,8 @@ SDKResult WRaster::GetLayersByGroupId(const GroupID& groupId, LayerIDs& relatedL
     relatedLayers.clear();
     for (LayersContainer::const_iterator cit = m_layers.begin(); cit != m_layers.end(); ++cit)
     {
-        if (cit->m_group_id == groupId)
-            relatedLayers.push_back(cit->m_uuid);
+        if (cit->getGroupId() == groupId)
+            relatedLayers.push_back(cit->getGroupId());
     }
 
     return kSDKResult_Succeeded;
@@ -488,9 +486,9 @@ std::vector<int> WRaster::DefineObjectsNearPoint(const LayerUUID& layerId, SMapP
     double distance = DBL_MAX;
     int index;
 
-    for (size_t i = 0; i < layer->m_objects.size(); i++)
+    for (size_t i = 0; i < i <= layer->VectorContainerElementsNumber(); i++)
     {
-        double currentDistance = layer->m_objects[i]->DistanceTo(pointCV);
+        double currentDistance = layer->GetVectorElement(i)->DistanceTo(pointCV);
         if (currentDistance < distance)
         {
             distance = currentDistance;
@@ -510,9 +508,9 @@ std::vector<int> WRaster::DefineObjectsInsidePolygon(const LayerUUID& layerId, c
         return ids;
 
 
-    for (size_t i =0 ; i != layer->m_objects.size(); i++)
+    for (size_t i =0 ; i <= layer->VectorContainerElementsNumber(); i++)
     {
-        if (mapPoints.Contains(*layer->m_objects[i]))
+        if (mapPoints.Contains(*layer->GetVectorElement(i)))
             ids.push_back(i);
     }
 
@@ -567,13 +565,15 @@ SDKResult WRaster::PasteObjectsToLayer(const LayerUUID& layerId, std::vector<std
         default:
             break;
         }
-        layer->m_objects.insert(layer->m_objects.end(), vectorObjects.begin(), vectorObjects.end());
+        //Костыль
+        for (size_t i = 0; i < vectorObjects.size(); i++)
+            layer->AddVectorElement(vectorObjects[i]);
     }
-    //Распознавание текста при необходимости
+    //Распознавание текста 
     if (layer->getType() == WLayer::LT_TEXT)
     {
         std::vector<int> textIdxs(rasterObjects.size());
-        std::iota(textIdxs.begin(), textIdxs.end(), layer->m_objects.size() - 1 - rasterObjects.size());
+        std::iota(textIdxs.begin(), textIdxs.end(), layer->VectorContainerElementsNumber() - 1 - rasterObjects.size());
         layer->RecognizeText(textIdxs, 0.0);
     }
     return kSDKResult_Succeeded;
@@ -592,30 +592,24 @@ std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& 
     {
         for (size_t i = 0; i < idxs.size(); i++)
         {
-            if (idxs[i] < layer->m_objects.size())
-            {
-                //Вырезание с растрового слоя 
-                WLine* line = dynamic_cast<WLine*>(layer->m_objects[idxs[i]]);
+            //Вырезание с растрового слоя 
+            WLine* line = dynamic_cast<WLine*>(layer->GetVectorElement(idxs[i]));
+            if (line != NULL)
                 regions.push_back(line->CutFromLayer(layer));
-                //Удаление из векторной коллекции 
-                delete layer->m_objects[idxs[i]];
-                layer->m_objects.erase(layer->m_objects.begin() + idxs[i]);
-            }
+            //Удаление из векторной коллекции 
+            layer->RemoveVectorElement(idxs[i]);
         }
     }
     case WLayer::LAYER_TYPE_ENUM::LT_TEXT:
     {
         for (size_t i = 0; i < idxs.size(); i++)
         {
-            if (idxs[i] < layer->m_objects.size())
-            {
-                //Вырезание с растрового слоя 
-                WText* text = dynamic_cast<WText*>(layer->m_objects[idxs[i]]);
+            //Вырезание с растрового слоя 
+            WText* text = dynamic_cast<WText*>(layer->GetVectorElement(idxs[i]));
+            if (text != NULL)
                 regions.push_back(text->CutFromLayer(layer));
-                //Удаление из векторной коллекции
-                delete layer->m_objects[idxs[i]];
-                layer->m_objects.erase(layer->m_objects.begin() + idxs[i]);
-            }
+            //Удаление из векторной коллекции
+            layer->RemoveVectorElement(idxs[i]);
         }
     }
 
@@ -1059,5 +1053,27 @@ SDKResult WLayer::RecognizeText(std::vector<int> idxs, const float minConfidence
         }
     }
 }
+// ------------------------------------------------------------
+void WLayer::AddVectorElement(WVectorObject* element)
+{
+    m_objects.push_back(element);
+}
+// ------------------------------------------------------------
+WVectorObject* WLayer::GetVectorElement(size_t idx)
+{
+    if (idx < m_objects.size())
+        return m_objects[idx];
+    return NULL;
+}
+// ------------------------------------------------------------
+void WLayer::RemoveVectorElement(size_t idx)
+{
+    if (idx < m_objects.size())
+    {
+        delete m_objects[idx];
+        m_objects.erase(m_objects.begin() + idx);
+    }
+}
+// ------------------------------------------------------------
 
 SDK_END_NAMESPACE
