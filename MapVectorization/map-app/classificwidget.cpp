@@ -55,8 +55,8 @@ void ClassificWidget::UpdateCollectionList()
     clearCollectionList();
     WLayer* currentLayer = m_layers.at(m_ui->listWidget->currentRow());
     WLayer::LAYER_TYPE type = currentLayer->getType();
-
-    for (int i = 0; i < currentLayer->VectorContainerElementsNumber(); i++)
+    const size_t containerSize = currentLayer->VectorContainerElementsNumber();
+    for (int i = 0; i < containerSize; i++)
     {
         if (m_ui->listWidget_2->item(i)->isSelected() || m_ui->listWidget_2->currentRow() == i)
         {
@@ -104,7 +104,8 @@ void ClassificWidget::on_listWidget_currentRowChanged(int currentRow)
     m_widget->UpdatePixmap();
 
     clearCollectionList();
-    for (size_t i = 0; i < currentLayer->VectorContainerElementsNumber(); i++)
+    const size_t containerSize = currentLayer->VectorContainerElementsNumber();
+    for (size_t i = 0; i < containerSize; i++)
     {
         switch (m_layers.at(currentRow)->getType())
         {
@@ -203,7 +204,8 @@ void ClassificWidget::on_catLinesButton_clicked()
     WLayer* currentLayer = m_layers.at(m_ui->listWidget->currentRow());
     WLine* vobj;
     bool isFirst = true;
-    for (size_t i = 0; i < currentLayer->VectorContainerElementsNumber(); i++)
+    const size_t containerSize = currentLayer->VectorContainerElementsNumber();
+    for (size_t i = 0; i < containerSize; i++)
     {
         if (m_ui->listWidget_2->item(i)->isSelected())
         {
@@ -254,8 +256,9 @@ void ClassificWidget::on_PolygonSelectionButton_clicked()
 void ClassificWidget::on_DeleteButton_clicked()
 {
     WLayer* currentLayer = m_layers.at(m_ui->listWidget->currentRow());
-    std::vector<int> idx;
-    for (int i = 0; i < currentLayer->VectorContainerElementsNumber(); i++)
+    std::vector<size_t> idx;
+    const size_t containerSize = currentLayer->VectorContainerElementsNumber();
+    for (int i = 0; i < containerSize; i++)
     {
         if (m_ui->listWidget_2->item(i)->isSelected())
         {
@@ -270,8 +273,9 @@ void ClassificWidget::on_DeleteButton_clicked()
 void ClassificWidget::on_MoveButton_clicked()
 {
     WLayer* currentLayer = m_layers.at(m_ui->listWidget->currentRow());
-    std::vector<int> idx;
-    for (int i = 0; i < currentLayer->VectorContainerElementsNumber(); i++)
+    std::vector<size_t> idx;
+    const size_t containerSize = currentLayer->VectorContainerElementsNumber();
+    for (int i = 0; i < containerSize; i++)
     {
         if (m_ui->listWidget_2->item(i)->isSelected())
         {

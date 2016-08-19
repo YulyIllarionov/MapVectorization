@@ -232,8 +232,6 @@ private:
 			++typesCount;
 		if ((type & LT_OTHER) != 0) 
 			++typesCount;
-		if ((type & LT_TEXT) != 0) 
-			++typesCount;
 
 		return typesCount == 1;
 	}
@@ -256,6 +254,7 @@ public:
 	w_range     getRange()     const { return m_color_range; }
 	std::string getName()      const { return m_name; }
 	GroupID     getGroupId()   const { return m_group_id; }
+    void        setID(std::string uuid) { m_uuid = uuid; }
     void        setName(std::string name) { m_name = name; }
     void        setType(LAYER_TYPE type) { m_type = type; }
     void        addType(LAYER_TYPE type) { m_type |= type; }
@@ -275,6 +274,7 @@ public:
     void AddVectorElement(WVectorObject* element);
     WVectorObject* GetVectorElement(size_t idx);
     void RemoveVectorElement(size_t idx);
+    void RemoveVectorElements(std::vector<size_t> idxs);
     //Костыль для графического интерфейса
     size_t VectorContainerElementsNumber() { return m_objects.size(); };
 
@@ -373,7 +373,7 @@ public:
 	std::vector<int> DefineObjectsNearPoint(const LayerUUID& layerId, SMapPoint point);
 
 	//Вырезание объектов со слоя
-	std::vector<std::vector<Wregion>> CutObjectsFromLayer(const LayerUUID& layerId, std::vector<int> idxs);
+	std::vector<std::vector<Wregion>> CutObjectsFromLayer(const LayerUUID& layerId, std::vector<size_t> idxs);
     //Вставка объектов на слой 
     SDKResult PasteObjectsToLayer(const LayerUUID& layerId, std::vector<std::vector<Wregion>> rasterObjects);
 

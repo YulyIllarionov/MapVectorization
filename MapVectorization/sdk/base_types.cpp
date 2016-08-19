@@ -236,7 +236,7 @@ WLayer* WRaster::AddLayer(const GroupID& groupId)
 {
     WLayer layer;
     layer.m_data = Mat(m_raster.size(), CV_8UC1, Scalar(0));
-    layer.getID() = utils::genUUID();
+    layer.setID(utils::genUUID());
     layer.getGroupId() = groupId.empty() ? utils::genUUID() : groupId;
     m_layers.push_back(layer);
 
@@ -489,13 +489,18 @@ std::vector<int> WRaster::DefineObjectsNearPoint(const LayerUUID& layerId, SMapP
     double distance = DBL_MAX;
     int index;
 
-    for (size_t i = 0; i < i <= layer->VectorContainerElementsNumber(); i++)
+    const size_t containerSize = layer->VectorContainerElementsNumber();
+    for (size_t i = 0; i < containerSize; i++)
     {
-        double currentDistance = layer->GetVectorElement(i)->DistanceTo(pointCV);
-        if (currentDistance < distance)
+        WVectorObject* currentObject = layer->GetVectorElement(i);
+        if (currentObject != NULL)
         {
-            distance = currentDistance;
-            index = i;
+            double currentDistance = currentObject->DistanceTo(pointCV);
+            if (currentDistance < distance)
+            {
+                distance = currentDistance;
+                index = i;
+            }
         }
     }
     ids.push_back(index);
@@ -510,11 +515,13 @@ std::vector<int> WRaster::DefineObjectsInsidePolygon(const LayerUUID& layerId, c
     if (!layer->IsSingleType() || mapPoints.Length() == 0)
         return ids;
 
-
-    for (size_t i =0 ; i <= layer->VectorContainerElementsNumber(); i++)
+    const size_t containerSize = layer->VectorContainerElementsNumber();
+    for (size_t i = 0; i <= containerSize; i++)
     {
-        if (mapPoints.Contains(*layer->GetVectorElement(i)))
-            ids.push_back(i);
+        WVectorObject* currentObject = layer->GetVectorElement(i);
+        if (currentObject != NULL)
+            if (mapPoints.Contains(*currentObject))
+                ids.push_back(i);
     }
 
     return ids;
@@ -549,12 +556,15 @@ SDKResult WRaster::PasteObjectsToLayer(const LayerUUID& layerId, std::vector<std
             Mat linesImg(roi.size(), CV_8UC1, Scalar(0));
             for (size_t j = 0; j < objectPoints.size(); j++)
             {
-                linesImg.at<uchar>(objectPoints[i] - roi.tl()) = 255;
+                linesImg.at<uchar>(objectPoints[j] - roi.tl()) = 255;
             }
+            //cv::namedWindow("textToLines", CV_WINDOW_KEEPRATIO);
+            //imshow("textToLines", linesImg);
+            imwrite("textToLines.png", linesImg);
             vectorObjects = SDK_NAMESPACE::utils::FindLinesOnMat(linesImg);
             for (size_t j = 0; j < vectorObjects.size(); j++)
-                for (size_t k = 0; k < vectorObjects[i]->m_points.size(); k++)
-                    vectorObjects[i]->m_points[k] += roi.tl();
+                for (size_t k = 0; k < vectorObjects[j]->m_points.size(); k++)
+                    vectorObjects[j]->m_points[k] += roi.tl();
 
             break;
         }
@@ -582,7 +592,7 @@ SDKResult WRaster::PasteObjectsToLayer(const LayerUUID& layerId, std::vector<std
     return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
-std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& layerId, std::vector<int> idxs)
+std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& layerId, std::vector<size_t> idxs)
 {
     WLayer* layer = GetLayerById(layerId);
     if (!layer->IsSingleType())
@@ -599,9 +609,8 @@ std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& 
             WLine* line = dynamic_cast<WLine*>(layer->GetVectorElement(idxs[i]));
             if (line != NULL)
                 regions.push_back(line->CutFromLayer(layer));
-            //Удаление из векторной коллекции 
-            layer->RemoveVectorElement(idxs[i]);
         }
+        break;
     }
     case WLayer::LAYER_TYPE_ENUM::LT_TEXT:
     {
@@ -611,12 +620,13 @@ std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& 
             WText* text = dynamic_cast<WText*>(layer->GetVectorElement(idxs[i]));
             if (text != NULL)
                 regions.push_back(text->CutFromLayer(layer));
-            //Удаление из векторной коллекции
-            layer->RemoveVectorElement(idxs[i]);
         }
+        break;
     }
+    }
+    //Удаление из векторной коллекции 
+    layer->RemoveVectorElements(idxs);
 
-    }
     return regions;
 }
 // ------------------------------------------------------------
@@ -782,7 +792,7 @@ std::vector<Wregion> WLine::CutFromLayer(WLayer* layer)
     line.Concat(Wregion(MathUtils::Wvector(m_points[m_points.size() - 2], m_points.back()).Middle()
         , layer->m_data, WPolygon(cv::minAreaRect(borderPoints), layer->m_data.size())));
 
-    return std::vector<Wregion> (1, line);
+    return std::vector<Wregion>(1, line);
 }
 // ------------------------------------------------------------
 void WLine::FindWidth(const cv::Mat& image)
@@ -1076,6 +1086,13 @@ void WLayer::RemoveVectorElement(size_t idx)
         delete m_objects[idx];
         m_objects.erase(m_objects.begin() + idx);
     }
+}
+// ------------------------------------------------------------
+void WLayer::RemoveVectorElements(std::vector<size_t> idxs)
+{
+    std::sort(idxs.rbegin(), idxs.rend());
+    for (size_t i = 0; i < idxs.size(); i++)
+        RemoveVectorElement(idxs[i]);
 }
 // ------------------------------------------------------------
 

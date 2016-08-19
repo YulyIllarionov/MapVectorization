@@ -316,8 +316,8 @@ namespace utils {
             std::vector<cv::Point> polygon;
 			polygon.push_back(nm_boxes[i].tl());
             polygon.push_back(nm_boxes[i].tl() + cv::Point(nm_boxes[i].width, 0));
+            polygon.push_back(nm_boxes[i].br());
             polygon.push_back(nm_boxes[i].tl() + cv::Point(0, nm_boxes[i].height));
-			polygon.push_back(nm_boxes[i].br());
 
 			WText* item = new WText(polygon);
             item->SetState(false);
