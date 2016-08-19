@@ -68,13 +68,11 @@ namespace utils {
                 {
                     if (needTrue)
                         img.at<cv::Vec4b>(y, x)[3] = alphaTrue;
-                    
                 }
                 else
                 {
                     if (needFalse)
                         img.at<cv::Vec4b>(y, x)[3] = alphaFalse;
-
                 }                    
     } 
     // ----------------------------------------------------

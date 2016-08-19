@@ -93,21 +93,42 @@ bool ClassificWidget::event(QEvent *event)
 void ClassificWidget::on_listWidget_currentRowChanged(int currentRow)
 {
     m_ui->listWidget_2->clear();
-    utils::SetTransparent(m_image->m_raster, cv::Mat(m_image->m_raster.size(), CV_8UC1, 1), 50);
-    for(int i=0; i<m_layers.size();i++)
-    {
-        if(i!=currentRow)    
-        utils::SetTransparent(m_image->m_raster, m_layers.at(i)->m_data, 150,0,1,0);
-    }
-    utils::SetTransparent(m_image->m_raster, m_layers.at(currentRow)->m_data, 255, 0, 1, 0);
+    //utils::SetTransparent(m_image->m_raster, cv::Mat(m_image->m_raster.size(), CV_8UC1, 1), 10);
+    //for(int i=0; i<m_layers.size();i++)
+    //{
+    //    if (i != currentRow)
+    //        utils::SetTransparent(m_image->m_raster, m_layers.at(i)->m_data, 200, 0, true, false);
+    //}
+    utils::SetTransparent(m_image->m_raster, m_layers.at(currentRow)->m_data, 255, 25, true, true);
     m_widget->UpdatePixmap();
 
     clearCollectionList();
     WObjectContainer &cont=m_layers.at(currentRow)->m_objects;
-    for(int i=0;i<cont.size();i++)
+    for(size_t i=0;i<cont.size();i++)
     {
-        m_ui->listWidget_2->addItem("#"+QString::number(i));
-
+        switch (m_layers.at(currentRow)->getType())
+        {
+        case WLayer::LAYER_TYPE_ENUM::LT_TEXT:
+        {
+            WText* text = dynamic_cast<WText*>(cont[i]);
+            if (text->GetText().empty())
+                m_ui->listWidget_2->addItem("!unrecognized!");
+            else
+                m_ui->listWidget_2->addItem(QString::fromUtf8(text->GetText().c_str()));            
+            break;
+        }
+        case WLayer::LAYER_TYPE_ENUM::LT_LINES:
+        {
+            WLine* line = dynamic_cast<WLine*>(cont[i]);
+            m_ui->listWidget_2->addItem("(" + QString::number(line->m_points.front().x) + "," +
+                QString::number(line->m_points.front().y) + ")-(" + QString::number(line->m_points.back().x) +
+                "," + QString::number(line->m_points.back().y) + ")  " + QString::number(line->m_points.size()) +
+                " points");
+            break;
+        }
+        default:
+            break;
+        }
     }
 }
 
@@ -179,25 +200,27 @@ void ClassificWidget::on_listWidget_2_currentRowChanged(int currentRow)
 
 void ClassificWidget::on_catLinesButton_clicked()
 {
-    /*WObjectContainer &cont=m_layers.at(m_ui->listWidget->currentRow())->m_objects;
+    WObjectContainer &cont=m_layers.at(m_ui->listWidget->currentRow())->m_objects;
     WLine* vobj;
     bool isFirst=true;
-    for(int i=0;i<cont.size();i++)
+    for(size_t i=0;i<cont.size();i++)
     {
         if(m_ui->listWidget_2->item(i)->isSelected())
         {
             if(isFirst)
             {
-                vobj = dynamic_cast<WLine*>(&cont.at(i));
+                vobj = dynamic_cast<WLine*>(cont.at(i));
                 isFirst=false;
             }
             else
             {
-                WLine* vobj2 = dynamic_cast<WLine*>(&cont.at(i));
-                //vobj->Concat(*vobj2);
+                WLine* vobj2 = dynamic_cast<WLine*>(cont.at(i));
+                vobj->Concat(*vobj2);
+                delete vobj2;
+                cont.erase(cont.begin() + i);
             }
         }
-    }*/
+    }
 }
 
 void ClassificWidget::clearCollectionList()

@@ -20,6 +20,7 @@
 #include "base_types.h"
 
 
+
 SDK_BEGIN_NAMESPACE
 
 using namespace cv;
@@ -597,6 +598,7 @@ std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& 
                 WLine* line = dynamic_cast<WLine*>(layer->m_objects[idxs[i]]);
                 regions.push_back(line->CutFromLayer(layer));
                 //Удаление из векторной коллекции 
+                delete layer->m_objects[idxs[i]];
                 layer->m_objects.erase(layer->m_objects.begin() + idxs[i]);
             }
         }
@@ -611,6 +613,7 @@ std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& 
                 WText* text = dynamic_cast<WText*>(layer->m_objects[idxs[i]]);
                 regions.push_back(text->CutFromLayer(layer));
                 //Удаление из векторной коллекции
+                delete layer->m_objects[idxs[i]];
                 layer->m_objects.erase(layer->m_objects.begin() + idxs[i]);
             }
         }
@@ -1046,6 +1049,10 @@ SDKResult WLayer::RecognizeText(std::vector<int> idxs, const float minConfidence
             cv::cvtColor(rotatedTextImg, rotatedTextImg, CV_GRAY2BGR);
             ocr->run(rotatedTextImg, output, &boxes, &words, &confidences, cv::text::OCR_LEVEL_WORD);
             //output.erase(remove(output.begin(), output.end(), '\n'), output.end());
+            //std::string textString;
+            //for (size_t j = 0; j < words.size(); j++)
+            //    textString += (words[j] + " ");
+            //textString.pop_back();
 
             text->AddText(output);
             text->SetState(true);

@@ -79,7 +79,7 @@ void LayersViewer::on_listWidget_currentRowChanged(int currentRow)
 {
     if (m_layers->size() > 0 &&currentRow>-1)
     {
-        utils::SetTransparent(m_image->m_raster, m_layers->at(currentRow)->m_data, 50);
+        utils::SetTransparent(m_image->m_raster, m_layers->at(currentRow)->m_data, 255, 25, true, true);
         m_widget->UpdatePixmap();
         if(m_layers->at(currentRow)->getType()==(WLayer::LAYER_TYPE_ENUM::LT_LINES | WLayer::LAYER_TYPE_ENUM::LT_TEXT))
         {

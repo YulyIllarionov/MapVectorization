@@ -54,7 +54,8 @@ public:
 
 SDK_BEGIN_NAMESPACE
 
-
+class WLayer;
+class Wregion;
 //Общий интерфейс всех векторных объектов
 class WVectorObject
 {
@@ -64,6 +65,7 @@ public:
 	virtual double DistanceTo(const cv::Point& mapPoint) const;
 
 	SMapPoint GetPoint(int i) { return SMapPoint(m_points.at(i).x, m_points.at(i).y); };
+    virtual std::vector<Wregion> CutFromLayer(WLayer* layer) { return std::vector<Wregion>(); }
 
 	//TODO переделать в private, но много где используется
 	WPointsContainer  m_points;
@@ -87,10 +89,9 @@ public:
     //Проверка другого векторного объекта на принадлежность полигону
 	bool Contains(const WVectorObject& object) const;
 	//virtual double DistanceTo(cv::Point mapPoint) const;
+    virtual std::vector<Wregion> CutFromLayer(WLayer* layer) { return std::vector<Wregion>(); }
 };
 
-class WLayer; //TODO используется в классах Wtext и WLine убрать
-class Wregion;
 // Объект кривая линия
 class WLine : public WVectorObject
 {
