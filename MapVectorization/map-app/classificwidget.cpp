@@ -166,16 +166,16 @@ void ClassificWidget::GetCoordAndType(int x, int y, int type)
                 m_selectPoints.append(QPointF(x, y));
                 m_polygon = m_widget->AddSelection(QPolygonF(m_selectPoints));
             }
-            //if (m_states == click_selection)
-            //{
-            //    std::vector<int> temp_vector = m_image->DefineObjectsNearPoint(m_layers.at(m_ui->listWidget->currentRow())->getID(), SMapPoint(x, y));
-            //    for (int i = 0; i < temp_vector.size(); i++)
-            //    {
-            //        m_ui->listWidget_2->setItemSelected(m_ui->listWidget_2->item(temp_vector.at(i)), true);
-            //        selectionHistory.push_back(temp_vector.at(i));
-            //    }
-            //    UpdateCollectionList();
-            //}
+            if (m_states == click_selection)
+            {
+                std::vector<int> temp_vector = m_image->DefineObjectsNearPoint(m_layers.at(m_ui->listWidget->currentRow())->getID(), SMapPoint(x, y));
+                for (int i = 0; i < temp_vector.size(); i++)
+                {
+                    m_ui->listWidget_2->setItemSelected(m_ui->listWidget_2->item(temp_vector.at(i)), true);
+                    //selectionHistory.push_back(temp_vector.at(i));
+                }
+                UpdateCollectionList();
+            }
 
         }
         if (type == 9)
