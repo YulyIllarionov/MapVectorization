@@ -297,16 +297,18 @@ namespace utils {
 		
 		// Detect character groups
 		std::vector<cv::Rect> nm_boxes;
-		cv::Mat tmp_rgb;
-		cv::cvtColor(tmp, tmp_rgb, cv::COLOR_GRAY2RGB);
-        cv::text::erGrouping(tmp_rgb, tmp, points, nm_boxes, cv::text::ERGROUPING_ORIENTATION_HORIZ);
-
-		for (int i = 0; i < nm_boxes.size(); i++) 
+		if (points.size() == 0)
 		{
-			cv::Mat tmp = cv::Mat::zeros(nm_boxes[i].height, nm_boxes[i].width, CV_8UC1);
-			tmp.copyTo(out_img_decomposition(nm_boxes[i]));
-		}
+			cv::Mat tmp_rgb;
+			cv::cvtColor(tmp, tmp_rgb, cv::COLOR_GRAY2RGB);
+			cv::text::erGrouping(tmp_rgb, tmp, points, nm_boxes, cv::text::ERGROUPING_ORIENTATION_HORIZ);
 
+			for (int i = 0; i < nm_boxes.size(); i++) 
+			{
+				cv::Mat tmp = cv::Mat::zeros(nm_boxes[i].height, nm_boxes[i].width, CV_8UC1);
+				tmp.copyTo(out_img_decomposition(nm_boxes[i]));
+			}
+		}
 		std::vector<cv::Rect> only_letters = DetectOnlyLetters(out_img_decomposition);
 
 		nm_boxes.insert(nm_boxes.end(), only_letters.begin(), only_letters.end());

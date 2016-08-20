@@ -119,15 +119,12 @@ SDKResult WLayer::InicializeTextContainer()
     std::vector<int> idxs(text.size());
     for (size_t i = 0; i < idxs.size(); i++)
     {
-        idxs[i] = m_objects.end() - m_objects.begin() + i;
+        idxs[i] = m_objects.size() + i;
     }
     m_objects.insert(m_objects.end(), text.begin(), text.end());
     //Распознавание текста
-    for (size_t i = 0; i < m_objects.size(); i++)
-    {
-        WText* currentText = dynamic_cast<WText*>(m_objects[i]);
-        this->RecognizeText(idxs, 0.0);
-    }
+    this->RecognizeText(idxs, 0.0);
+ 
     return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
@@ -1060,9 +1057,11 @@ SDKResult WLayer::RecognizeText(std::vector<int> idxs, const float minConfidence
             //for (size_t j = 0; j < words.size(); j++)
             //    textString += (words[j] + " ");
             //textString.pop_back();
-
+			if (!output.empty()) 
+			{
             text->AddText(output);
             text->SetState(true);
+			}
         }
     }
 }
