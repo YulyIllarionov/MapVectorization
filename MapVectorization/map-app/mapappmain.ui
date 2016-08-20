@@ -30,6 +30,7 @@
      <string>Файл</string>
     </property>
     <addaction name="OpenImage"/>
+    <addaction name="SaveAsVector"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
@@ -123,6 +124,11 @@
   <action name="actionUpdatePixmap">
    <property name="text">
     <string>UpdatePixmap</string>
+   </property>
+  </action>
+  <action name="SaveAsVector">
+   <property name="text">
+    <string>Сохранить в вектор</string>
    </property>
   </action>
  </widget>

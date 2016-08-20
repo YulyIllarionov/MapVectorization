@@ -555,9 +555,7 @@ SDKResult WRaster::PasteObjectsToLayer(const LayerUUID& layerId, std::vector<std
             {
                 linesImg.at<uchar>(objectPoints[j] - roi.tl()) = 255;
             }
-            //cv::namedWindow("textToLines", CV_WINDOW_KEEPRATIO);
-            //imshow("textToLines", linesImg);
-            imwrite("textToLines.png", linesImg);
+            //imwrite("textToLines.png", linesImg);
             vectorObjects = SDK_NAMESPACE::utils::FindLinesOnMat(linesImg);
             for (size_t j = 0; j < vectorObjects.size(); j++)
                 for (size_t k = 0; k < vectorObjects[j]->m_points.size(); k++)
@@ -743,52 +741,26 @@ std::vector<Wregion> WLine::CutFromLayer(WLayer* layer)
     cv::Point2f point2;
     std::vector<Point> borderPoints;
 
-    vec1 = MathUtils::Wvector(m_points[0], m_points[1]);
-    vec2 = vec1.PerpendicularVec();
-    point1 = vec2.ÑodirectionalVec(m_width).End();
-    point2 = vec2.OppositeVec().ÑodirectionalVec(m_width).End();
-    borderPoints.push_back(vec1.ÑodirectionalVec(m_width).End());
-    borderPoints.push_back(vec2.ÑodirectionalVec(m_width).End());
-    borderPoints.push_back(vec1.OppositeVec().ÑodirectionalVec(m_width).End());
-    borderPoints.push_back(vec2.OppositeVec().ÑodirectionalVec(m_width).End());
-    line.Concat(Wregion(m_points.front(), layer->m_data, WPolygon(borderPoints)));
+    cv::circle(layer->m_data, m_points[0], m_width * 0.7, 0, 2);
+    cv::circle(layer->m_data, m_points.back(), m_width * 0.7, 0, 2);
 
-    vec1 = MathUtils::Wvector(m_points.back(), m_points[m_points.size() - 2]);
-    vec2 = vec1.PerpendicularVec();
-    borderPoints.clear();
-    borderPoints.push_back(vec1.ÑodirectionalVec(m_width).End());
-    borderPoints.push_back(vec2.ÑodirectionalVec(m_width).End());
-    borderPoints.push_back(vec1.OppositeVec().ÑodirectionalVec(m_width).End());
-    borderPoints.push_back(vec2.OppositeVec().ÑodirectionalVec(m_width).End());
-    line.Concat(Wregion(m_points.back(), layer->m_data, WPolygon(borderPoints)));
+    //cv::namedWindow("lineCut", CV_WINDOW_KEEPRATIO);
+    //cv::imshow("lineCut", layer->m_data);
+    //cv::waitKey();
 
+    if (m_points.size() == 2)
+        m_points.insert(m_points.begin() + 1, 
+            MathUtils::Wvector(m_points.front(), m_points.back()).Middle());
+    Wregion(m_points.front(), layer->m_data);
+    Wregion(m_points.back(), layer->m_data);
     for (size_t i = 1; i < m_points.size() - 1; i++)
     {
-        borderPoints.clear();
-        borderPoints.push_back(point1);
-        borderPoints.push_back(point2);
-        vec1 = MathUtils::Wvector(m_points[i], m_points[i - 1]);
-        vec2 = MathUtils::Wvector(m_points[i], m_points[i + 1]);
-        bisectVec = vec1.BisectorVec(vec2);
-        bisectVec = bisectVec.ÑodirectionalVec(m_width);
-        point1 = bisectVec.End();
-        point2 = bisectVec.OppositeVec().End();
-        borderPoints.push_back(point1);
-        borderPoints.push_back(point2);
-        //cv::RotatedRect borderRect = cv::minAreaRect(borderPoints);
-        line.Concat(Wregion(MathUtils::Wvector(m_points[i - 1], m_points[i]).Middle(),
-            layer->m_data, WPolygon(cv::minAreaRect(borderPoints), layer->m_data.size())));
+        line.Concat(Wregion(m_points[i], layer->m_data));
+        //cv::imshow("lineCut", layer->m_data);
+        //cv::waitKey();
     }
-    vec1 = MathUtils::Wvector(m_points.back(), m_points[m_points.size() - 2]);
-    vec2 = vec1.PerpendicularVec();
-    borderPoints.clear();
-    borderPoints.push_back(point1);
-    borderPoints.push_back(point2);
-    borderPoints.push_back(vec2.ÑodirectionalVec(m_width).End());
-    borderPoints.push_back(vec2.OppositeVec().ÑodirectionalVec(m_width).End());
-    line.Concat(Wregion(MathUtils::Wvector(m_points[m_points.size() - 2], m_points.back()).Middle()
-        , layer->m_data, WPolygon(cv::minAreaRect(borderPoints), layer->m_data.size())));
-
+    //cv::destroyAllWindows();
+    
     return std::vector<Wregion>(1, line);
 }
 // ------------------------------------------------------------
@@ -801,7 +773,7 @@ void WLine::FindWidth(const cv::Mat& image)
     for (size_t i = 0; i < widths.size(); i++)
     {
         int halfWidth = 1;
-        while (SDK_NAMESPACE::utils::SquareFilling(image, m_points[i], halfWidth) > 0.7)
+        while (SDK_NAMESPACE::utils::SquareFilling(image, m_points[i], halfWidth) > 0.75)
             halfWidth++;
         widths[i] = halfWidth * 2 - 1;
     }

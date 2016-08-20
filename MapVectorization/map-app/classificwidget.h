@@ -51,6 +51,7 @@ private:
     QList<QPolygonF>                        m_textPolygons;
     QList<QGraphicsPolygonItem*>            m_polygonForText;
     QList< QList<QGraphicsRectItem*> >      m_rectForLines;
+    std::vector<int>                        selectionHistory; 
     enum States
     {
         nothing=0,polygon_selection,click_selection
