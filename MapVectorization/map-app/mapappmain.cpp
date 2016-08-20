@@ -90,3 +90,8 @@ void mapAppMain::on_actionUpdatePixmap_triggered()
 {
     static_cast<ImageViewer *>(m_tabs->currentWidget())->UpdatePixmap();
 }
+
+void mapAppMain::on_SaveAsVector_triggered()
+{
+    QString str = QFileDialog::getSaveFileName(0, "Save file", "", "Vector Files (*.svg) ;; *.*");
+}
