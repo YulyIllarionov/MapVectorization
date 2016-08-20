@@ -64,12 +64,12 @@ QGraphicsPolygonItem *ImageViewer::AddTextSelection(QPolygonF polygon)
 
 void ImageViewer::AddLineSelection(QVector<QPointF> &vec, QList<QGraphicsRectItem *> &items)
 {
-    QPen pen(Qt::SolidLine);
-    QBrush brush(QColor(255,18,18,200));
+    QPen pen(Qt::NoPen);
+    QBrush brush(QColor(18,255,18,200));
     for(int i=0;i<vec.size();i++)
     {
         QPointF tempPoint=vec.at(i);
-        QRectF rect(tempPoint.x()-3,tempPoint.y()-3,7,7);
+        QRectF rect(tempPoint.x()-3,tempPoint.y()-2,5,5);
         items.append(scene()->addRect(rect,pen,brush));
 
     }

@@ -558,9 +558,7 @@ SDKResult WRaster::PasteObjectsToLayer(const LayerUUID& layerId, std::vector<std
             {
                 linesImg.at<uchar>(objectPoints[j] - roi.tl()) = 255;
             }
-            //cv::namedWindow("textToLines", CV_WINDOW_KEEPRATIO);
-            //imshow("textToLines", linesImg);
-            imwrite("textToLines.png", linesImg);
+            //imwrite("textToLines.png", linesImg);
             vectorObjects = SDK_NAMESPACE::utils::FindLinesOnMat(linesImg);
             for (size_t j = 0; j < vectorObjects.size(); j++)
                 for (size_t k = 0; k < vectorObjects[j]->m_points.size(); k++)
@@ -804,7 +802,7 @@ void WLine::FindWidth(const cv::Mat& image)
     for (size_t i = 0; i < widths.size(); i++)
     {
         int halfWidth = 1;
-        while (SDK_NAMESPACE::utils::SquareFilling(image, m_points[i], halfWidth) > 0.7)
+        while (SDK_NAMESPACE::utils::SquareFilling(image, m_points[i], halfWidth) > 0.8)
             halfWidth++;
         widths[i] = halfWidth * 2 - 1;
     }

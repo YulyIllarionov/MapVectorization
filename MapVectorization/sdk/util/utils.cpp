@@ -173,7 +173,7 @@ namespace utils {
         cv::Mat skeleton;
         //Скелетизация изображения
         SDK_NAMESPACE::WSkeletonizer::Instance().Skeletonize(img, skeleton);
-        cv::imwrite("skeleton.png", skeleton);
+        //cv::imwrite("skeleton.png", skeleton);
         for (int y = 1; y < skeleton.rows - 1; y++)
         {
             for (int x = 1; x < skeleton.cols - 1; x++)

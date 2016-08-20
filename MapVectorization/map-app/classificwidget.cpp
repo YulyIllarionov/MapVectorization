@@ -93,6 +93,7 @@ bool ClassificWidget::event(QEvent *event)
 void ClassificWidget::on_listWidget_currentRowChanged(int currentRow)
 {
     m_ui->listWidget_2->clear();
+    selectionHistory.clear();
     WLayer* currentLayer = m_layers.at(currentRow);
     //utils::SetTransparent(m_image->m_raster, cv::Mat(m_image->m_raster.size(), CV_8UC1, 1), 10);
     //for(int i=0; i<m_layers.size();i++)
@@ -139,12 +140,22 @@ void ClassificWidget::GetCoordAndType(int x, int y, int type)
     {
         if (type == 2)
         {
-            delete m_polygon;
-            m_polygon = NULL;
-            m_ui->ClickSelectionButton->setChecked(false);
-            m_ui->PolygonSelectionButton->setChecked(false);
-            m_selectPoints.clear();
-
+            if (m_states == polygon_selection)
+            {
+                delete m_polygon;
+                m_polygon = NULL;
+                m_ui->ClickSelectionButton->setChecked(false);
+                m_ui->PolygonSelectionButton->setChecked(false);
+                m_selectPoints.clear();
+            }
+            if (m_states == click_selection)
+            {
+                if (!selectionHistory.empty())
+                {
+                    m_ui->listWidget_2->setItemSelected(m_ui->listWidget_2->item(selectionHistory.back()), false);
+                    selectionHistory.pop_back();
+                }
+            }
         }
         if (type == 1)
         {
@@ -155,15 +166,16 @@ void ClassificWidget::GetCoordAndType(int x, int y, int type)
                 m_selectPoints.append(QPointF(x, y));
                 m_polygon = m_widget->AddSelection(QPolygonF(m_selectPoints));
             }
-            if (m_states == click_selection)
-            {
-                std::vector<int> temp_vector = m_image->DefineObjectsNearPoint(m_layers.at(m_ui->listWidget->currentRow())->getID(), SMapPoint(x, y));
-                for (int i = 0; i < temp_vector.size(); i++)
-                {
-                    m_ui->listWidget_2->setItemSelected(m_ui->listWidget_2->item(temp_vector.at(i)), 1);
-                }
-                UpdateCollectionList();
-            }
+            //if (m_states == click_selection)
+            //{
+            //    std::vector<int> temp_vector = m_image->DefineObjectsNearPoint(m_layers.at(m_ui->listWidget->currentRow())->getID(), SMapPoint(x, y));
+            //    for (int i = 0; i < temp_vector.size(); i++)
+            //    {
+            //        m_ui->listWidget_2->setItemSelected(m_ui->listWidget_2->item(temp_vector.at(i)), true);
+            //        selectionHistory.push_back(temp_vector.at(i));
+            //    }
+            //    UpdateCollectionList();
+            //}
 
         }
         if (type == 9)

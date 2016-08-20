@@ -110,7 +110,7 @@ public:
 	void Concat(const WLine& line);
 	//virtual double DistanceTo(cv::Point mapPoint) const;
 	//Упростить линию изпользуя алгоритм Дугласа-Пекера
-    void SimplifyDP(double epsilon = 2.0);
+    void SimplifyDP(double epsilon = 1.0);
     //Вырезать объект с растрового слоя
     virtual std::vector<Wregion> CutFromLayer(WLayer* layer);
     //Нахождение толщины линии
