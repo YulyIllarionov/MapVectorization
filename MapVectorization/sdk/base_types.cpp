@@ -349,7 +349,7 @@ SDKResult WRaster::GetLayersByType(WLayer::LAYER_TYPE type, LayerIDs& layer_ids)
     layer_ids.clear();
     for (LayersContainer::const_iterator cit = m_layers.begin(); cit != m_layers.end(); ++cit)
     {
-        if ((cit->getType() & type) != 0)
+        if (cit->getType() == type)
             layer_ids.push_back(cit->getID());
     }
     return kSDKResult_Succeeded;
@@ -590,6 +590,27 @@ SDKResult WRaster::PasteObjectsToLayer(const LayerUUID& layerId, std::vector<std
     return kSDKResult_Succeeded;
 }
 // ------------------------------------------------------------
+void WRaster::SaveVectorToFile(std::string filename)
+{
+    std::ofstream fout(filename);
+    LayerIDs lineLayers;
+
+    fout << "<?xml version = \"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" 
+        << std::endl << "<svg:svg width=\"" << m_raster.cols << " "
+        << "height=\"" << m_raster.rows << " "
+        << "version = \"1.1\">" << std::endl;
+    fout.close();
+    GetLayersByType(WLayer::LAYER_TYPE_ENUM::LT_LINES, lineLayers);
+    for (size_t i = 0; i < lineLayers.size(); i++)
+    {
+        WLayer* currentLayer = GetLayerById(lineLayers[i]);
+        currentLayer->SaveVectorElementsToFile(filename);
+    }
+    fout.open(filename, std::ofstream::app);
+    fout << "</svg>" << std::endl;
+    fout.close();
+}
+// ------------------------------------------------------------
 std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& layerId, std::vector<size_t> idxs)
 {
     WLayer* layer = GetLayerById(layerId);
@@ -782,6 +803,16 @@ void WLine::FindWidth(const cv::Mat& image)
     }
     std::sort(widths.begin(), widths.end());
     m_width = (double)widths[widths.size() / 2];
+}
+// ------------------------------------------------------------
+void WLine::SaveToFile(std::string filename)
+{
+    std::ofstream fout(filename, std::ios_base::app);
+    fout << "\t" << "<polyline fill=\"none\" stroke=\"black\" points=\"";
+    for (size_t i = 0; i < m_points.size(); i++)
+        fout << m_points[i].x << "," << m_points[i].y << " ";
+    fout <<  "/>" << std::endl;
+    fout.close();
 }
 // ------------------------------------------------------------
 void WText::RotateToHorizon(WLayer* layer, cv::Mat& image)
@@ -1067,5 +1098,29 @@ void WLayer::RemoveVectorElements(std::vector<size_t> idxs)
         RemoveVectorElement(idxs[i]);
 }
 // ------------------------------------------------------------
+void WLayer::SaveVectorElementToFile(size_t idx, std::string filename)
+{
+    switch (m_type)
+    {
+    case WLayer::LAYER_TYPE_ENUM::LT_LINES:
+    {
+        WLine* line = dynamic_cast<WLine*>(m_objects[idx]);
+        line->SaveToFile(filename);
+    }
+    break;
+    case WLayer::LAYER_TYPE_ENUM::LT_TEXT:
+    {
 
+    }
+    default:
+        break;
+    }
+}
+// ------------------------------------------------------------
+void WLayer::SaveVectorElementsToFile(std::string filename)
+{
+    for (size_t i = 0; i < m_objects.size(); i++)
+        SaveVectorElementToFile(i, filename);
+}
+// ------------------------------------------------------------
 SDK_END_NAMESPACE

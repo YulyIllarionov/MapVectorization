@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <string>
-
+#include <fstream>
 #include "app/sdk_const.h"
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
@@ -115,7 +115,8 @@ public:
     virtual std::vector<Wregion> CutFromLayer(WLayer* layer);
     //Нахождение толщины линии
     void FindWidth(const cv::Mat& image);
-    //Окружающий полигон
+    //Сохранение в файл
+    void SaveToFile(std::string filename);
 private:
     //Толщина линии
     volatile double m_width;
@@ -275,6 +276,8 @@ public:
     WVectorObject* GetVectorElement(size_t idx);
     void RemoveVectorElement(size_t idx);
     void RemoveVectorElements(std::vector<size_t> idxs);
+    void SaveVectorElementToFile(size_t idx, std::string filename);
+    void SaveVectorElementsToFile(std::string filename);
     //Костыль для графического интерфейса
     size_t VectorContainerElementsNumber() { return m_objects.size(); };
 
@@ -376,6 +379,8 @@ public:
 	std::vector<std::vector<Wregion>> CutObjectsFromLayer(const LayerUUID& layerId, std::vector<size_t> idxs);
     //Вставка объектов на слой 
     SDKResult PasteObjectsToLayer(const LayerUUID& layerId, std::vector<std::vector<Wregion>> rasterObjects);
+    //Сохранение векторных объектов в файл
+    void SaveVectorToFile(std::string filename);
 
 private:
 	SDKResult SetLayerType (const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite);
