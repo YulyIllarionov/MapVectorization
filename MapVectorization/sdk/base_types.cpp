@@ -16,7 +16,8 @@
 
 #include <math.h>
 #include <algorithm>
-
+#include <locale>
+#include <codecvt>
 #include "base_types.h"
 
 
@@ -165,6 +166,8 @@ WRaster::WRaster(const std::string& imgPath)
 // ------------------------------------------------------------
 void WRaster::Initialize(const std::string& imgPath)
 {
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	m_image_path = converter.from_bytes(imgPath);
     // Read the file
     Mat raster = imread(String(imgPath), CV_LOAD_IMAGE_COLOR);
     cvtColor(raster, m_raster, CV_BGR2BGRA, 4);
@@ -340,6 +343,17 @@ WLayer* WRaster::GetLayerByName(const std::string& name)
     }
     return nullptr;
 }
+//-------------------------------------------------------------
+WLayer* WRaster::GetLayerByContainerPosition(uint pos)
+{
+	if (pos < m_layers.size())
+	{
+		auto it = m_layers.begin();
+		std::advance(it, pos);
+		return &*it;
+	}
+	return nullptr;
+}
 // ------------------------------------------------------------
 SDKResult WRaster::GetLayersByType(WLayer::LAYER_TYPE type, LayerIDs& layer_ids) const
 {
@@ -352,9 +366,10 @@ SDKResult WRaster::GetLayersByType(WLayer::LAYER_TYPE type, LayerIDs& layer_ids)
     return kSDKResult_Succeeded;
 }
 //------------------------------------------------------------
-std::wstring WRaster::GetImgPath()
+std::string WRaster::GetImgPath()
 {
-	return m_image_path;
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	return converter.to_bytes(m_image_path);
 }
 // ------------------------------------------------------------
 // use only as an example. define other split funcs as a member of the WRaster class

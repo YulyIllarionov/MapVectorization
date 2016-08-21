@@ -261,7 +261,7 @@ public:
     void        removeType(LAYER_TYPE type) { m_type &= ~type; }
     void        addColorToRange(const w_color& color) { m_color_range.addColor(color); }
     bool        colorContains(cv::Vec3b color) { return m_color_range.contains(color); }
-
+	uint		getContainerSize() { return m_objects.size(); }
     //Рисование круга на растровом слое.
     //Используется в качестве ластика
 	void DrawCircle(SMapPoint point, uint radius, uchar color);
@@ -277,7 +277,6 @@ public:
     void RemoveVectorElements(std::vector<size_t> idxs);
     //Костыль для графического интерфейса
     size_t VectorContainerElementsNumber() { return m_objects.size(); };
-
     //Растровая бинарная маска слоя
     //Каждый пиксель маски представляет собой переменную типа uchar
     //Нулевое значение пикселя означает отсутствие пикселя на маске, ненулевое - присутствие
@@ -356,6 +355,7 @@ public:
 	// return layer's ref
 	WLayer*   GetLayerById    (const LayerUUID& layerId);
 	WLayer*   GetLayerByName  (const std::string& name);
+	WLayer*   GetLayerByContainerPosition  (uint pos);
 	// get layers idxs by type
 	SDKResult GetLayersByType (WLayer::LAYER_TYPE type, LayerIDs& layerIds) const;
 	// split layer by function
@@ -377,7 +377,7 @@ public:
     //Вставка объектов на слой 
     SDKResult PasteObjectsToLayer(const LayerUUID& layerId, std::vector<std::vector<Wregion>> rasterObjects);
 
-	std::wstring GetImgPath();
+	std::string GetImgPath();
 
 private:
 	SDKResult SetLayerType (const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite);
