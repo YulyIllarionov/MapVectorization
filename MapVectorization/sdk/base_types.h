@@ -377,6 +377,8 @@ public:
     //Вставка объектов на слой 
     SDKResult PasteObjectsToLayer(const LayerUUID& layerId, std::vector<std::vector<Wregion>> rasterObjects);
 
+	std::wstring GetImgPath();
+
 private:
 	SDKResult SetLayerType (const LayerUUID& layerId, WLayer::LAYER_TYPE type, bool overwrite);
 	void Initialize(const std::string& imgPath);

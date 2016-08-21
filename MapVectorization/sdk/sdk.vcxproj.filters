@@ -66,10 +66,10 @@
     <ClInclude Include="graphics\skeletonization.h">
       <Filter>Header Files\graphics</Filter>
     </ClInclude>
-    <ClInclude Include="data_mappers\IDataMapper.h">
+    <ClInclude Include="data_mappers\datamappers.h">
       <Filter>Header Files\data_mappers</Filter>
     </ClInclude>
-    <ClInclude Include="data_mappers\SMapPointDataMapper.h">
+    <ClInclude Include="data_mappers\xml_interface.h">
       <Filter>Header Files\data_mappers</Filter>
     </ClInclude>
   </ItemGroup>
@@ -92,7 +92,10 @@
     <ClCompile Include="graphics\skeletonization.cpp">
       <Filter>Source Files\graphics</Filter>
     </ClCompile>
-    <ClCompile Include="data_mappers\SMapPointDataMapper.cpp">
+    <ClCompile Include="data_mappers\datamappers.cpp">
+      <Filter>Source Files\data_mappers</Filter>
+    </ClCompile>
+    <ClCompile Include="data_mappers\xml_interface.cpp">
       <Filter>Source Files\data_mappers</Filter>
     </ClCompile>
   </ItemGroup>

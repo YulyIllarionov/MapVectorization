@@ -228,8 +228,8 @@
     <ClInclude Include="app\sdk_const.h" />
     <ClInclude Include="app\sdk_result.h" />
     <ClInclude Include="base_types.h" />
-    <ClInclude Include="data_mappers\IDataMapper.h" />
-    <ClInclude Include="data_mappers\SMapPointDataMapper.h" />
+    <ClInclude Include="data_mappers\datamappers.h" />
+    <ClInclude Include="data_mappers\xml_interface.h" />
     <ClInclude Include="graphics\skeletonization.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -238,7 +238,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="base_types.cpp" />
-    <ClCompile Include="data_mappers\SMapPointDataMapper.cpp" />
+    <ClCompile Include="data_mappers\datamappers.cpp" />
+    <ClCompile Include="data_mappers\xml_interface.cpp" />
     <ClCompile Include="graphics\skeletonization.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp">

@@ -351,6 +351,11 @@ SDKResult WRaster::GetLayersByType(WLayer::LAYER_TYPE type, LayerIDs& layer_ids)
     }
     return kSDKResult_Succeeded;
 }
+//------------------------------------------------------------
+std::wstring WRaster::GetImgPath()
+{
+	return m_image_path;
+}
 // ------------------------------------------------------------
 // use only as an example. define other split funcs as a member of the WRaster class
 SDKResult splitFuncExample(WLayer* layer, WLayer* l1, WLayer* l2)
