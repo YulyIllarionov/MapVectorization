@@ -4,12 +4,14 @@
 
 SDK_BEGIN_NAMESPACE
 
-void SaveProject(std::string &filename, WRaster& item)
+int SaveProject(std::string &filename, WRaster* item)
 {
-	tinyxml2::XMLDocument doc;
-	doc.NewDeclaration();
-	WRasterDataMapper::Write(item, &doc);
-	doc.SaveFile(filename.c_str());
+	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
+	doc->NewDeclaration();
+	WRasterDataMapper::Write(item, doc);
+	int ret = doc->SaveFile(filename.c_str());
+	//delete doc;
+	return ret;
 }
 
 SDK_END_NAMESPACE

@@ -17,7 +17,7 @@
 #include "imageviewer.h"
 #include "layersviewer.h"
 #include "classificwidget.h"
-
+#include "../sdk/data_mappers/xml_interface.h"
 
 // Тип виджета
 enum WIDGET_TYPE

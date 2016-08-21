@@ -93,5 +93,6 @@ void mapAppMain::on_actionUpdatePixmap_triggered()
 
 void mapAppMain::on_SaveAsVector_triggered()
 {
-    QString str = QFileDialog::getSaveFileName(0, "Save file", "", "Vector Files (*.svg) ;; *.*");
+    QString str = QFileDialog::getSaveFileName(0, "Save file", "", "Vector Files (*.xml) ;; *.*");
+	int ret = SaveProject(str.toStdString(), m_image);
 }

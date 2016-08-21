@@ -3,6 +3,6 @@
 
 SDK_BEGIN_NAMESPACE
 
-void SaveProject(std::string& filename, WRaster& item);
+int SaveProject(std::string& filename, WRaster* item);
 
 SDK_END_NAMESPACE

@@ -9,7 +9,7 @@ class WRasterDataMapper
 {
 public:
 	static std::shared_ptr<WRaster> Read(size_t);
-	static void Write(WRaster&, tinyxml2::XMLDocument*);
+	static void Write(WRaster* item, tinyxml2::XMLDocument* doc);
 };
 
 SDK_END_NAMESPACE
