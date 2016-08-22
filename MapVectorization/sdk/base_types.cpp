@@ -698,6 +698,13 @@ bool WPolygon::Contains(const cv::Point& point) const
     return pointPolygonTest(m_points, point, false) >= 0;
 }
 // ------------------------------------------------------------
+cv::Point* WVectorObject::GetItem(uint i) 
+{
+	if (i < m_points.size())
+		return &m_points[i]; 
+	return nullptr;
+};
+// ------------------------------------------------------------
 double WVectorObject::DistanceTo(const cv::Point& mapPoint) const
 {
     int squaredDistance = INT_MAX;
@@ -799,6 +806,11 @@ void WLine::FindWidth(const cv::Mat& image)
     }
     std::sort(widths.begin(), widths.end());
     m_width = (double)widths[widths.size() / 2];
+}
+// ------------------------------------------------------------
+double WLine::GetWidth()
+{
+	return m_width;
 }
 // ------------------------------------------------------------
 void WText::RotateToHorizon(WLayer* layer, cv::Mat& image)
@@ -1061,6 +1073,13 @@ SDKResult WLayer::RecognizeText(std::vector<int> idxs, const float minConfidence
 void WLayer::AddVectorElement(WVectorObject* element)
 {
     m_objects.push_back(element);
+}
+// ------------------------------------------------------------
+WVectorObject* WLayer::GetObject(uint i)
+{
+	if(i < m_objects.size())
+		return m_objects[i];
+	return nullptr;
 }
 // ------------------------------------------------------------
 WVectorObject* WLayer::GetVectorElement(size_t idx)

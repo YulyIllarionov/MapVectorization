@@ -65,8 +65,8 @@ public:
 	virtual double DistanceTo(const cv::Point& mapPoint) const;
 
 	SMapPoint GetPoint(int i) { return SMapPoint(m_points.at(i).x, m_points.at(i).y); };
-    virtual std::vector<Wregion> CutFromLayer(WLayer* layer) { return std::vector<Wregion>(); }
-
+    virtual std::vector<Wregion> CutFromLayer(WLayer* layer) { return std::vector<Wregion>(); };
+	virtual cv::Point* GetItem(uint i);
 	//TODO переделать в private, но много где используется
 	WPointsContainer  m_points;
 };
@@ -115,6 +115,8 @@ public:
     virtual std::vector<Wregion> CutFromLayer(WLayer* layer);
     //Нахождение толщины линии
     void FindWidth(const cv::Mat& image);
+
+	double GetWidth();
     //Окружающий полигон
 private:
     //Толщина линии
@@ -141,7 +143,7 @@ public:
 	//Изменить флаг
 	void SetState(bool state) { m_state = state; }
 	bool GetState() const { return m_state; }
-
+	float GetAngle() const { return m_angle; }
 	//Копирование полигона с текстом на cv::Mat и поворот до горизонтального положения
     //Угол находится при помощи преобразования Хафа для линий
     //Используется при распознавании текста
@@ -151,6 +153,7 @@ public:
 
 private:
 	std::string m_text;     //Содержащийся текст
+	float		m_angle;		//Угол наклона на изображении
 	bool        m_state;    //Флаг состояний: 0 - текст локализован, 1 - текст распознан
 };
 
@@ -262,6 +265,8 @@ public:
     void        addColorToRange(const w_color& color) { m_color_range.addColor(color); }
     bool        colorContains(cv::Vec3b color) { return m_color_range.contains(color); }
 	uint		getContainerSize() { return m_objects.size(); }
+	WVectorObject* GetObject(uint i);
+	
     //Рисование круга на растровом слое.
     //Используется в качестве ластика
 	void DrawCircle(SMapPoint point, uint radius, uchar color);
