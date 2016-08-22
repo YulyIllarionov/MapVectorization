@@ -9,7 +9,7 @@ class WRasterDataMapper
 {
 public:
 	//static std::shared_ptr<WRaster> Read(size_t);
-	static void Write(WRaster* item, tinyxml2::XMLDocument* doc);
+	static void Write(std::shared_ptr<WRaster> item, tinyxml2::XMLDocument* doc);
 };
 
 class WLayerDataMapper

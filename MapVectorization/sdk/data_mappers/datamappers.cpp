@@ -10,7 +10,7 @@ SDK_BEGIN_NAMESPACE
 //	return a;
 //}
 
-void WRasterDataMapper::Write(WRaster* item, tinyxml2::XMLDocument* doc)
+void WRasterDataMapper::Write(std::shared_ptr<WRaster> item, tinyxml2::XMLDocument* doc)
 {
 	tinyxml2::XMLNode* raster_node = doc->NewElement("raster");	
 	doc->InsertFirstChild(raster_node);
@@ -42,7 +42,7 @@ void WLayerDataMapper::Write(WLayer* item, tinyxml2::XMLDocument* doc, tinyxml2:
 	layer_node->SetAttribute("LAYER_TYPE", item->getType());
 	WRangeDataMapper::Write(&item->getRange(), doc, layer_node);
 
-	tinyxml2::XMLElement* vector_object_container_node = doc->NewElement("vector_object_container_node");
+	tinyxml2::XMLElement* vector_object_container_node = doc->NewElement("vector_object_container");
 	layer_node->InsertEndChild(vector_object_container_node);
 	uint size = item->getContainerSize();
 	vector_object_container_node->SetAttribute("size", size); 

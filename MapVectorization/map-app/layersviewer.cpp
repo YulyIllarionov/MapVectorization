@@ -5,7 +5,7 @@
 #include "layerconfiguredialog.h"
 
 
-LayersViewer::LayersViewer(WRaster* image, ImageViewer* widget, QList<WLayer*> *layers,QWidget* parent) :
+LayersViewer::LayersViewer(std::shared_ptr<WRaster> image, ImageViewer* widget, QList<WLayer*> *layers,QWidget* parent) :
     QWidget(parent), m_ui(new Ui::LayersViewer)
 {
     m_ui->setupUi(this);

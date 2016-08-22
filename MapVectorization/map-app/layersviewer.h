@@ -7,6 +7,7 @@
 #include "../sdk/app/sdk_const.h"
 #include "../sdk/base_types.h"
 #include "../sdk/util/utils.h"
+#include <memory>
 
 #include "imageviewer.h"
 using namespace SDK_NAMESPACE;
@@ -16,7 +17,7 @@ class LayersViewer : public QWidget
     Q_OBJECT
 
 public:
-    explicit LayersViewer(WRaster* image, ImageViewer* widget, QList<WLayer*> *layers, QWidget* parent = 0);
+    explicit LayersViewer(std::shared_ptr<WRaster> image, ImageViewer* widget, QList<WLayer*> *layers, QWidget* parent = 0);
     ~LayersViewer();
     public slots:
     void UpdateList();
@@ -39,7 +40,7 @@ protected:
 private:
     Ui::LayersViewer         *m_ui;
     ImageViewer              *m_widget;
-    SDK_NAMESPACE::WRaster   *m_image;
+    std::shared_ptr<WRaster>  m_image;
     QList<WLayer*>           *m_layers;
     WLayer                   *m_tempLayer;
 };

@@ -3,7 +3,7 @@
 
 using namespace SDK_NAMESPACE;
 
-ClassificWidget::ClassificWidget(WRaster *image, ImageViewer *widget, QList<WLayer*> *layers, QWidget *parent) :
+ClassificWidget::ClassificWidget(std::shared_ptr<WRaster> image, ImageViewer *widget, QList<WLayer*> *layers, QWidget *parent) :
     QWidget(parent), m_ui(new Ui::ClassificWidget)
 {
     m_ui->setupUi(this);

@@ -4,7 +4,7 @@
 
 SDK_BEGIN_NAMESPACE
 
-int SaveProject(std::string &filename, WRaster* item)
+int SaveProject(std::string &filename, std::shared_ptr<WRaster> item)
 {
 	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
 	doc->NewDeclaration();

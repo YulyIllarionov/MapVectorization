@@ -2,6 +2,7 @@
 #define CLASSIFICWIDGET_H
 
 #include <QWidget>
+#include <memory>
 #include "../sdk/app/sdk_const.h"
 #include "../sdk/base_types.h"
 #include "../sdk/util/utils.h"
@@ -15,7 +16,7 @@ class ClassificWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ClassificWidget(WRaster* image, ImageViewer* widget,QList<WLayer*> *layers,QWidget *parent = 0);
+    explicit ClassificWidget(std::shared_ptr<WRaster> image, ImageViewer* widget,QList<WLayer*> *layers,QWidget *parent = 0);
     ~ClassificWidget();
 public slots:
     void UpdateList();
@@ -44,7 +45,7 @@ private:
 private:
     Ui::ClassificWidget *                   m_ui;
     ImageViewer*                            m_widget;
-    SDK_NAMESPACE::WRaster*                 m_image;
+    std::shared_ptr<WRaster>                m_image;
     QList<WLayer*>                          m_layers;
     QGraphicsPolygonItem*                   m_polygon;
     QVector<QPointF>                        m_selectPoints;

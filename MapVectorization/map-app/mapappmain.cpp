@@ -16,7 +16,6 @@ mapAppMain::mapAppMain(QWidget *parent)
 
 mapAppMain::~mapAppMain()
 {
-    delete  m_image;
 }
 
 void mapAppMain::on_OpenImage_triggered()
@@ -24,7 +23,7 @@ void mapAppMain::on_OpenImage_triggered()
     QString str = QFileDialog::getOpenFileName(0, "Open image", "", "Image Files (*.png *.jpg *.bmp) ;; *.*");
     if(!str.isEmpty())
     {
-        m_image = new WRaster(str.toStdString());
+		m_image = std::make_shared<WRaster>(str.toStdString());
         ImageViewer*  imView = new ImageViewer(
         QImage((uchar*)m_image->m_raster.data,
           m_image->m_raster.cols, 

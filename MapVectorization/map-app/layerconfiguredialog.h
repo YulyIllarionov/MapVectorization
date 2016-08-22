@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QColorDialog>
 
+#include <memory>
 
 #include "../sdk/app/sdk_const.h"
 #include "../sdk/base_types.h"
@@ -22,7 +23,7 @@ class LayerConfigureDialog : public QWidget
     Q_OBJECT
 
 public:
-    explicit LayerConfigureDialog(WRaster* image, ImageViewer* widget,WLayer *tempLayer, QWidget *parent = 0);
+    explicit LayerConfigureDialog(std::shared_ptr<WRaster> image, ImageViewer* widget,WLayer *tempLayer, QWidget *parent = 0);
     ~LayerConfigureDialog();
 
 protected:
@@ -52,7 +53,7 @@ signals:
 private:
     Ui::LayerConfigureDialog*   m_ui;
     ImageViewer*              m_widget;
-    WRaster*   m_image;
+    std::shared_ptr<WRaster>  m_image;
     WLayer *m_tempLayer;
 
     int   m_r, m_g, m_b;
