@@ -47,5 +47,11 @@ public:
 	static void Write(std::shared_ptr<WText> item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node);
 };
 
+class WMaskDataMapper
+{
+public:
+	static cv::Mat Read(tinyxml2::XMLElement* node);
+	static void Write(cv::Mat& item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node);
+};
 
 SDK_END_NAMESPACE

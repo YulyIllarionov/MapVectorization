@@ -251,17 +251,9 @@ WLayer* WRaster::AddLayer(const GroupID& groupId)
 // ------------------------------------------------------------
 void WRaster::AddLayer(WLayer layer)
 {
-	layer.m_data = cv::Mat::zeros(m_raster.size(), CV_8UC1);
+	if (layer.getType() == 3)
+		layer.m_data = 1 - cv::Mat::zeros(m_raster.size(), CV_8UC1);
 	m_layers.push_back(layer);
-	for (int y = 0; y < m_raster.rows; y++)
-    {
-        for (int x = 0; x < m_raster.cols; x++)
-        {
-            const Vec4b currentColorOld = m_raster.at<Vec4b>(y, x);
-            const Vec3b currentColor(currentColorOld[0], currentColorOld[1], currentColorOld[2]);
-            layer.m_data.at<uchar>(y, x) = layer.colorContains(currentColor) ? 1 : 0;
-        }
-    }
 }
 // ------------------------------------------------------------
 SDKResult WRaster::RemoveLayer(const LayerUUID& layerId)

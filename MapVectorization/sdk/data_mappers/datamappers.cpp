@@ -31,6 +31,15 @@ void WLayerDataMapper::Write(WLayer* item, tinyxml2::XMLDocument* doc, tinyxml2:
 	layer_node->SetAttribute("GroupID", item->getGroupId().c_str());
 	WRangeDataMapper::Write(&item->getRange(), doc, layer_node);
 
+	if (item->getType() != 3)
+	{
+		tinyxml2::XMLElement* layer_mask_node = doc->NewElement("layer_mask");
+		layer_mask_node->SetAttribute("cols", item->m_data.cols);
+		layer_mask_node->SetAttribute("rows", item->m_data.rows);
+		WMaskDataMapper::Write(item->m_data, doc, layer_mask_node);
+		layer_node->InsertEndChild(layer_mask_node);
+	}
+
 	tinyxml2::XMLElement* vector_object_container_node = doc->NewElement("vector_object_container");
 	layer_node->InsertEndChild(vector_object_container_node);
 	uint size = item->getContainerSize();
@@ -50,6 +59,19 @@ void WLayerDataMapper::Write(WLayer* item, tinyxml2::XMLDocument* doc, tinyxml2:
 		}
 	}		
 	node->InsertEndChild(layer_node);
+}
+ 
+void WMaskDataMapper::Write(cv::Mat& item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node)
+{
+	for (int x = 0; x < item.cols; x++)
+    {
+        for (int y = 0; y < item.rows; y++)
+        {
+			cv::Point tmp(x, y);
+			if (item.at<uchar>(tmp) != 0)
+				CVPointDataMapper::Write(&tmp, doc, node); 
+		}
+	}
 }
 
 void WRangeDataMapper::Write(w_range* item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node)
@@ -171,6 +193,13 @@ WLayer WLayerDataMapper::Read(tinyxml2::XMLElement* node)
 	w_range range = WRangeDataMapper::Read(range_node);	
 	result.setRange(range);
 
+	if (type != 3)
+	{
+		tinyxml2::XMLElement* layer_mask_node = node->FirstChildElement("layer_mask");
+		cv::Mat mask = WMaskDataMapper::Read(layer_mask_node);
+		result.m_data = mask;
+	}
+
 	tinyxml2::XMLElement* vector_object_container_node = node->FirstChildElement("vector_object_container");
 	if (type == WLayer::LAYER_TYPE_ENUM::LT_LINES)
 	{
@@ -193,6 +222,25 @@ WLayer WLayerDataMapper::Read(tinyxml2::XMLElement* node)
 			vector_object_node = vector_object_node->NextSiblingElement("text");
 		}
 	}
+	return result;
+}
+
+cv::Mat WMaskDataMapper::Read(tinyxml2::XMLElement* node)
+{
+	uint rows, cols;
+	tinyxml2::XMLError m_error;
+	m_error = node->QueryUnsignedAttribute("rows", &rows);
+	m_error = node->QueryUnsignedAttribute("cols", &cols);
+
+	cv::Mat result = cv::Mat::zeros(rows, cols, CV_8UC1);
+	tinyxml2::XMLElement*  point_node = node->FirstChildElement("point");
+	while (point_node != nullptr)
+	{
+		cv::Point tmp = CVPointDataMapper::Read(point_node);
+		result.at<uchar>(tmp) = 1;
+		point_node = point_node->NextSiblingElement("point");
+	}
+
 	return result;
 }
 
