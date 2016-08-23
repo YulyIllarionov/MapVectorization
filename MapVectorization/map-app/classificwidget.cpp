@@ -60,7 +60,7 @@ void ClassificWidget::UpdateCollectionList()
     {
         if (m_ui->listWidget_2->item(i)->isSelected() || m_ui->listWidget_2->currentRow() == i)
         {
-            WVectorObject* vobj = currentLayer->GetVectorElement(i);
+            auto vobj = currentLayer->GetVectorElement(i);
             QVector<QPointF> tempPoints;
             for (int j = 0; j < vobj->Length(); j++)
             {
@@ -112,7 +112,7 @@ void ClassificWidget::on_listWidget_currentRowChanged(int currentRow)
         {
         case WLayer::LAYER_TYPE_ENUM::LT_TEXT:
         {
-            WText* text = dynamic_cast<WText*>(currentLayer->GetVectorElement(i));
+            auto text = std::dynamic_pointer_cast<WText>(currentLayer->GetVectorElement(i));
             if (text->GetText().empty())
                 m_ui->listWidget_2->addItem("!unrecognized!");
             else
@@ -121,7 +121,7 @@ void ClassificWidget::on_listWidget_currentRowChanged(int currentRow)
         }
         case WLayer::LAYER_TYPE_ENUM::LT_LINES:
         {
-            WLine* line = dynamic_cast<WLine*>(currentLayer->GetVectorElement(i));
+            auto line = std::dynamic_pointer_cast<WLine>(currentLayer->GetVectorElement(i));
             m_ui->listWidget_2->addItem("(" + QString::number(line->m_points.front().x) + "," +
                 QString::number(line->m_points.front().y) + ")-(" + QString::number(line->m_points.back().x) +
                 "," + QString::number(line->m_points.back().y) + ")  " + QString::number(line->m_points.size()) +
@@ -214,7 +214,7 @@ void ClassificWidget::on_listWidget_2_currentRowChanged(int currentRow)
 void ClassificWidget::on_catLinesButton_clicked()
 {
     WLayer* currentLayer = m_layers.at(m_ui->listWidget->currentRow());
-    WLine* vobj;
+    std::shared_ptr<WLine> vobj;
     bool isFirst = true;
     const size_t containerSize = currentLayer->VectorContainerElementsNumber();
     for (size_t i = 0; i < containerSize; i++)
@@ -223,14 +223,13 @@ void ClassificWidget::on_catLinesButton_clicked()
         {
             if (isFirst)
             {
-                vobj = dynamic_cast<WLine*>(currentLayer->GetVectorElement(i));
+                vobj = std::dynamic_pointer_cast<WLine>(currentLayer->GetVectorElement(i));
                 isFirst = false;
             }
             else
             {
-                WLine* vobj2 = dynamic_cast<WLine*>(currentLayer->GetVectorElement(i));
+                auto vobj2 = std::dynamic_pointer_cast<WLine>(currentLayer->GetVectorElement(i));
                 vobj->Concat(*vobj2);
-                delete vobj2;
                 currentLayer->RemoveVectorElement(i);
             }
         }

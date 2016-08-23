@@ -95,3 +95,34 @@ void mapAppMain::on_SaveAsVector_triggered()
     QString str = QFileDialog::getSaveFileName(0, "Save file", "", "Vector Files (*.xml) ;; *.*");
 	int ret = SaveProject(str.toStdString(), m_image);
 }
+
+void mapAppMain::on_LoadVector_triggered()
+{
+	QString str = QFileDialog::getOpenFileName(0, "Open file", "", "Vector Files (*.xml) ;; *.*");
+	auto result = LoadProject(str.toStdString());
+	if (result)
+	{
+		m_image = result;
+		m_layers.clear();
+		uint size = m_image->GetLayersCount();
+		for (uint i = 0; i < size; i++)
+		{
+			m_layers.push_back(m_image->GetLayerByContainerPosition(i));
+		}
+
+		ImageViewer*  imView = new ImageViewer(
+        QImage((uchar*)m_image->m_raster.data,
+          m_image->m_raster.cols, 
+            m_image->m_raster.rows,
+            m_image->m_raster.step,
+          QImage::Format_ARGB32));
+        
+        m_tabs->addTab(imView, str.section('/', -1, -1));
+        m_tabsInfo.append(tab_info(imView, WT_RASTR_IMAGE, ++m_idCounter));
+        imView->UpdatePixmap();
+        imView->FitView();
+        QObject::connect(m_ui.ZoomIn, SIGNAL(triggered(bool)), imView, SLOT(ZoomIn()));
+        QObject::connect(m_ui.ZoomOut, SIGNAL(triggered(bool)), imView, SLOT(ZoomOut()));
+        QObject::connect(m_ui.FitImage, SIGNAL(triggered(bool)), imView, SLOT(FitView()));
+	}
+}

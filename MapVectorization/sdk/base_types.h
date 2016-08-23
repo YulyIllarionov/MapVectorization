@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 #include "app/sdk_const.h"
 #include <opencv2/highgui/highgui.hpp>
@@ -103,7 +104,7 @@ public:
         m_width = -1;
 	};
 	~WLine() {};
-
+	void SetWidth(double width) { m_width = width; }
 	//WLine& operator=(WLine& other);
 
     //Конкатенация двух линий
@@ -144,6 +145,7 @@ public:
 	void SetState(bool state) { m_state = state; }
 	bool GetState() const { return m_state; }
 	float GetAngle() const { return m_angle; }
+	void setAngle(float angle) { m_angle = angle; }
 	//Копирование полигона с текстом на cv::Mat и поворот до горизонтального положения
     //Угол находится при помощи преобразования Хафа для линий
     //Используется при распознавании текста
@@ -153,12 +155,12 @@ public:
 
 private:
 	std::string m_text;     //Содержащийся текст
-	float		m_angle;		//Угол наклона на изображении
+	float		m_angle;	//Угол наклона на изображении
 	bool        m_state;    //Флаг состояний: 0 - текст локализован, 1 - текст распознан
 };
 
 //Контейнер для векторных объектов 
-typedef std::vector<WVectorObject*> WObjectContainer;
+typedef std::vector<std::shared_ptr<WVectorObject>> WObjectContainer;
 
 //TODO Убрать если не нужен
 //  Enumerator
@@ -188,7 +190,7 @@ struct w_range
 	inline bool contains(const cv::Vec3b& color);
 	w_color getLow();
 	w_color getHigh();
-
+	void setData(cv::Vec3b m_low, cv::Vec3b m_high);
 private:
     //Верхняя и нижняя границы диапазона
 	cv::Vec3b low;
@@ -256,6 +258,7 @@ public:
 	bool        IsSingleType() const { return IsSingleType(m_type); }
 	w_range     getRange()     const { return m_color_range; }
 	std::string getName()      const { return m_name; }
+	void		setGroupId(std::string id)			 { m_group_id = id; }
 	GroupID     getGroupId()   const { return m_group_id; }
     void        setID(std::string uuid) { m_uuid = uuid; }
     void        setName(std::string name) { m_name = name; }
@@ -263,9 +266,10 @@ public:
     void        addType(LAYER_TYPE type) { m_type |= type; }
     void        removeType(LAYER_TYPE type) { m_type &= ~type; }
     void        addColorToRange(const w_color& color) { m_color_range.addColor(color); }
+	void		setRange(w_range range) { m_color_range = range; }
     bool        colorContains(cv::Vec3b color) { return m_color_range.contains(color); }
 	uint		getContainerSize() { return m_objects.size(); }
-	WVectorObject* GetObject(uint i);
+	std::shared_ptr<WVectorObject> GetObject(uint i);
 	
     //Рисование круга на растровом слое.
     //Используется в качестве ластика
@@ -276,8 +280,8 @@ public:
     //Распознавание текста объектов векторной коллекции по задаваемым индексам
     SDKResult RecognizeText(std::vector<int> idxs, const float minConfidences);
     
-    void AddVectorElement(WVectorObject* element);
-    WVectorObject* GetVectorElement(size_t idx);
+    void AddVectorElement(std::shared_ptr<WVectorObject> element);
+    std::shared_ptr<WVectorObject> GetVectorElement(size_t idx);
     void RemoveVectorElement(size_t idx);
     void RemoveVectorElements(std::vector<size_t> idxs);
     //Костыль для графического интерфейса
@@ -348,6 +352,8 @@ public:
 	//TODO убрать все что не используется
 	WLayer*   AddLayer(const GroupID& groupId = "");      
 	// create and add new layer
+	void   AddLayer(WLayer layer);      
+	//
 	SDKResult RemoveLayer     (const LayerUUID& layerId);
 	// add layer color
 	SDKResult AddColorToLayer (const LayerUUID& layerId, const w_color& color);

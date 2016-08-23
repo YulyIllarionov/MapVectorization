@@ -70,7 +70,7 @@ void LayersViewer::UpdateList()
         case WLayer::LAYER_TYPE_ENUM::LT_NONE:
             temp = "none"; break;
         }*/
-        QString temp= QString::number((int)m_layers->at(i)->getType());
+        QString temp= QString::number((unsigned int)m_layers->at(i)->getType());
         m_ui->listWidget->addItem(QString::fromStdString(m_layers->at(i)->getName())+" - "+temp);
     }
 

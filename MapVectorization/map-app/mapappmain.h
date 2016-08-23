@@ -60,6 +60,8 @@ private slots:
 
     void on_SaveAsVector_triggered();
 
+	void on_LoadVector_triggered();
+
 private:
     Ui::mapAppMainClass       m_ui;
     int                       m_idCounter;  // Если ведется работа с несколькими проектами

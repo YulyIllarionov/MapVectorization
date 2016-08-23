@@ -207,7 +207,7 @@ namespace utils {
                             }
                         }
                         //Объединение двух найденных частей линии 
-                        WLine* line = new WLine(lines[0]);
+                        auto line = std::make_shared<WLine> (lines[0]);
                         for (int i = 1; i < lines.size(); i++)
                         {
                             line->Concat(lines[i]);
@@ -321,7 +321,7 @@ namespace utils {
             polygon.push_back(nm_boxes[i].br());
             polygon.push_back(nm_boxes[i].tl() + cv::Point(0, nm_boxes[i].height));
 
-			WText* item = new WText(polygon);
+			auto item = std::make_shared<WText>(polygon);
             item->SetState(false);
 			textContainer.push_back(item);
 

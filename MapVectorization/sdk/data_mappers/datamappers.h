@@ -8,43 +8,43 @@ SDK_BEGIN_NAMESPACE
 class WRasterDataMapper
 {
 public:
-	//static std::shared_ptr<WRaster> Read(size_t);
+	static std::shared_ptr<WRaster> Read(tinyxml2::XMLDocument* doc);
 	static void Write(std::shared_ptr<WRaster> item, tinyxml2::XMLDocument* doc);
 };
 
 class WLayerDataMapper
 {
 public:
-	//static std::shared_ptr<WLayer> Read(size_t);
+	static WLayer Read(tinyxml2::XMLElement* node);
 	static void Write(WLayer* item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node);
 };
 
 class WRangeDataMapper
 {
 public:
-	//static std::shared_ptr<w_range> Read(size_t);
+	static w_range Read(tinyxml2::XMLElement* node);
 	static void Write(w_range* item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node);
 };
 
 class CVPointDataMapper
 {
 public:
-	//static std::shared_ptr<WLine> Read(size_t);
+	static cv::Point Read(tinyxml2::XMLElement* node);
 	static void Write(cv::Point* item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node);
 };
 
 class WLineDataMapper
 {
 public:
-	//static std::shared_ptr<WLine> Read(size_t);
-	static void Write(WLine* item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node);
+	static std::shared_ptr<WLine> Read(tinyxml2::XMLElement* node);
+	static void Write(std::shared_ptr<WLine> item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node);
 };
 
 class WTextDataMapper
 {
 public:
-	//static std::shared_ptr<WLine> Read(size_t);
-	static void Write(WText* item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node);
+	static std::shared_ptr<WText> Read(tinyxml2::XMLElement* node);
+	static void Write(std::shared_ptr<WText> item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node);
 };
 
 

@@ -95,6 +95,12 @@ w_color w_range::getHigh()
     return w_color(this->high);
 }
 // ------------------------------------------------------------
+void w_range::setData(cv::Vec3b m_low, cv::Vec3b m_high)
+{
+	low = m_low;
+	high = m_high;
+}
+// ------------------------------------------------------------
 void WLayer::DrawCircle(SMapPoint point, uint radius, uchar color)
 {
     circle(m_data, point.ToPoint(), radius, color, -1);
@@ -241,6 +247,21 @@ WLayer* WRaster::AddLayer(const GroupID& groupId)
     m_layers.push_back(layer);
 
     return &m_layers.back();
+}
+// ------------------------------------------------------------
+void WRaster::AddLayer(WLayer layer)
+{
+	layer.m_data = cv::Mat::zeros(m_raster.size(), CV_8UC1);
+	m_layers.push_back(layer);
+	for (int y = 0; y < m_raster.rows; y++)
+    {
+        for (int x = 0; x < m_raster.cols; x++)
+        {
+            const Vec4b currentColorOld = m_raster.at<Vec4b>(y, x);
+            const Vec3b currentColor(currentColorOld[0], currentColorOld[1], currentColorOld[2]);
+            layer.m_data.at<uchar>(y, x) = layer.colorContains(currentColor) ? 1 : 0;
+        }
+    }
 }
 // ------------------------------------------------------------
 SDKResult WRaster::RemoveLayer(const LayerUUID& layerId)
@@ -509,7 +530,7 @@ std::vector<int> WRaster::DefineObjectsNearPoint(const LayerUUID& layerId, SMapP
     const size_t containerSize = layer->VectorContainerElementsNumber();
     for (size_t i = 0; i < containerSize; i++)
     {
-        WVectorObject* currentObject = layer->GetVectorElement(i);
+        auto currentObject = layer->GetVectorElement(i);
         if (currentObject != NULL)
         {
             double currentDistance = currentObject->DistanceTo(pointCV);
@@ -535,7 +556,7 @@ std::vector<int> WRaster::DefineObjectsInsidePolygon(const LayerUUID& layerId, c
     const size_t containerSize = layer->VectorContainerElementsNumber();
     for (size_t i = 0; i <= containerSize; i++)
     {
-        WVectorObject* currentObject = layer->GetVectorElement(i);
+        auto currentObject = layer->GetVectorElement(i);
         if (currentObject != NULL)
             if (mapPoints.Contains(*currentObject))
                 ids.push_back(i);
@@ -586,7 +607,7 @@ SDKResult WRaster::PasteObjectsToLayer(const LayerUUID& layerId, std::vector<std
         case WLayer::LT_TEXT:
         {
             cv::RotatedRect lineRect = cv::minAreaRect(objectPoints);
-            vectorObjects.push_back(new WText(WPolygon(lineRect, layer->m_data.size()).m_points));//TODO 
+            vectorObjects.push_back(std::make_shared<WText> (WPolygon(lineRect, layer->m_data.size()).m_points));//TODO 
 
             break;
         }
@@ -621,7 +642,7 @@ std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& 
         for (size_t i = 0; i < idxs.size(); i++)
         {
             //Вырезание с растрового слоя 
-            WLine* line = dynamic_cast<WLine*>(layer->GetVectorElement(idxs[i]));
+            auto line = std::dynamic_pointer_cast<WLine>(layer->GetVectorElement(idxs[i]));
             if (line != NULL)
                 regions.push_back(line->CutFromLayer(layer));
         }
@@ -632,7 +653,7 @@ std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& 
         for (size_t i = 0; i < idxs.size(); i++)
         {
             //Вырезание с растрового слоя 
-            WText* text = dynamic_cast<WText*>(layer->GetVectorElement(idxs[i]));
+            auto text = std::dynamic_pointer_cast<WText>(layer->GetVectorElement(idxs[i]));
             if (text != NULL)
                 regions.push_back(text->CutFromLayer(layer));
         }
@@ -1045,7 +1066,7 @@ SDKResult WLayer::RecognizeText(std::vector<int> idxs, const float minConfidence
     {
         if (idxs[i] < m_objects.size())
         {
-            WText* text = dynamic_cast<WText*>(m_objects[idxs[i]]);
+			auto text = std::dynamic_pointer_cast<WText>(m_objects[idxs[i]]);
             cv::Mat rotatedTextImg;
             text->RotateToHorizon(this, rotatedTextImg);
 
@@ -1070,19 +1091,19 @@ SDKResult WLayer::RecognizeText(std::vector<int> idxs, const float minConfidence
     }
 }
 // ------------------------------------------------------------
-void WLayer::AddVectorElement(WVectorObject* element)
+void WLayer::AddVectorElement(std::shared_ptr<WVectorObject> element)
 {
     m_objects.push_back(element);
 }
 // ------------------------------------------------------------
-WVectorObject* WLayer::GetObject(uint i)
+std::shared_ptr<WVectorObject> WLayer::GetObject(uint i)
 {
 	if(i < m_objects.size())
 		return m_objects[i];
 	return nullptr;
 }
 // ------------------------------------------------------------
-WVectorObject* WLayer::GetVectorElement(size_t idx)
+std::shared_ptr<WVectorObject> WLayer::GetVectorElement(size_t idx)
 {
     if (idx < m_objects.size())
         return m_objects[idx];
@@ -1093,7 +1114,6 @@ void WLayer::RemoveVectorElement(size_t idx)
 {
     if (idx < m_objects.size())
     {
-        delete m_objects[idx];
         m_objects.erase(m_objects.begin() + idx);
     }
 }
