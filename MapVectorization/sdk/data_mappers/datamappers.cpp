@@ -165,7 +165,7 @@ WLayer WLayerDataMapper::Read(tinyxml2::XMLElement* node)
 
 	uint type;
 	tinyxml2::XMLError m_error = node->QueryUnsignedAttribute("LAYER_TYPE", &type);
-	result.addType(type);
+	result.setType(type);
 
 	tinyxml2::XMLElement* range_node = node->FirstChildElement("range");
 	w_range range = WRangeDataMapper::Read(range_node);	
