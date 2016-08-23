@@ -40,6 +40,8 @@ private slots:
 
     void on_MoveButton_clicked();
 
+	void EditVectorObjectField(QListWidgetItem*);
+
 private:
     void clearCollectionList();
 private:

@@ -21,6 +21,7 @@ ClassificWidget::ClassificWidget(std::shared_ptr<WRaster> image, ImageViewer *wi
     if (!m_layers.isEmpty()) m_ui->listWidget->setCurrentRow(0);
     QObject::connect(m_widget->GetPixItem(), SIGNAL(sendCoordAndType(int, int, int)), this, SLOT(GetCoordAndType(int, int, int)));
     m_states = click_selection;
+	QObject::connect(m_ui->listWidget_2, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(EditVectorObjectField(QListWidgetItem*)));
 
 }
 void ClassificWidget::closeEvent(QCloseEvent *event)
@@ -298,4 +299,9 @@ void ClassificWidget::on_MoveButton_clicked()
     UpdateCollectionList();
 
 
+}
+void ClassificWidget::EditVectorObjectField(QListWidgetItem*)
+{
+	// ёлий, тебе сюда
+	UpdateCollectionList();
 }
