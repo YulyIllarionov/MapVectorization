@@ -826,25 +826,26 @@ double WLine::GetWidth()
 	return m_width;
 }
 // ------------------------------------------------------------
-void WText::RotateToHorizon(WLayer* layer, cv::Mat& image)
+double WText::RotateToHorizon(WLayer* layer, cv::Mat& img2Recognition)
 {
     if (layer->getType() != WLayer::LAYER_TYPE_ENUM::LT_TEXT)
-        return;
+        return 0.0;
 
     //Копирование полигона на отдельное изображение 
     Rect roi = cv::boundingRect(m_points);
-    Mat img2Recognition(roi.size(), CV_8UC1, Scalar(0));
-    for (int y = roi.y; y < roi.y + roi.height; y++)
+    roi.width = std::min((layer->m_data.cols - roi.x), roi.width);
+    roi.height = std::min((layer->m_data.rows - roi.y), roi.height);
+    img2Recognition = cv::Mat(roi.size(), CV_8UC1, Scalar(0));
+    for (int y = 0; y < img2Recognition.rows; y++)
     {
-        for (int x = roi.x; x < roi.x + roi.width; x++)
+        for (int x = 0; x < img2Recognition.cols; x++)
         {
-            Point current(x, y);
-            img2Recognition.at<uchar>(y - roi.y, x - roi.x) = layer->m_data.at<uchar>(current);
+            img2Recognition.at<uchar>(y, x) = layer->m_data.at<uchar>(cv::Point(x,y) + roi.tl());
         }
     }
     //Нахождение угла поворота
     std::vector<cv::Vec4i> textLines;
-    cv::HoughLinesP(img2Recognition, textLines, 1, CV_PI / 180, 80, img2Recognition.cols / 4, img2Recognition.cols / 10);
+    cv::HoughLinesP(img2Recognition, textLines, 1, CV_PI / 180, 40, img2Recognition.cols / 4, img2Recognition.cols / 8);
     std::vector<double> lineAngles(textLines.size());
     for (size_t i = 0; i < textLines.size(); i++)
     {
@@ -852,18 +853,25 @@ void WText::RotateToHorizon(WLayer* layer, cv::Mat& image)
     }
     std::sort(lineAngles.begin(), lineAngles.end());
     double angle = 0.0;
-    if (!lineAngles.empty())//(std::abs(lineAngles.back() - lineAngles.front()) < (std::M_PI_2))
-        angle = lineAngles[lineAngles.size() / 2] * 180 / 3.141592; //TODO заменить на пи
+    if (!lineAngles.empty())//(std::abs(lineAngles.back() - lineAngles.front()) < (CV_PI/2))
+        angle = lineAngles[lineAngles.size() / 2] * 180 / CV_PI; //TODO заменить на пи
+
+    //Скелетизация изображения
+    SDK_NAMESPACE::WSkeletonizer::Instance().Skeletonize(img2Recognition.clone(), img2Recognition); 
 
     //Поворот
-    //cv::Point2f center(img2Recognition.cols / 2.0, img2Recognition.rows / 2.0);
-    //cv::Mat rot = cv::getRotationMatrix2D(center, angle, 1.0);
-    //cv::Rect bbox = cv::RotatedRect(center, img2Recognition.size(), angle).boundingRect();
-    //rot.at<double>(0, 2) += bbox.width / 2.0 - center.x;
-    //rot.at<double>(1, 2) += bbox.height / 2.0 - center.y;
-    //cv::warpAffine(img2Recognition, image, rot, bbox.size());
-    image = img2Recognition;
-
+    cv::Point2f center(img2Recognition.cols / 2.0, img2Recognition.rows / 2.0);
+    cv::Mat rot = cv::getRotationMatrix2D(center, angle, 1.0);
+    cv::Rect bbox = cv::RotatedRect(center, img2Recognition.size(), angle).boundingRect();
+    rot.at<double>(0, 2) += bbox.width / 2.0 - center.x;
+    rot.at<double>(1, 2) += bbox.height / 2.0 - center.y;
+    cv::warpAffine(img2Recognition, img2Recognition, rot, bbox.size());
+    //namedWindow("before", CV_WINDOW_KEEPRATIO);
+    //namedWindow("after", CV_WINDOW_KEEPRATIO);
+    //imshow("before", image);
+    //imshow("after", img2Recognition);
+    //waitKey();
+    return angle;
 }
 // ------------------------------------------------------------
 std::vector<Wregion> WText::CutFromLayer(WLayer* layer)
@@ -1060,7 +1068,7 @@ SDKResult WLayer::RecognizeText(std::vector<int> idxs, const float minConfidence
         {
 			auto text = std::dynamic_pointer_cast<WText>(m_objects[idxs[i]]);
             cv::Mat rotatedTextImg;
-            text->RotateToHorizon(this, rotatedTextImg);
+            text->setAngle(text->RotateToHorizon(this, rotatedTextImg));
 
             std::string output;
             std::vector<cv::Rect>   boxes;

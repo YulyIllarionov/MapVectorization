@@ -149,13 +149,13 @@ public:
 	//Копирование полигона с текстом на cv::Mat и поворот до горизонтального положения
     //Угол находится при помощи преобразования Хафа для линий
     //Используется при распознавании текста
-    void RotateToHorizon(WLayer* layer, cv::Mat& image);
+    double RotateToHorizon(WLayer* layer, cv::Mat& image);
     //Вырезать с растрового слоя
     virtual std::vector<Wregion> CutFromLayer(WLayer* layer);
 
 private:
 	std::string m_text;     //Содержащийся текст
-	float		m_angle;	//Угол наклона на изображении
+	float		m_angle;	//Угол наклона относительно горизонтали на изображении
 	bool        m_state;    //Флаг состояний: 0 - текст локализован, 1 - текст распознан
 };
 
