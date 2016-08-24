@@ -6,6 +6,7 @@
 #include "stdafx.h"
 #include <fstream>  
 #include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc.hpp"
 #include "opencv2/text.hpp"
 
 #include "util/utils.h"
@@ -1030,24 +1031,25 @@ SDKResult WRaster::SplitLines(const LayerUUID& layerId, const LayerUUID& linesLa
     WLayer* othersLayer = GetLayerById(othersLayerID);
     //othersLayer->m_data = Mat(layer->m_data.size(), layer->m_data.type(), 0);
 
-    Mat temp = layer->m_data.clone();
-    for (int y = 1; y < temp.rows - 1; y++)
+    linesLayer->m_data = layer->m_data.clone();
+    othersLayer->m_data = cv::Mat(layer->m_data.size(), CV_8UC1, Scalar(0));
+
+    //Скопировано из utils.cpp TODO 
+    WObjectContainer text = SDK_NAMESPACE::utils::FindTextOnMat(layer->m_data);
+
+    for (size_t i = 0; i < text.size(); i++)
     {
-        for (int x = 1; x < temp.cols - 1; x++)
+        Rect roi = boundingRect(text[i]->m_points);
+        for (int y = roi.y; y < roi.y + roi.height; y++)
         {
-            if (temp.at<uchar>(y, x)>0)
+            for (int x = roi.x; x < roi.x + roi.width; x++)
             {
-                Wregion region(Point(x, y), temp);
-                if (region.Square() > 4)
-                {
-                    if (region.IsLine())
-                        region.drawOn(linesLayer->m_data, 255);
-                    else
-                        region.drawOn(othersLayer->m_data, 255);
-                }
+                othersLayer->m_data.at<uchar>(y, x) = linesLayer->m_data.at<uchar>(y, x);
+                linesLayer->m_data.at<uchar>(y, x) = 0;
             }
         }
     }
+
 
     return kSDKResult_Succeeded;
 }
