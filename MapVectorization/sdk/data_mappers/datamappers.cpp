@@ -231,7 +231,7 @@ cv::Mat WMaskDataMapper::Read(tinyxml2::XMLElement* node)
 	while (point_node != nullptr)
 	{
 		cv::Point tmp = CVPointDataMapper::Read(point_node);
-		result.at<uchar>(tmp) = 1;
+		result.at<uchar>(tmp) = 255;
 		point_node = point_node->NextSiblingElement("point");
 	}
 

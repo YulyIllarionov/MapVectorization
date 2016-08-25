@@ -283,8 +283,8 @@ namespace utils {
 		er_filter1->run(tmp, regions);
 		er_filter2->run(tmp, regions);
 		
-		std::vector<std::vector<cv::Point>> points;
-		detectRegions(tmp, er_filter1, er_filter2, points);	
+		//std::vector<std::vector<cv::Point>> points;
+		//detectRegions(tmp, er_filter1, er_filter2, points);	
 	
 		cv::Mat out_img_decomposition= cv::Mat::zeros(tmp.rows + 2, tmp.cols + 2, CV_8UC1);
 		for (int i=0; i<(int)regions.size(); i++)
@@ -297,11 +297,17 @@ namespace utils {
 		
 		// Detect character groups
 		std::vector<cv::Rect> nm_boxes;
-		if (points.size() == 0)
+		std::vector<std::vector<cv::Vec2i>> nm_region_groups;
+		std::vector<std::vector<cv::text::ERStat>> nm_regions;
+		nm_regions.push_back(regions);
+		std::vector<cv::Mat> nm_channels;
+		nm_channels.push_back(tmp);
+
+		if (regions.size() != 0)
 		{
 			cv::Mat tmp_rgb;
 			cv::cvtColor(tmp, tmp_rgb, cv::COLOR_GRAY2RGB);
-			cv::text::erGrouping(tmp_rgb, tmp, points, nm_boxes, cv::text::ERGROUPING_ORIENTATION_HORIZ);
+			cv::text::erGrouping(tmp_rgb, nm_channels, nm_regions, nm_region_groups, nm_boxes, cv::text::ERGROUPING_ORIENTATION_HORIZ);
 
 			for (int i = 0; i < nm_boxes.size(); i++) 
 			{
