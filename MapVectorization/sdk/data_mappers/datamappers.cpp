@@ -31,15 +31,12 @@ void WLayerDataMapper::Write(WLayer* item, tinyxml2::XMLDocument* doc, tinyxml2:
 	layer_node->SetAttribute("GroupID", item->getGroupId().c_str());
 	WRangeDataMapper::Write(&item->getRange(), doc, layer_node);
 
-	if (item->getType() != 3)
-	{
-		tinyxml2::XMLElement* layer_mask_node = doc->NewElement("layer_mask");
-		layer_mask_node->SetAttribute("cols", item->m_data.cols);
-		layer_mask_node->SetAttribute("rows", item->m_data.rows);
-		WMaskDataMapper::Write(item->m_data, doc, layer_mask_node);
-		layer_node->InsertEndChild(layer_mask_node);
-	}
-
+	tinyxml2::XMLElement* layer_mask_node = doc->NewElement("layer_mask");
+	layer_mask_node->SetAttribute("cols", item->m_data.cols);
+	layer_mask_node->SetAttribute("rows", item->m_data.rows);
+	WMaskDataMapper::Write(item->m_data, doc, layer_mask_node);
+	layer_node->InsertEndChild(layer_mask_node);
+	
 	tinyxml2::XMLElement* vector_object_container_node = doc->NewElement("vector_object_container");
 	layer_node->InsertEndChild(vector_object_container_node);
 	uint size = item->getContainerSize();
@@ -193,13 +190,10 @@ WLayer WLayerDataMapper::Read(tinyxml2::XMLElement* node)
 	w_range range = WRangeDataMapper::Read(range_node);	
 	result.setRange(range);
 
-	if (type != 3)
-	{
-		tinyxml2::XMLElement* layer_mask_node = node->FirstChildElement("layer_mask");
-		cv::Mat mask = WMaskDataMapper::Read(layer_mask_node);
-		result.m_data = mask;
-	}
-
+	tinyxml2::XMLElement* layer_mask_node = node->FirstChildElement("layer_mask");
+	cv::Mat mask = WMaskDataMapper::Read(layer_mask_node);
+	result.m_data = mask;
+	
 	tinyxml2::XMLElement* vector_object_container_node = node->FirstChildElement("vector_object_container");
 	if (type == WLayer::LAYER_TYPE_ENUM::LT_LINES)
 	{

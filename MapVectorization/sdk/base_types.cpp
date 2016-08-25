@@ -251,8 +251,6 @@ WLayer* WRaster::AddLayer(const GroupID& groupId)
 // ------------------------------------------------------------
 void WRaster::AddLayer(WLayer layer)
 {
-	if (layer.getType() == 3)
-		layer.m_data = 1 - cv::Mat::zeros(m_raster.size(), CV_8UC1);
 	m_layers.push_back(layer);
 }
 // ------------------------------------------------------------
