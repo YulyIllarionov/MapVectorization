@@ -1038,9 +1038,11 @@ SDKResult WRaster::SplitLines(const LayerUUID& layerId, const LayerUUID& linesLa
     for (size_t i = 0; i < text.size(); i++)
     {
         Rect roi = boundingRect(text[i]->m_points);
-        for (int y = roi.y; y < (roi.y + roi.height - 1); y++)
+        roi.width = std::min(layer->m_data.cols - roi.x, roi.width);
+        roi.height = std::min(layer->m_data.rows - roi.y, roi.height);
+        for (int y = roi.y; y < (roi.y + roi.height); y++)
         {
-            for (int x = roi.x; x < (roi.x + roi.width - 1); x++)
+            for (int x = roi.x; x < (roi.x + roi.width); x++)
             {
                 othersLayer->m_data.at<uchar>(y, x) = linesLayer->m_data.at<uchar>(y, x);
                 linesLayer->m_data.at<uchar>(y, x) = 0;
