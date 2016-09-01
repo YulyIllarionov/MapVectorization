@@ -828,12 +828,16 @@ double WLine::GetWidth()
 double WText::RotateToHorizon(WLayer* layer, cv::Mat& img2Recognition)
 {
     if (layer->getType() != WLayer::LAYER_TYPE_ENUM::LT_TEXT)
-        return 0.0;
+        return 361.0;
 
     //Копирование полигона на отдельное изображение 
     Rect roi = cv::boundingRect(m_points);
     roi.width = std::min((layer->m_data.cols - roi.x), roi.width);
     roi.height = std::min((layer->m_data.rows - roi.y), roi.height);
+	
+	if ((roi.x < 0) || (roi.y < 0) || (roi.x >= layer->m_data.cols) || (roi.y >= layer->m_data.rows))
+		return 361.0;
+
     img2Recognition = cv::Mat(roi.size(), CV_8UC1, Scalar(0));
     for (int y = 0; y < img2Recognition.rows; y++)
     {
@@ -1070,7 +1074,11 @@ SDKResult WLayer::RecognizeText(std::vector<int> idxs, const float minConfidence
         {
 			auto text = std::dynamic_pointer_cast<WText>(m_objects[idxs[i]]);
             cv::Mat rotatedTextImg;
-            text->setAngle(text->RotateToHorizon(this, rotatedTextImg));
+			float angle = text->RotateToHorizon(this, rotatedTextImg);
+
+			if (angle > 360)
+				continue;
+            text->setAngle(angle);
 
             std::string output;
             std::vector<cv::Rect>   boxes;
