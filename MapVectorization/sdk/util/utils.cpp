@@ -126,30 +126,69 @@ namespace utils {
     {
         std::vector<cv::Point> neighbors;
         uchar color = image.at<uchar>(point);
-        point.y--;
-        if (image.at<uchar>(point) == color)
-                neighbors.push_back(point);
-        point.x++;
-        if (image.at<uchar>(point) == color)
-            neighbors.push_back(point);
+
+		point.y--;
+		if (point.y >= 0)
+		{
+			if (image.at<uchar>(point) == color)
+					neighbors.push_back(point);
+			point.x++;
+
+			if (point.x < image.cols)
+			{
+				if (image.at<uchar>(point) == color)
+					neighbors.push_back(point);
+			}
+		}
+		else 
+			point.x++;
+
         point.y++;
-        if (image.at<uchar>(point) == color)
-            neighbors.push_back(point);
-        point.y++;
-        if (image.at<uchar>(point) == color)
-            neighbors.push_back(point);
+		if (point.x < image.cols)
+		{
+			if (image.at<uchar>(point) == color)
+				neighbors.push_back(point);
+			point.y++;
+
+			if (point.y < image.rows)
+			{
+				if (image.at<uchar>(point) == color)
+					neighbors.push_back(point);
+			}
+		}
+		else
+			point.y++;
+
         point.x--;
-        if (image.at<uchar>(point) == color)
-            neighbors.push_back(point);
-        point.x--;
-        if (image.at<uchar>(point) == color)
-            neighbors.push_back(point);
-        point.y--;
-        if (image.at<uchar>(point) == color)
-            neighbors.push_back(point);
-        point.y--;
-        if (image.at<uchar>(point) == color)
-            neighbors.push_back(point);
+		if (point.y < image.rows)
+		{
+			if (image.at<uchar>(point) == color)
+				neighbors.push_back(point);
+			point.x--;
+
+			if (point.x >= 0)
+			{
+				if (image.at<uchar>(point) == color)
+					neighbors.push_back(point);
+			}
+		}
+
+		else
+			point.x--;
+
+		point.y--;
+		if (point.x >= 0)
+		{
+			if (image.at<uchar>(point) == color)
+				neighbors.push_back(point);
+			point.y--;
+
+			if (point.y >= 0)
+			{
+				if (image.at<uchar>(point) == color)
+					neighbors.push_back(point);
+			}
+		}
 
         return neighbors;
     }
@@ -174,9 +213,9 @@ namespace utils {
         //Скелетизация изображения
         SDK_NAMESPACE::WSkeletonizer::Instance().Skeletonize(img, skeleton);
         //cv::imwrite("skeleton.png", skeleton);
-        for (int y = 1; y < skeleton.rows - 1; y++)
+        for (int y = 0; y < skeleton.rows; y++)
         {
-            for (int x = 1; x < skeleton.cols - 1; x++)
+            for (int x = 0; x < skeleton.cols; x++)
             {
                 cv::Point initial(x, y);
                 //Поиск ненулевой точки на изображении
