@@ -32,6 +32,7 @@
     <addaction name="OpenImage"/>
     <addaction name="SaveAsVector"/>
     <addaction name="LoadVector"/>
+    <addaction name="ExportSVG"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
@@ -135,6 +136,11 @@
   <action name="LoadVector">
    <property name="text">
     <string>Загрузить проект</string>
+   </property>
+  </action>
+  <action name="ExportSVG">
+   <property name="text">
+    <string>Экспорт в SVG</string>
    </property>
   </action>
  </widget>

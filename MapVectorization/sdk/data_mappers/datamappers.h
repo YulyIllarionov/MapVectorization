@@ -10,6 +10,7 @@ class WRasterDataMapper
 public:
 	static std::shared_ptr<WRaster> Read(tinyxml2::XMLDocument* doc);
 	static void Write(std::shared_ptr<WRaster> item, tinyxml2::XMLDocument* doc);
+	static void WriteSVG(std::shared_ptr<WRaster> item, tinyxml2::XMLDocument* doc);
 };
 
 class WLayerDataMapper
@@ -17,6 +18,7 @@ class WLayerDataMapper
 public:
 	static WLayer Read(tinyxml2::XMLElement* node);
 	static void Write(WLayer* item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node);
+	static void WriteSVG(WLayer* item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node);
 };
 
 class WRangeDataMapper
@@ -38,6 +40,7 @@ class WLineDataMapper
 public:
 	static std::shared_ptr<WLine> Read(tinyxml2::XMLElement* node);
 	static void Write(std::shared_ptr<WLine> item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node);
+	static void WriteSVG(std::shared_ptr<WLine> item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node);
 };
 
 class WTextDataMapper
@@ -45,6 +48,7 @@ class WTextDataMapper
 public:
 	static std::shared_ptr<WText> Read(tinyxml2::XMLElement* node);
 	static void Write(std::shared_ptr<WText> item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node);
+	static void WriteSVG(std::shared_ptr<WText> item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node);
 };
 
 class WMaskDataMapper

@@ -96,6 +96,12 @@ void mapAppMain::on_SaveAsVector_triggered()
 	int ret = SaveProject(str.toStdString(), m_image);
 }
 
+void mapAppMain::on_ExportSVG_triggered()
+{
+	QString str = QFileDialog::getSaveFileName(0, "Save file", "", "SVG Files (*.svg) ;; *.*");
+	int ret = SaveSVG(str.toStdString(), m_image);
+}
+
 void mapAppMain::on_LoadVector_triggered()
 {
 	QString str = QFileDialog::getOpenFileName(0, "Open file", "", "Vector Files (*.xml) ;; *.*");

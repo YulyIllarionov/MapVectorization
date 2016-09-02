@@ -319,4 +319,88 @@ std::shared_ptr<WText> WTextDataMapper::Read(tinyxml2::XMLElement* node)
 	return result;
 }
 
+// ---------------------------------------------------------------------------------------
+
+void WRasterDataMapper::WriteSVG(std::shared_ptr<WRaster> item, tinyxml2::XMLDocument* doc)
+{
+	tinyxml2::XMLElement* raster_node = doc->NewElement("svg");	
+	raster_node->SetAttribute("version", 1.1);
+	raster_node->SetAttribute("width", item->m_raster.cols);
+	raster_node->SetAttribute("height", item->m_raster.rows);
+	raster_node->SetAttribute("baseProfile", "full");
+	raster_node->SetAttribute("xmlns", "http://www.w3.org/2000/svg");
+	raster_node->SetAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+	raster_node->SetAttribute("xmlns:ev", "http://www.w3.org/2001/xml-events");
+	doc->InsertEndChild(raster_node);
+	
+	uint size = item->GetLayersCount();
+	for (uint i = 0; i < size; i++)
+	{
+		WLayerDataMapper::WriteSVG(item->GetLayerByContainerPosition(i), doc, raster_node);
+	}
+}
+
+void WLayerDataMapper::WriteSVG(WLayer* item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node)
+{
+	uint size = item->getContainerSize();
+	if (item->getType() == WLayer::LAYER_TYPE_ENUM::LT_LINES)
+	{
+		for (uint i = 0; i < size; i++)
+		{
+			auto line_item = std::dynamic_pointer_cast<WLine>(item->GetObject(i));
+			WLineDataMapper::WriteSVG(line_item, doc, node);
+			
+		}
+	}
+
+	else if (item->getType() == WLayer::LAYER_TYPE_ENUM::LT_TEXT)
+	{
+		for (uint i = 0; i < size; i++)
+		{
+			auto text_item = std::dynamic_pointer_cast<WText>(item->GetObject(i));
+			WTextDataMapper::WriteSVG(text_item, doc, node);
+		}	
+	}
+
+	else
+		return;
+}
+
+void WLineDataMapper::WriteSVG(std::shared_ptr<WLine> item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node)
+{
+	tinyxml2::XMLElement* line_node = doc->NewElement("polyline");
+	line_node->SetAttribute("stroke-width", item->GetWidth());
+	line_node->SetAttribute("stroke", "rgb(0,0,0)");
+	line_node->SetAttribute("fill", "rgb(255,255,255)");
+
+	std::string points("");
+	uint size = item->Length();
+	for (uint i = 0; i < size; i++)
+	{
+		auto current = item->GetItem(i);
+		std::string x = std::to_string(current->x);
+		std::string y = std::to_string(current->y);
+		std::string tmp = x + "," + y;
+		points += tmp;
+		points += " ";
+	}
+	line_node->SetAttribute("points", points.c_str());
+	node->InsertEndChild(line_node);
+}
+
+void WTextDataMapper::WriteSVG(std::shared_ptr<WText> item, tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* node)
+{
+	tinyxml2::XMLElement* text_node = doc->NewElement("text");
+	text_node->SetAttribute("x", item->GetPoint(3).GetX());
+	text_node->SetAttribute("y", item->GetPoint(3).GetY());
+	
+	std::string font_size = std::to_string(abs(item->GetPoint(0).GetY() - item->GetPoint(3).GetY()));
+	font_size += "px";
+	text_node->SetAttribute("font-size", font_size.c_str());
+
+	text_node->SetText(item->GetText().c_str());
+	
+	node->InsertEndChild(text_node);
+}
+
 SDK_END_NAMESPACE

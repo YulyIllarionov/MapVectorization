@@ -24,4 +24,16 @@ std::shared_ptr<WRaster> LoadProject(std::string &filename)
 	return result;
 }
 
+
+int SaveSVG(std::string& filename, std::shared_ptr<WRaster> item)
+{
+	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
+	tinyxml2::XMLDeclaration* declaration = doc->NewDeclaration();
+	//doc->InsertFirstChild(declaration);
+	WRasterDataMapper::WriteSVG(item, doc);
+	int result = doc->SaveFile(filename.c_str());
+	delete doc;
+	return result;
+}
+
 SDK_END_NAMESPACE
