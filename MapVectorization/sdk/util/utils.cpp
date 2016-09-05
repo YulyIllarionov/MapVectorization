@@ -297,6 +297,11 @@ namespace utils {
 		{
 			cv::approxPolyDP(cv::Mat(contours.at(i)), contours_poly.at(i), 3, true);
 			cv::Rect appRect(boundingRect(cv::Mat(contours_poly.at(i))));
+			appRect.x -= appRect.width/10;
+			appRect.y -= appRect.height/10;
+			appRect.width += appRect.width/5;
+			appRect.height += appRect.height/5;
+			FitSize(appRect, img.size());
 			boundRect.push_back(appRect);		
 		}
 
@@ -393,5 +398,12 @@ namespace utils {
         }
         return square / ((roi.height + 1) * (roi.width + 1));
     }
+	void FitSize(cv::Rect& rect, cv::Size size)
+	{
+		rect.x = std::max(0, rect.x);
+		rect.y = std::max(0, rect.y);
+		rect.width = std::min(size.width, rect.width);
+		rect.height = std::min(size.height, rect.height);
+	}
 }
 SDK_END_NAMESPACE

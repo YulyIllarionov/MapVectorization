@@ -860,7 +860,7 @@ double WText::RotateToHorizon(WLayer* layer, cv::Mat& img2Recognition)
         angle = lineAngles[lineAngles.size() / 2] * 180 / CV_PI; //TODO заменить на пи
 
     //Скелетизация изображения
-    SDK_NAMESPACE::WSkeletonizer::Instance().Skeletonize(img2Recognition.clone(), img2Recognition); 
+    //SDK_NAMESPACE::WSkeletonizer::Instance().Skeletonize(img2Recognition.clone(), img2Recognition); 
 
     //Поворот
     cv::Point2f center(img2Recognition.cols / 2.0, img2Recognition.rows / 2.0);

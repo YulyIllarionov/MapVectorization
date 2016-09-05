@@ -51,6 +51,8 @@ namespace utils
   void  ErDraw(const cv::Mat &src, cv::Mat &dst, cv::Rect region);
   //
   double SquareFilling(const cv::Mat &image, cv::Point center, int radius);
+  //
+  void FitSize(cv::Rect& rect, cv::Size size);
 }
 
 SDK_END_NAMESPACE
