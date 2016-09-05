@@ -394,11 +394,14 @@ void WTextDataMapper::WriteSVG(std::shared_ptr<WText> item, tinyxml2::XMLDocumen
 	text_node->SetAttribute("x", item->GetPoint(3).GetX());
 	text_node->SetAttribute("y", item->GetPoint(3).GetY());
 	
-	std::string font_size = std::to_string(abs(item->GetPoint(0).GetY() - item->GetPoint(3).GetY()));
+	std::string font_size = std::to_string(abs(item->GetPoint(0).GetY() - item->GetPoint(3).GetY()) * 
+		std::cos(item->GetAngle() * CV_PI/180));
 	font_size += "px";
 	text_node->SetAttribute("font-size", font_size.c_str());
-
-	text_node->SetText(item->GetText().c_str());
+	if(item->GetText().empty())
+		text_node->SetText("?");
+	else
+		text_node->SetText(item->GetText().c_str());
 	
 	node->InsertEndChild(text_node);
 }
