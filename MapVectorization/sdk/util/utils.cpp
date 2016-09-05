@@ -402,8 +402,8 @@ namespace utils {
 	{
 		rect.x = std::max(0, rect.x);
 		rect.y = std::max(0, rect.y);
-		rect.width = std::min(size.width, rect.width);
-		rect.height = std::min(size.height, rect.height);
+		rect.width = std::min(size.width - rect.x, rect.width);
+		rect.height = std::min(size.height - rect.y, rect.height);
 	}
 }
 SDK_END_NAMESPACE

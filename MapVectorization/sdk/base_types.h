@@ -98,6 +98,7 @@ class WLine : public WVectorObject
 {
 public:
 
+	WLine(){};
 	WLine(const WPointsContainer& points)
 	{
 		m_points = points;
@@ -434,10 +435,14 @@ class Wregion
 {
 public:
     Wregion() {};
+	//
+	Wregion(WPointsContainer Points) {points = Points;}
     //ѕоиск св€зной области по точке
 	Wregion(const cv::Point& point, cv::Mat& img);
     //ѕоиск св€зной области по точке с границами поиска заданными полигоном
     Wregion(const cv::Point& point, cv::Mat& img, WPolygon edges);
+	//ѕоиск св€зной области по точке с границами поиска заданными кругом
+	Wregion::Wregion(const cv::Point& point, cv::Mat& img, double radius);
     //¬озвращает описанный пр€моугольник, параллельный горизонту
 	cv::Rect boundingRectangle();
     //ѕлощадь св€зной области

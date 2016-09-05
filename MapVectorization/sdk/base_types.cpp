@@ -561,54 +561,58 @@ SDKResult WRaster::PasteObjectsToLayer(const LayerUUID& layerId, std::vector<std
     WLayer* layer = GetLayerById(layerId);
     if (!layer->IsSingleType())
         return kSDKResult_Error;
+	//Объединение всех связных областей текущего объекта в один вектор
+	std::vector<Point> objectPoints;
     for (size_t i = 0; i < rasterObjects.size(); i++)
-    {
-        //Объединение всех связных областей текущего объекта в один вектор
-        std::vector<Point> objectPoints;
+    {        
         for (size_t j = 0; j < rasterObjects[i].size(); j++)
         {
             std::vector<Point> currentPoints = rasterObjects[i][j].GetPoints();
             objectPoints.insert(objectPoints.end(), currentPoints.begin(), currentPoints.end());
         }
-        //Вставка растровых объектов на слой
+	}
+    //Вставка растровых объектов на слой
+    for (size_t j = 0; j < objectPoints.size(); j++)
+    {
+        layer->m_data.at<uchar>(objectPoints[j]) = 255;
+    }
+    //Получение векторных объектов для имеющихся растровых
+    WObjectContainer vectorObjects;
+    switch (layer->getType())
+    {
+    case WLayer::LT_LINES:
+    {
+        Rect roi = boundingRect(objectPoints);
+		
+        Mat linesImg(roi.size(), CV_8UC1, Scalar(0));
         for (size_t j = 0; j < objectPoints.size(); j++)
         {
-            layer->m_data.at<uchar>(objectPoints[j]) = 255;
+            linesImg.at<uchar>(objectPoints[j] - roi.tl()) = 255;
         }
-        //Получение векторных объектов для имеющихся растровых
-        WObjectContainer vectorObjects;
-        switch (layer->getType())
-        {
-        case WLayer::LT_LINES:
-        {
-            Rect roi = boundingRect(objectPoints);
-            Mat linesImg(roi.size(), CV_8UC1, Scalar(0));
-            for (size_t j = 0; j < objectPoints.size(); j++)
-            {
-                linesImg.at<uchar>(objectPoints[j] - roi.tl()) = 255;
-            }
-            //imwrite("textToLines.png", linesImg);
-            vectorObjects = SDK_NAMESPACE::utils::FindLinesOnMat(linesImg);
-            for (size_t j = 0; j < vectorObjects.size(); j++)
-                for (size_t k = 0; k < vectorObjects[j]->m_points.size(); k++)
-                    vectorObjects[j]->m_points[k] += roi.tl();
+        //imwrite("textToLines.png", linesImg);
+        vectorObjects = SDK_NAMESPACE::utils::FindLinesOnMat(linesImg);
+        for (size_t j = 0; j < vectorObjects.size(); j++)
+            for (size_t k = 0; k < vectorObjects[j]->m_points.size(); k++)
+                vectorObjects[j]->m_points[k] += roi.tl();
 
-            break;
-        }
-        case WLayer::LT_TEXT:
-        {
-            cv::RotatedRect lineRect = cv::minAreaRect(objectPoints);
-            vectorObjects.push_back(std::make_shared<WText> (WPolygon(lineRect, layer->m_data.size()).m_points));//TODO 
-
-            break;
-        }
-        default:
-            break;
-        }
-        //Костыль
-        for (size_t i = 0; i < vectorObjects.size(); i++)
-            layer->AddVectorElement(vectorObjects[i]);
+        break;
     }
+    case WLayer::LT_TEXT:
+    {
+		if (!objectPoints.empty())
+		{
+			cv::RotatedRect lineRect = cv::minAreaRect(objectPoints);
+			vectorObjects.push_back(std::make_shared<WText> (WPolygon(lineRect, layer->m_data.size()).m_points));//TODO 
+		}
+        break;
+    }
+    default:
+        break;
+    }
+    //Костыль
+    for (size_t i = 0; i < vectorObjects.size(); i++)
+        layer->AddVectorElement(vectorObjects[i]);
+
     //Распознавание текста 
     if (layer->getType() == WLayer::LT_TEXT)
     {
@@ -633,7 +637,7 @@ std::vector<std::vector<Wregion>> WRaster::CutObjectsFromLayer(const LayerUUID& 
         for (size_t i = 0; i < idxs.size(); i++)
         {
             //Вырезание с растрового слоя 
-            auto line = std::dynamic_pointer_cast<WLine>(layer->GetVectorElement(idxs[i]));
+            std::shared_ptr<WLine> line = std::dynamic_pointer_cast<WLine>(layer->GetVectorElement(idxs[i]));
             if (line != NULL)
                 regions.push_back(line->CutFromLayer(layer));
         }
@@ -769,7 +773,7 @@ std::vector<Wregion> WLine::CutFromLayer(WLayer* layer)
     if (layer->getType() != WLayer::LAYER_TYPE_ENUM::LT_LINES)
         return std::vector<Wregion>();
 
-    if (this->Length() <= 1)
+    if (this->Length() == 0)
         return std::vector<Wregion>();
 
     Wregion line;
@@ -780,18 +784,23 @@ std::vector<Wregion> WLine::CutFromLayer(WLayer* layer)
     cv::Point2f point2;
     std::vector<Point> borderPoints;
 
-    cv::circle(layer->m_data, m_points[0], m_width * 0.7, 0, 2);
-    cv::circle(layer->m_data, m_points.back(), m_width * 0.7, 0, 2);
+    //cv::circle(layer->m_data, m_points[0], m_width * 0.7, 0, 2);
+    //cv::circle(layer->m_data, m_points.back(), m_width * 0.7, 0, 2);
 
     //cv::namedWindow("lineCut", CV_WINDOW_KEEPRATIO);
     //cv::imshow("lineCut", layer->m_data);
     //cv::waitKey();
 
+    line.Concat(Wregion(m_points.front(), layer->m_data, m_width * 0.8));
+	if (m_points.size() > 1)
+		line.Concat(Wregion(m_points.back(), layer->m_data, m_width * 0.8));
+		
     if (m_points.size() == 2)
-        m_points.insert(m_points.begin() + 1, 
-            MathUtils::Wvector(m_points.front(), m_points.back()).Middle());
-    Wregion(m_points.front(), layer->m_data);
-    Wregion(m_points.back(), layer->m_data);
+	{
+		m_points.insert(m_points.begin() + 1,
+			MathUtils::Wvector(m_points.front(), m_points.back()).Middle());
+	}
+
     for (size_t i = 1; i < m_points.size() - 1; i++)
     {
         line.Concat(Wregion(m_points[i], layer->m_data));
@@ -808,6 +817,7 @@ void WLine::FindWidth(const cv::Mat& image)
     if (m_points.empty())
         return;
 
+	m_width = 1;
     std::vector<int> widths(m_points.size());
     for (size_t i = 0; i < widths.size(); i++)
     {
@@ -963,6 +973,48 @@ Wregion::Wregion(const cv::Point& point, cv::Mat& img, WPolygon edges)
             continue;
         //Пропуск граничных точек полигона
         if (!edges.Contains(currentPoint))
+            continue;
+        points.push_back(currentPoint); //Добавить точку к результату
+
+        img.at<uchar>(currentPoint) = 0; // Закрасить на изображении
+
+        for (int k = currentPoint.x - 1; k <= currentPoint.x + 1; k++)
+        {
+            for (int l = currentPoint.y - 1; l <= currentPoint.y + 1; l++)
+            {
+                //if ((l == point.y) && (k == point.x))
+                //  continue;
+
+                if (img.at<uchar>(l, k) != 0)
+                {
+                    stack.push(Point(k, l));
+                    img.at<uchar>(l, k) = 0; // Закрасить на изображении
+                }
+            }
+        }
+    }
+}
+// ------------------------------------------------------------
+Wregion::Wregion(const cv::Point& point, cv::Mat& img, double radius)
+{
+    if (img.at<uchar>(point) == 0)
+        return;
+
+
+    cv::Point currentPoint;
+    std::stack <cv::Point> stack;
+
+    stack.push(point);
+
+    while (!stack.empty())
+    {
+        currentPoint = stack.top();
+        stack.pop(); // Удалить точку из стека
+        //Пропуск граничных точек изображения
+        if (SDK_NAMESPACE::utils::isEdgePoint(currentPoint, img))
+            continue;
+        //Пропуск граничных точек полигона
+        if (SDK_NAMESPACE::utils::squaredDistanceBetween(point, currentPoint) > (radius * radius))
             continue;
         points.push_back(currentPoint); //Добавить точку к результату
 
